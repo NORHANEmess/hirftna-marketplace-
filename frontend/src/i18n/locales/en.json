@@ -1,0 +1,545 @@
+{
+  "lang": {
+    "ar": "العربية",
+    "en": "English",
+    "fr": "Français"
+  },
+
+  "nav": {
+    "home": "Home",
+    "browse": "Browse",
+    "wishlist": "Wishlist",
+    "orders": "Orders",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "login": "Login",
+    "register": "Sign Up",
+    "logout": "Sign Out",
+    "dashboard": "Dashboard",
+    "myProducts": "My Products",
+    "myShop": "My Shop"
+  },
+
+  "home": {
+    "hero": {
+      "badge": "✦ Authentic Algerian Handcraft",
+      "title": "Every piece tells a story",
+      "subtitle": "Commission custom work from local artisans",
+      "cta": "Explore Crafts"
+    },
+    "whatIsHirftna": {
+      "title": "What is Hirftna?",
+      "readStory": "Read our wonderful and unique story",
+      "pillar1Title": "A community with positive impact",
+      "pillar1Body": "Hirftna is an Algerian online marketplace where people come together to make, sell, buy and discover unique handmade items. We are a community that aims to bring positive change to small businesses, individuals and local culture.",
+      "pillar1Link": "Discover the artisans behind Hirftna →",
+      "pillar2Title": "Support for independent creators",
+      "pillar2Body": "At Hirftna, we have no warehouse — we have artisans across Algeria who sell what they make. We facilitate this process by helping you connect directly with creators and discover extraordinary handmade and custom pieces.",
+      "pillar3Title": "Peace of mind, guaranteed",
+      "pillar3Body": "We place the highest importance on authenticity and quality. Every seller is reviewed and every product can be commissioned to your exact specifications. If you ever need help, we are always here.",
+      "ctaQuestion": "You have a question? Great, we have answers.",
+      "ctaButton": "Explore the marketplace"
+    },
+    "featured": {
+      "eyebrow": "FEATURED",
+      "title": "Handpicked for You",
+      "seeAll": "See all",
+      "tabs": {
+        "all": "All",
+        "newest": "New Arrivals",
+        "bestseller": "Best Sellers",
+        "rating": "Top Rated"
+      }
+    },
+    "sellers": {
+      "eyebrow": "MEET THE MAKERS",
+      "title": "Top Artisans",
+      "subtitle": "Get to know the talented craftspeople behind your favorite products.",
+      "discoverAll": "Discover All Artisans",
+      "products": "Products",
+      "rating": "Rating"
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1Title": "Browse",
+      "step1Desc": "Explore handcrafted products",
+      "step2Title": "Request",
+      "step2Desc": "Send your custom order details",
+      "step3Title": "Receive",
+      "step3Desc": "Get your unique handmade piece"
+    },
+    "sellerCta": {
+      "question": "Are you an artisan?",
+      "title": "Sell your crafts to thousands of buyers",
+      "button": "Create your shop"
+    }
+  },
+
+  "browse": {
+    "title": "Browse Products",
+    "searchPlaceholder": "Search for a product or artisan...",
+    "filter": "Filter",
+    "sortBy": "Sort By",
+    "category": "Category",
+    "priceRange": "Price Range",
+    "allCategories": "All Categories",
+    "clearAll": "Clear all",
+    "found": "{{count}} products found",
+    "loadMore": "Load More",
+    "noResults": "No products found",
+    "noResultsFiltered": "Try different filters or clear the current one",
+    "sort": {
+      "newest": "Newest",
+      "price_asc": "Price: Low → High",
+      "price_desc": "Price: High → Low",
+      "rating": "Top Rated"
+    }
+  },
+
+  "product": {
+    "handmade": "✋ Handmade",
+    "priceRange": "Price Range",
+    "completion": "Estimated completion: {{days}} days",
+    "requestOrder": "Request Custom Order",
+    "requestOrderSub": "Your request goes directly to the artisan for review",
+    "unavailable": "Unavailable",
+    "priceOnRequest": "Price on request",
+    "from": "From {{price}} DA",
+    "tabs": {
+      "details": "Details",
+      "reviews": "Reviews",
+      "seller": "About the Artisan"
+    },
+    "reviews": {
+      "empty": "No reviews yet",
+      "emptySub": "Be the first to order and review this product",
+      "count": "({{count}})"
+    },
+    "seller": {
+      "viewProfile": "View Full Profile"
+    },
+    "trust": {
+      "quality": "Quality Guaranteed",
+      "custom": "Custom Made",
+      "timeline": "{{days}} days to complete",
+      "flexTimeline": "Flexible timeline",
+      "delivery": "Flexible Delivery"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "products": "Products"
+    },
+    "notFound": "Product not found",
+    "errorLoad": "Could not load this product",
+    "backToBrowse": "← Back to Browse"
+  },
+
+  "seller": {
+    "verified": "Verified",
+    "products": "Products",
+    "rating": "Rating",
+    "tabs": {
+      "products": "Products",
+      "story": "Artisan Story",
+      "reviews": "Reviews"
+    },
+    "story": {
+      "empty": "This artisan hasn't shared their story yet",
+      "certified": "Certified artisan on Hirftna"
+    },
+    "reviews": {
+      "empty": "No reviews yet",
+      "count": "{{count}} reviews",
+      "summary": "Average Rating"
+    },
+    "products_empty": "No products available right now",
+    "notFound": "Artisan not found",
+    "errorLoad": "Could not load this artisan's page"
+  },
+
+  "order": {
+    "title": "My Orders",
+    "total": "{{count}} orders",
+    "customOrder": "Custom order",
+    "placedOn": "Placed on {{date}}",
+    "status": {
+      "pending": "Pending Review",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "completed": "Completed"
+    },
+    "tabs": {
+      "all": "All",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+    "empty": "No orders yet",
+    "emptySub": "Browse products and place your first custom order",
+    "emptyFiltered": "No orders with this status",
+    "emptyFilteredSub": "Try a different filter",
+    "startBrowsing": "Start Browsing",
+    "details": {
+      "description": "Order Description",
+      "budget": "Client Budget",
+      "deadline": "Requested Deadline",
+      "delivery": "Delivery Method",
+      "payment": "Payment Method",
+      "phone": "Client Phone",
+      "address": "Delivery Address",
+      "refImages": "Reference Images",
+      "rejection": "Rejection Reason"
+    },
+    "delivery": {
+      "hand_to_hand": "Hand to Hand",
+      "office_pickup": "Office Pickup",
+      "fast": "Fast Delivery"
+    },
+    "payment": {
+      "cash_on_delivery": "Cash on Delivery",
+      "card": "Card Payment"
+    },
+    "actions": {
+      "accept": "Accept Order",
+      "reject": "Reject",
+      "confirmReject": "Confirm Rejection",
+      "cancel": "Cancel",
+      "rejectionReason": "Reason for Rejection",
+      "rejectionPlaceholder": "Explain why you cannot fulfil this order...",
+      "accepting": "Accepting...",
+      "rejecting": "Rejecting..."
+    }
+  },
+
+  "sellerOrders": {
+    "title": "Orders",
+    "incoming": "Incoming",
+    "purchases": "My Purchases",
+    "pendingAlert": "{{count}} order(s) need your review",
+    "incomingEmpty": "No incoming orders yet",
+    "incomingEmptySub": "Share your shop link to start receiving orders",
+    "purchasesEmpty": "You haven't placed any orders yet",
+    "purchasesEmptySub": "You can also buy from other artisans"
+  },
+
+  "customOrder": {
+    "title": "Custom Order Request",
+    "for": "For: {{name}}",
+    "steps": {
+      "details": "Details",
+      "delivery": "Delivery",
+      "contact": "Contact"
+    },
+    "step1": {
+      "title": "Tell the artisan what you want",
+      "subtitle": "Be as specific as possible — colors, size, material",
+      "descLabel": "What do you want?",
+      "descPlaceholder": "e.g. I'd like a hand-painted ceramic vase, 30cm tall, in turquoise with Berber geometric patterns...",
+      "budgetLabel": "Budget Range",
+      "budgetHint": "optional",
+      "budgetMin": "Min",
+      "budgetMax": "Max",
+      "deadlineLabel": "Deadline",
+      "deadlineHint": "optional — must be a future date",
+      "imagesLabel": "Reference Images",
+      "imagesHint": "optional",
+      "imagesLimit": "Up to 3 reference images"
+    },
+    "step2": {
+      "title": "How do you want to receive it?",
+      "subtitle": "Choose your delivery and payment preferences",
+      "deliveryLabel": "Delivery Method",
+      "paymentLabel": "Payment Method",
+      "delivery": {
+        "hand_to_hand": "Hand to Hand",
+        "hand_to_hand_desc": "Direct delivery from artisan",
+        "office_pickup": "Office Pickup",
+        "office_pickup_desc": "Pick up at our partner office",
+        "fast": "Fast Delivery",
+        "fast_desc": "Express shipping to your door"
+      },
+      "payment": {
+        "cash_on_delivery": "Cash on Delivery",
+        "cash_on_delivery_desc": "Pay when you receive",
+        "card": "Card Payment",
+        "card_desc": "Pay online securely"
+      }
+    },
+    "step3": {
+      "title": "Your contact details",
+      "subtitle": "The artisan needs this to reach you",
+      "nameLabel": "Full Name",
+      "namePlaceholder": "Your full name",
+      "phoneLabel": "Phone Number",
+      "phoneHint": "+213 format",
+      "phonePlaceholder": "+213 555 123 456",
+      "addressLabel": "Delivery Address",
+      "addressHint": "full address, min 10 characters",
+      "addressPlaceholder": "Street, city, wilaya..."
+    },
+    "next": "Next",
+    "back": "Back",
+    "submit": "Send Order Request",
+    "submitting": "Sending...",
+    "success": {
+      "title": "Order Sent!",
+      "subtitle": "Your custom order has been sent to the artisan. They will review it and get back to you soon.",
+      "viewOrders": "View My Orders",
+      "continueBrowsing": "Continue Browsing"
+    }
+  },
+
+  "wishlist": {
+    "title": "Saved Products",
+    "count_one": "item saved",
+    "count_other": "items saved",
+    "empty": "Nothing saved yet",
+    "emptySub": "Tap the heart icon on any product to save it here",
+    "discover": "Discover Products",
+    "remove": "Remove from wishlist",
+    "save": "Save to wishlist"
+  },
+
+  "notifications": {
+    "title": "Notifications",
+    "count_one": "notification",
+    "count_other": "notifications",
+    "markAllRead": "Mark all read",
+    "marking": "Marking...",
+    "sectionNew": "New — {{count}}",
+    "sectionEarlier": "Earlier",
+    "empty": "All caught up!",
+    "emptySub": "You'll see order updates and alerts here",
+    "types": {
+      "new_order": "New Order",
+      "order_received": "New Order",
+      "order_accepted": "Order Accepted",
+      "order_rejected": "Order Rejected",
+      "order_completed": "Order Complete",
+      "message": "Message",
+      "system": "Notification"
+    }
+  },
+
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to continue",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "example@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "submit": "Sign In",
+      "submitting": "Signing in...",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create a new account",
+      "errors": {
+        "emailRequired": "Email address is required",
+        "emailInvalid": "Invalid email format",
+        "passwordRequired": "Password is required"
+      }
+    },
+    "register": {
+      "title": "Create a new account",
+      "subtitle": "Join the Hirftna community",
+      "nameLabel": "Full Name",
+      "namePlaceholder": "e.g. Amina Bouzid",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "example@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "At least 8 characters",
+      "confirmLabel": "Confirm Password",
+      "confirmPlaceholder": "Repeat your password",
+      "roleClient": "Client",
+      "roleClientSub": "I buy and order",
+      "roleSeller": "Artisan",
+      "roleSellerSub": "I sell my crafts",
+      "hintClient": "✦ You will be able to browse products and place custom orders from artisans",
+      "hintSeller": "✦ You will be able to create your shop and add your handmade products right after signing up",
+      "terms": "By registering, you agree to",
+      "termsLink": "Terms of Service",
+      "and": "and",
+      "privacyLink": "Privacy Policy",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign In",
+      "submitClient": "Create Client Account",
+      "submitSeller": "Create Artisan Account",
+      "submitting": "Creating account...",
+      "strength": {
+        "veryWeak": "Very weak",
+        "weak": "Weak",
+        "medium": "Medium",
+        "strong": "Strong"
+      },
+      "errors": {
+        "nameRequired": "Full name is required",
+        "emailRequired": "Email address is required",
+        "emailInvalid": "Invalid email format",
+        "passwordRequired": "Password is required",
+        "passwordShort": "Password must be at least 8 characters",
+        "confirmRequired": "Please confirm your password",
+        "confirmMismatch": "Passwords do not match"
+      }
+    }
+  },
+
+  "profile": {
+    "title": "My Profile",
+    "email": "Email Address",
+    "nameLabel": "Full Name",
+    "phoneLabel": "Phone Number",
+    "phoneHint": "Optional — for order contact",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Profile saved",
+    "changePhoto": "Tap the camera icon to change your photo",
+    "myOrders": "My Orders",
+    "myOrdersSub": "View and track your custom orders",
+    "savedProducts": "Saved Products",
+    "savedProductsSub": "Your wishlist",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "updatePassword": "Update Password",
+    "updating": "Updating...",
+    "passwordChanged": "Password changed",
+    "logout": "Sign Out",
+    "loggingOut": "Signing out..."
+  },
+
+  "sellerProfile": {
+    "title": "Shop Settings",
+    "subtitle": "Manage your artisan profile",
+    "tabs": {
+      "shop": "Shop",
+      "story": "Story",
+      "account": "Account"
+    },
+    "shopName": "Shop Name",
+    "bio": "Short Bio",
+    "bioHint": "Shown under your shop name",
+    "category": "Main Category",
+    "city": "City / Wilaya",
+    "cityPlaceholder": "e.g. Tizi Ouzou",
+    "avatar": "Shop Avatar",
+    "avatarSub": "Tap the camera icon to change your photo",
+    "storyTitle": "Your Artisan Story",
+    "storyHint": "{{count}} characters",
+    "storyExplain": "✦ This appears on your public profile page under \"Story of the Seller\". Tell buyers who you are, how you started, and what makes your craft unique.",    "storyPreview": "Preview",
+    "accountInfo": "Account Information",
+    "role": "Role",
+    "roleSeller": "Artisan / Seller",
+    "verification": "Verification",
+    "verified": "Verified",
+    "pendingVerification": "Pending verification",
+    "password": "Password",
+    "changePassword": "Change",
+    "dangerZone": "Danger Zone",
+    "deactivate": "Deactivate Shop",
+    "deactivateSub": "Hides your shop and products from buyers",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Profile saved successfully"
+  },
+
+  "sellerDashboard": {
+    "welcome": "Welcome back,",
+    "pendingAlert": "{{count}} order(s) awaiting your review",
+    "stats": {
+      "sales": "Completed Sales",
+      "revenue": "Total Revenue",
+      "views": "Product Views",
+      "rating": "Average Rating"
+    },
+    "quickActions": "Quick Actions",
+    "addProduct": "Add New Product",
+    "addProductSub": "List a new handmade item",
+    "viewOrders": "View All Orders",
+    "viewOrdersSub": "Manage incoming custom orders",
+    "editProfile": "Edit Shop Profile",
+    "editProfileSub": "Update story, avatar and info",
+    "recentOrders": "Recent Orders",
+    "seeAll": "See all",
+    "noOrders": "No orders yet",
+    "noOrdersSub": "Share your shop link to start receiving orders",
+    "viewShop": "View",
+    "yourShop": "Your public shop"
+  },
+
+  "sellerProducts": {
+    "title": "My Products",
+    "totalActive": "{{total}} products · {{active}} active",
+    "add": "Add Product",
+    "empty": "No products yet",
+    "emptySub": "Add your first handmade product to start selling",
+    "addFirst": "Add Your First Product",
+    "form": {
+      "addTitle": "Add New Product",
+      "editTitle": "Edit Product",
+      "nameLabel": "Product Name",
+      "namePlaceholder": "e.g. Hand-woven Berber Rug",
+      "descLabel": "Description",
+      "descPlaceholder": "Describe your product, materials, dimensions...",
+      "pricingLabel": "Pricing (DA)",
+      "basePrice": "Base Price",
+      "minPrice": "Min Range",
+      "maxPrice": "Max Range",
+      "categoryLabel": "Category",
+      "completionLabel": "Completion Time (days)",
+      "imagesLabel": "Product Images",
+      "visibleLabel": "Visible to buyers",
+      "visibleSub": "Toggle to show or hide this product",
+      "save": "Save Changes",
+      "add": "Add Product",
+      "saving": "Saving...",
+      "selectCategory": "Select..."
+    },
+    "delete": {
+      "title": "Delete Product?",
+      "body": "\"{{name}}\" will be permanently removed.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "status": {
+      "active": "Active",
+      "hidden": "Hidden"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "hide": "Hide product",
+      "show": "Show product"
+    }
+  },
+
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong. Please try again.",
+    "retry": "Retry",
+    "back": "Back",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "close": "Close",
+    "or": "or",
+    "and": "and",
+    "yes": "Yes",
+    "no": "No",
+    "search": "Search",
+    "notFound": "Page not found",
+    "goHome": "Go Home",
+    "currency": "DA",
+    "verified": "Verified",
+    "days": "days",
+    "day": "day",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago",
+    "logoTagline": "Algerian Handcraft Marketplace"
+  }
+}
