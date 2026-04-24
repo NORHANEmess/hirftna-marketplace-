@@ -1,0 +1,546 @@
+{
+  "lang": {
+    "ar": "العربية",
+    "en": "English",
+    "fr": "Français"
+  },
+
+  "nav": {
+    "home": "Accueil",
+    "browse": "Parcourir",
+    "wishlist": "Favoris",
+    "orders": "Commandes",
+    "notifications": "Notifications",
+    "profile": "Profil",
+    "login": "Connexion",
+    "register": "Inscription",
+    "logout": "Déconnexion",
+    "dashboard": "Tableau de bord",
+    "myProducts": "Mes produits",
+    "myShop": "Ma boutique"
+  },
+
+  "home": {
+    "hero": {
+      "badge": "✦ Artisanat algérien authentique",
+      "title": "Chaque pièce raconte une histoire",
+      "subtitle": "Commandez des créations personnalisées auprès d'artisans locaux",
+      "cta": "Explorer les artisanats"
+    },
+    "whatIsHirftna": {
+      "title": "Qu'est-ce que Hirftna ?",
+      "readStory": "Lisez notre belle et unique histoire",
+      "pillar1Title": "Une communauté à impact positif",
+      "pillar1Body": "Hirftna est une place de marché en ligne algérienne où les gens se retrouvent pour fabriquer, vendre, acheter et découvrir des articles artisanaux uniques. Nous sommes une communauté qui vise à apporter des changements positifs aux petites entreprises, aux individus et à la culture locale.",
+      "pillar1Link": "Découvrez les artisans derrière Hirftna →",
+      "pillar2Title": "Soutien aux créateurs indépendants",
+      "pillar2Body": "Chez Hirftna, nous n'avons pas d'entrepôt — nous avons des artisans à travers l'Algérie qui vendent ce qu'ils fabriquent. Nous facilitons ce processus en vous aidant à vous connecter directement avec les créateurs et à découvrir des pièces artisanales et personnalisées extraordinaires.",
+      "pillar3Title": "La tranquillité d'esprit, garantie",
+      "pillar3Body": "Nous accordons la plus haute importance à l'authenticité et à la qualité. Chaque vendeur est vérifié et chaque produit peut être commandé selon vos spécifications exactes. Si jamais vous avez besoin d'aide, nous sommes toujours là.",
+      "ctaQuestion": "Vous avez une question ? Parfait, nous avons des réponses.",
+      "ctaButton": "Explorer le marché"
+    },
+    "featured": {
+      "eyebrow": "EN VEDETTE",
+      "title": "Sélectionnés pour vous",
+      "seeAll": "Voir tout",
+      "tabs": {
+        "all": "Tout",
+        "newest": "Nouveautés",
+        "bestseller": "Meilleures ventes",
+        "rating": "Mieux notés"
+      }
+    },
+    "sellers": {
+      "eyebrow": "RENCONTREZ LES CRÉATEURS",
+      "title": "Meilleurs artisans",
+      "subtitle": "Découvrez les artisans talentueux derrière vos produits préférés.",
+      "discoverAll": "Découvrir tous les artisans",
+      "products": "Produits",
+      "rating": "Note"
+    },
+    "howItWorks": {
+      "title": "Comment ça marche ?",
+      "step1Title": "Parcourez",
+      "step1Desc": "Explorez les produits artisanaux",
+      "step2Title": "Commandez",
+      "step2Desc": "Envoyez les détails de votre commande personnalisée",
+      "step3Title": "Recevez",
+      "step3Desc": "Obtenez votre pièce unique et artisanale"
+    },
+    "sellerCta": {
+      "question": "Êtes-vous artisan ?",
+      "title": "Vendez vos créations à des milliers d'acheteurs",
+      "button": "Créez votre boutique"
+    }
+  },
+
+  "browse": {
+    "title": "Parcourir les produits",
+    "searchPlaceholder": "Rechercher un produit ou un artisan...",
+    "filter": "Filtrer",
+    "sortBy": "Trier par",
+    "category": "Catégorie",
+    "priceRange": "Fourchette de prix",
+    "allCategories": "Toutes les catégories",
+    "clearAll": "Tout effacer",
+    "found": "{{count}} produits trouvés",
+    "loadMore": "Charger plus",
+    "noResults": "Aucun produit trouvé",
+    "noResultsFiltered": "Essayez des filtres différents ou effacez le filtre actuel",
+    "sort": {
+      "newest": "Plus récents",
+      "price_asc": "Prix : croissant",
+      "price_desc": "Prix : décroissant",
+      "rating": "Mieux notés"
+    }
+  },
+
+  "product": {
+    "handmade": "✋ Fait main",
+    "priceRange": "Fourchette de prix",
+    "completion": "Délai estimé : {{days}} jours",
+    "requestOrder": "Demander une commande personnalisée",
+    "requestOrderSub": "Votre demande va directement à l'artisan pour examen",
+    "unavailable": "Indisponible",
+    "priceOnRequest": "Prix sur demande",
+    "from": "À partir de {{price}} DA",
+    "tabs": {
+      "details": "Détails",
+      "reviews": "Avis",
+      "seller": "À propos de l'artisan"
+    },
+    "reviews": {
+      "empty": "Aucun avis pour l'instant",
+      "emptySub": "Soyez le premier à commander et à évaluer ce produit",
+      "count": "({{count}})"
+    },
+    "seller": {
+      "viewProfile": "Voir le profil complet"
+    },
+    "trust": {
+      "quality": "Qualité garantie",
+      "custom": "Fait sur mesure",
+      "timeline": "{{days}} jours pour réaliser",
+      "flexTimeline": "Délai flexible",
+      "delivery": "Livraison flexible"
+    },
+    "breadcrumb": {
+      "home": "Accueil",
+      "products": "Produits"
+    },
+    "notFound": "Produit introuvable",
+    "errorLoad": "Impossible de charger ce produit",
+    "backToBrowse": "← Retour à la navigation"
+  },
+
+  "seller": {
+    "verified": "Vérifié",
+    "products": "Produits",
+    "rating": "Note",
+    "tabs": {
+      "products": "Produits",
+      "story": "Histoire de l'artisan",
+      "reviews": "Avis"
+    },
+    "story": {
+      "empty": "Cet artisan n'a pas encore partagé son histoire",
+      "certified": "Artisan certifié sur Hirftna"
+    },
+    "reviews": {
+      "empty": "Aucun avis pour l'instant",
+      "count": "{{count}} avis",
+      "summary": "Note moyenne"
+    },
+    "products_empty": "Aucun produit disponible pour le moment",
+    "notFound": "Artisan introuvable",
+    "errorLoad": "Impossible de charger la page de cet artisan"
+  },
+
+  "order": {
+    "title": "Mes commandes",
+    "total": "{{count}} commandes",
+    "customOrder": "Commande personnalisée",
+    "placedOn": "Passée le {{date}}",
+    "status": {
+      "pending": "En attente d'examen",
+      "accepted": "Acceptée",
+      "rejected": "Refusée",
+      "completed": "Terminée"
+    },
+    "tabs": {
+      "all": "Tout",
+      "pending": "En attente",
+      "accepted": "Acceptée",
+      "completed": "Terminée",
+      "rejected": "Refusée"
+    },
+    "empty": "Aucune commande pour l'instant",
+    "emptySub": "Parcourez les produits et passez votre première commande personnalisée",
+    "emptyFiltered": "Aucune commande avec ce statut",
+    "emptyFilteredSub": "Essayez un autre filtre",
+    "startBrowsing": "Commencer à parcourir",
+    "details": {
+      "description": "Description de la commande",
+      "budget": "Budget du client",
+      "deadline": "Délai demandé",
+      "delivery": "Mode de livraison",
+      "payment": "Mode de paiement",
+      "phone": "Téléphone du client",
+      "address": "Adresse de livraison",
+      "refImages": "Images de référence",
+      "rejection": "Motif de refus"
+    },
+    "delivery": {
+      "hand_to_hand": "De main en main",
+      "office_pickup": "Retrait en bureau",
+      "fast": "Livraison rapide"
+    },
+    "payment": {
+      "cash_on_delivery": "Paiement à la livraison",
+      "card": "Paiement par carte"
+    },
+    "actions": {
+      "accept": "Accepter la commande",
+      "reject": "Refuser",
+      "confirmReject": "Confirmer le refus",
+      "cancel": "Annuler",
+      "rejectionReason": "Motif de refus",
+      "rejectionPlaceholder": "Expliquez pourquoi vous ne pouvez pas réaliser cette commande...",
+      "accepting": "Acceptation en cours...",
+      "rejecting": "Refus en cours..."
+    }
+  },
+
+  "sellerOrders": {
+    "title": "Commandes",
+    "incoming": "Reçues",
+    "purchases": "Mes achats",
+    "pendingAlert": "{{count}} commande(s) en attente de votre examen",
+    "incomingEmpty": "Aucune commande reçue pour l'instant",
+    "incomingEmptySub": "Partagez le lien de votre boutique pour commencer à recevoir des commandes",
+    "purchasesEmpty": "Vous n'avez pas encore passé de commande",
+    "purchasesEmptySub": "Vous pouvez également acheter auprès d'autres artisans"
+  },
+
+  "customOrder": {
+    "title": "Demande de commande personnalisée",
+    "for": "Pour : {{name}}",
+    "steps": {
+      "details": "Détails",
+      "delivery": "Livraison",
+      "contact": "Contact"
+    },
+    "step1": {
+      "title": "Dites à l'artisan ce que vous voulez",
+      "subtitle": "Soyez aussi précis que possible — couleurs, taille, matière",
+      "descLabel": "Que voulez-vous ?",
+      "descPlaceholder": "Ex : Je souhaite un vase en céramique peint à la main, 30 cm de hauteur, en turquoise avec des motifs géométriques berbères...",
+      "budgetLabel": "Fourchette de budget",
+      "budgetHint": "facultatif",
+      "budgetMin": "Min",
+      "budgetMax": "Max",
+      "deadlineLabel": "Date limite",
+      "deadlineHint": "facultatif — doit être une date future",
+      "imagesLabel": "Images de référence",
+      "imagesHint": "facultatif",
+      "imagesLimit": "Jusqu'à 3 images de référence"
+    },
+    "step2": {
+      "title": "Comment souhaitez-vous recevoir votre commande ?",
+      "subtitle": "Choisissez vos préférences de livraison et de paiement",
+      "deliveryLabel": "Mode de livraison",
+      "paymentLabel": "Mode de paiement",
+      "delivery": {
+        "hand_to_hand": "De main en main",
+        "hand_to_hand_desc": "Livraison directe de l'artisan",
+        "office_pickup": "Retrait en bureau",
+        "office_pickup_desc": "Retrait dans notre bureau partenaire",
+        "fast": "Livraison rapide",
+        "fast_desc": "Expédition express à votre porte"
+      },
+      "payment": {
+        "cash_on_delivery": "Paiement à la livraison",
+        "cash_on_delivery_desc": "Payez à la réception",
+        "card": "Paiement par carte",
+        "card_desc": "Paiement en ligne sécurisé"
+      }
+    },
+    "step3": {
+      "title": "Vos coordonnées",
+      "subtitle": "L'artisan en a besoin pour vous contacter",
+      "nameLabel": "Nom complet",
+      "namePlaceholder": "Votre nom complet",
+      "phoneLabel": "Numéro de téléphone",
+      "phoneHint": "Format +213",
+      "phonePlaceholder": "+213 555 123 456",
+      "addressLabel": "Adresse de livraison",
+      "addressHint": "adresse complète, 10 caractères minimum",
+      "addressPlaceholder": "Rue, ville, wilaya..."
+    },
+    "next": "Suivant",
+    "back": "Retour",
+    "submit": "Envoyer la demande",
+    "submitting": "Envoi en cours...",
+    "success": {
+      "title": "Commande envoyée !",
+      "subtitle": "Votre commande personnalisée a été envoyée à l'artisan. Il la examinera et vous répondra bientôt.",
+      "viewOrders": "Voir mes commandes",
+      "continueBrowsing": "Continuer à parcourir"
+    }
+  },
+
+  "wishlist": {
+    "title": "Produits sauvegardés",
+    "count_one": "article sauvegardé",
+    "count_other": "articles sauvegardés",
+    "empty": "Rien de sauvegardé pour l'instant",
+    "emptySub": "Appuyez sur l'icône cœur sur n'importe quel produit pour le sauvegarder ici",
+    "discover": "Découvrir des produits",
+    "remove": "Retirer des favoris",
+    "save": "Sauvegarder dans les favoris"
+  },
+
+  "notifications": {
+    "title": "Notifications",
+    "count_one": "notification",
+    "count_other": "notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "marking": "Marquage en cours...",
+    "sectionNew": "Nouveau — {{count}}",
+    "sectionEarlier": "Précédentes",
+    "empty": "Vous êtes à jour !",
+    "emptySub": "Vous verrez ici les mises à jour de commandes et les alertes",
+    "types": {
+      "new_order": "Nouvelle commande",
+      "order_received": "Nouvelle commande",
+      "order_accepted": "Commande acceptée",
+      "order_rejected": "Commande refusée",
+      "order_completed": "Commande terminée",
+      "message": "Message",
+      "system": "Notification"
+    }
+  },
+
+  "auth": {
+    "login": {
+      "title": "Bon retour",
+      "subtitle": "Connectez-vous pour continuer",
+      "emailLabel": "Adresse e-mail",
+      "emailPlaceholder": "exemple@email.com",
+      "passwordLabel": "Mot de passe",
+      "passwordPlaceholder": "••••••••",
+      "submit": "Se connecter",
+      "submitting": "Connexion en cours...",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "createAccount": "Créer un nouveau compte",
+      "errors": {
+        "emailRequired": "L'adresse e-mail est requise",
+        "emailInvalid": "Format d'e-mail invalide",
+        "passwordRequired": "Le mot de passe est requis"
+      }
+    },
+    "register": {
+      "title": "Créer un nouveau compte",
+      "subtitle": "Rejoignez la communauté Hirftna",
+      "nameLabel": "Nom complet",
+      "namePlaceholder": "ex. Amina Bouzid",
+      "emailLabel": "Adresse e-mail",
+      "emailPlaceholder": "exemple@email.com",
+      "passwordLabel": "Mot de passe",
+      "passwordPlaceholder": "Au moins 8 caractères",
+      "confirmLabel": "Confirmer le mot de passe",
+      "confirmPlaceholder": "Répétez votre mot de passe",
+      "roleClient": "Client",
+      "roleClientSub": "J'achète et je commande",
+      "roleSeller": "Artisan",
+      "roleSellerSub": "Je vends mes créations",
+      "hintClient": "✦ Vous pourrez parcourir les produits et passer des commandes personnalisées auprès des artisans",
+      "hintSeller": "✦ Vous pourrez créer votre boutique et ajouter vos produits artisanaux dès votre inscription",
+      "terms": "En vous inscrivant, vous acceptez",
+      "termsLink": "les Conditions d'utilisation",
+      "and": "et",
+      "privacyLink": "la Politique de confidentialité",
+      "hasAccount": "Vous avez déjà un compte ?",
+      "signIn": "Se connecter",
+      "submitClient": "Créer un compte client",
+      "submitSeller": "Créer un compte artisan",
+      "submitting": "Création du compte...",
+      "strength": {
+        "veryWeak": "Très faible",
+        "weak": "Faible",
+        "medium": "Moyen",
+        "strong": "Fort"
+      },
+      "errors": {
+        "nameRequired": "Le nom complet est requis",
+        "emailRequired": "L'adresse e-mail est requise",
+        "emailInvalid": "Format d'e-mail invalide",
+        "passwordRequired": "Le mot de passe est requis",
+        "passwordShort": "Le mot de passe doit comporter au moins 8 caractères",
+        "confirmRequired": "Veuillez confirmer votre mot de passe",
+        "confirmMismatch": "Les mots de passe ne correspondent pas"
+      }
+    }
+  },
+
+  "profile": {
+    "title": "Mon profil",
+    "email": "Adresse e-mail",
+    "nameLabel": "Nom complet",
+    "phoneLabel": "Numéro de téléphone",
+    "phoneHint": "Facultatif — pour le contact de commande",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "saved": "Profil enregistré",
+    "changePhoto": "Appuyez sur l'icône appareil photo pour changer votre photo",
+    "myOrders": "Mes commandes",
+    "myOrdersSub": "Voir et suivre vos commandes personnalisées",
+    "savedProducts": "Produits sauvegardés",
+    "savedProductsSub": "Votre liste de favoris",
+    "changePassword": "Changer le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le nouveau mot de passe",
+    "updatePassword": "Mettre à jour le mot de passe",
+    "updating": "Mise à jour...",
+    "passwordChanged": "Mot de passe modifié",
+    "logout": "Se déconnecter",
+    "loggingOut": "Déconnexion..."
+  },
+
+  "sellerProfile": {
+    "title": "Paramètres de la boutique",
+    "subtitle": "Gérez votre profil d'artisan",
+    "tabs": {
+      "shop": "Boutique",
+      "story": "Histoire",
+      "account": "Compte"
+    },
+    "shopName": "Nom de la boutique",
+    "bio": "Courte biographie",
+    "bioHint": "Affichée sous le nom de votre boutique",
+    "category": "Catégorie principale",
+    "city": "Ville / Wilaya",
+    "cityPlaceholder": "ex. Tizi Ouzou",
+    "avatar": "Avatar de la boutique",
+    "avatarSub": "Appuyez sur l'icône appareil photo pour changer votre photo",
+    "storyTitle": "Votre histoire d'artisan",
+    "storyHint": "{{count}} caractères",
+    "storyExplain": "✦ Cela apparaît sur votre page publique sous « Histoire du vendeur ». Parlez aux acheteurs de vous, de vos débuts et de ce qui rend votre artisanat unique.",
+    "storyPreview": "Aperçu",
+    "accountInfo": "Informations du compte",
+    "role": "Rôle",
+    "roleSeller": "Artisan / Vendeur",
+    "verification": "Vérification",
+    "verified": "Vérifié",
+    "pendingVerification": "Vérification en attente",
+    "password": "Mot de passe",
+    "changePassword": "Modifier",
+    "dangerZone": "Zone de danger",
+    "deactivate": "Désactiver la boutique",
+    "deactivateSub": "Cache votre boutique et vos produits aux acheteurs",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "saved": "Profil enregistré avec succès"
+  },
+
+  "sellerDashboard": {
+    "welcome": "Bon retour,",
+    "pendingAlert": "{{count}} commande(s) en attente de votre examen",
+    "stats": {
+      "sales": "Ventes réalisées",
+      "revenue": "Revenu total",
+      "views": "Vues des produits",
+      "rating": "Note moyenne"
+    },
+    "quickActions": "Actions rapides",
+    "addProduct": "Ajouter un nouveau produit",
+    "addProductSub": "Référencer un nouvel article artisanal",
+    "viewOrders": "Voir toutes les commandes",
+    "viewOrdersSub": "Gérer les commandes personnalisées entrantes",
+    "editProfile": "Modifier le profil de la boutique",
+    "editProfileSub": "Mettre à jour l'histoire, l'avatar et les informations",
+    "recentOrders": "Commandes récentes",
+    "seeAll": "Voir tout",
+    "noOrders": "Aucune commande pour l'instant",
+    "noOrdersSub": "Partagez le lien de votre boutique pour commencer à recevoir des commandes",
+    "viewShop": "Voir",
+    "yourShop": "Votre boutique publique"
+  },
+
+  "sellerProducts": {
+    "title": "Mes produits",
+    "totalActive": "{{total}} produits · {{active}} actifs",
+    "add": "Ajouter un produit",
+    "empty": "Aucun produit pour l'instant",
+    "emptySub": "Ajoutez votre premier produit artisanal pour commencer à vendre",
+    "addFirst": "Ajouter votre premier produit",
+    "form": {
+      "addTitle": "Ajouter un nouveau produit",
+      "editTitle": "Modifier le produit",
+      "nameLabel": "Nom du produit",
+      "namePlaceholder": "ex. Tapis berbère tissé à la main",
+      "descLabel": "Description",
+      "descPlaceholder": "Décrivez votre produit, les matériaux, les dimensions...",
+      "pricingLabel": "Tarification (DA)",
+      "basePrice": "Prix de base",
+      "minPrice": "Min",
+      "maxPrice": "Max",
+      "categoryLabel": "Catégorie",
+      "completionLabel": "Délai de réalisation (jours)",
+      "imagesLabel": "Images du produit",
+      "visibleLabel": "Visible par les acheteurs",
+      "visibleSub": "Activez ou désactivez la visibilité de ce produit",
+      "save": "Enregistrer les modifications",
+      "add": "Ajouter le produit",
+      "saving": "Enregistrement...",
+      "selectCategory": "Sélectionner..."
+    },
+    "delete": {
+      "title": "Supprimer le produit ?",
+      "body": "« {{name}} » sera définitivement supprimé.",
+      "confirm": "Supprimer",
+      "cancel": "Annuler"
+    },
+    "status": {
+      "active": "Actif",
+      "hidden": "Masqué"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "hide": "Masquer le produit",
+      "show": "Afficher le produit"
+    }
+  },
+
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur inattendue s'est produite. Veuillez réessayer.",
+    "retry": "Réessayer",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "close": "Fermer",
+    "or": "ou",
+    "and": "et",
+    "yes": "Oui",
+    "no": "Non",
+    "search": "Rechercher",
+    "notFound": "Page introuvable",
+    "goHome": "Retour à l'accueil",
+    "currency": "DA",
+    "verified": "Vérifié",
+    "days": "jours",
+    "day": "jour",
+    "justNow": "À l'instant",
+    "minutesAgo": "il y a {{count}} min",
+    "hoursAgo": "il y a {{count}} h",
+    "daysAgo": "il y a {{count}} j",
+    "logoTagline": "Place de marché de l'artisanat algérien"
+  }
+}
