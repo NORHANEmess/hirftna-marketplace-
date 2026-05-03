@@ -45,14 +45,8 @@ const UUID_REGEX =
 const validateFile = (file) => {
   if (!file) throw new AppError('No file provided', 400);
 
-  if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-    throw new AppError(
-      'Invalid file type. Only JPEG, PNG, and WebP images are allowed.',
-      400
-    );
-  }
-
   const ext = path.extname(file.originalname || '').toLowerCase();
+
   if (!ALLOWED_EXTENSIONS.includes(ext)) {
     throw new AppError(
       'Invalid file extension. Only .jpg, .jpeg, .png, .webp allowed.',

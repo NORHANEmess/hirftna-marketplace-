@@ -4,23 +4,22 @@ const { supabasePublic, supabaseAdmin } = require('../config/supabase');
 const { sendError } = require('../utils/response');
 const logger = require('../utils/logger');
 
-const AUTH_TIMEOUT_MS = 6000;
-const AUTH_RETRY_COUNT = 1;
+const AUTH_TIMEOUT_MS   = 6000;
+const AUTH_RETRY_COUNT  = 1;
 const AUTH_RETRY_DELAY_MS = 250;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const isTransientAuthError = (error) => {
   const message = String(error?.message || '').toLowerCase();
-  const code = error?.code || error?.cause?.code || '';
-
+  const code    = error?.code || error?.cause?.code || '';
   return (
-    code === 'ECONNRESET' ||
-    code === 'ETIMEDOUT' ||
+    code === 'ECONNRESET'   ||
+    code === 'ETIMEDOUT'    ||
     code === 'ECONNABORTED' ||
     message.includes('fetch failed') ||
-    message.includes('timeout') ||
-    message.includes('timed out') ||
+    message.includes('timeout')      ||
+    message.includes('timed out')    ||
     message.includes('network')
   );
 };
@@ -40,19 +39,16 @@ const verifySupabaseToken = async (token) => {
         supabasePublic.auth.getUser(token),
         createAuthTimeout(),
       ]);
-
       return result;
     } catch (error) {
       lastError = error;
 
-      if (!isTransientAuthError(error) || attempt === AUTH_RETRY_COUNT) {
-        throw error;
-      }
+      if (!isTransientAuthError(error) || attempt === AUTH_RETRY_COUNT) throw error;
 
       logger.warn({
         message: 'Supabase auth verification failed transiently, retrying',
         attempt: attempt + 1,
-        error: error.message,
+        error:   error.message,
       });
 
       await sleep(AUTH_RETRY_DELAY_MS);
@@ -69,9 +65,7 @@ const loadDatabaseUser = async (userId) => {
     .eq('id', userId)
     .single();
 
-  if (dbError || !dbUser) {
-    return null;
-  }
+  if (dbError || !dbUser) return null;
 
   const { data: seller } = await supabaseAdmin
     .from('sellers')
@@ -79,10 +73,7 @@ const loadDatabaseUser = async (userId) => {
     .eq('user_id', userId)
     .maybeSingle();
 
-  return {
-    ...dbUser,
-    seller_id: seller?.id ?? null,
-  };
+  return { ...dbUser, seller_id: seller?.id ?? null };
 };
 
 const authenticate = async (req, res, next) => {
@@ -105,67 +96,32 @@ const authenticate = async (req, res, next) => {
     } catch (error) {
       logger.warn({
         message: 'Authentication temporarily unavailable',
-        url: req.originalUrl,
-        ip: req.ip,
-        error: error.message,
+        url:     req.originalUrl,
+        ip:      req.ip,
+        error:   error.message,
       });
-
-      return sendError(
-        res,
-        'Authentication service temporarily unavailable. Please try again.',
-        503
-      );
+      return sendError(res, 'Authentication service temporarily unavailable. Please try again.', 503);
     }
 
-    const {
-      data: { user: supabaseUser } = {},
-      error: authError,
-    } = authResult || {};
+    const { data: { user: supabaseUser } = {}, error: authError } = authResult || {};
 
     if (authError || !supabaseUser) {
-      logger.warn({
-        message: 'Invalid or expired token attempt',
-        ip: req.ip,
-        url: req.originalUrl,
-      });
-
-      return sendError(
-        res,
-        'Access denied. Invalid or expired token.',
-        401
-      );
+      logger.warn({ message: 'Invalid or expired token attempt', ip: req.ip, url: req.originalUrl });
+      return sendError(res, 'Access denied. Invalid or expired token.', 401);
     }
 
     const dbUser = await loadDatabaseUser(supabaseUser.id);
 
     if (!dbUser) {
-      logger.error({
-        message: 'Authenticated user not found in database',
-        userId: supabaseUser.id,
-      });
-
-      return sendError(
-        res,
-        'User account not found. Please contact support.',
-        401
-      );
+      logger.error({ message: 'Authenticated user not found in database', userId: supabaseUser.id });
+      return sendError(res, 'User account not found. Please contact support.', 401);
     }
 
     req.user = dbUser;
-    req.authTransientError = false;
-
     next();
   } catch (err) {
-    logger.error({
-      message: 'Authentication middleware error',
-      error: err.message,
-    });
-
-    return sendError(
-      res,
-      'Authentication failed. Please try again.',
-      401
-    );
+    logger.error({ message: 'Authentication middleware error', error: err.message });
+    return sendError(res, 'Authentication failed. Please try again.', 401);
   }
 };
 
@@ -175,7 +131,6 @@ const optionalAuthenticate = async (req, res, next) => {
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       req.user = null;
-      req.authTransientError = false;
       return next();
     }
 
@@ -183,7 +138,6 @@ const optionalAuthenticate = async (req, res, next) => {
 
     if (!token || token.trim() === '') {
       req.user = null;
-      req.authTransientError = false;
       return next();
     }
 
@@ -193,36 +147,25 @@ const optionalAuthenticate = async (req, res, next) => {
     } catch (error) {
       logger.warn({
         message: 'Optional auth failed transiently, continuing as visitor',
-        error: error.message,
-        url: req.originalUrl,
+        error:   error.message,
+        url:     req.originalUrl,
       });
-
       req.user = null;
-      req.authTransientError = true;
       return next();
     }
 
-    const {
-      data: { user: supabaseUser } = {},
-      error: authError,
-    } = authResult || {};
+    const { data: { user: supabaseUser } = {}, error: authError } = authResult || {};
 
     if (authError || !supabaseUser) {
       req.user = null;
-      req.authTransientError = false;
       return next();
     }
 
     req.user = await loadDatabaseUser(supabaseUser.id);
-    req.authTransientError = false;
     next();
   } catch (err) {
-    logger.warn({
-      message: 'Optional auth error, continuing as visitor',
-      error: err.message,
-    });
+    logger.warn({ message: 'Optional auth error, continuing as visitor', error: err.message });
     req.user = null;
-    req.authTransientError = true;
     next();
   }
 };

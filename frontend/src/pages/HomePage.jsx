@@ -66,7 +66,6 @@ function SellerCard({ seller }) {
             </div>
           )}
         </div>
-
         <div className="text-center mb-2">
           <div className="flex items-center justify-center gap-1.5">
             <p className="text-sm font-bold text-warm-900 truncate max-w-[120px]">{seller.shop_name}</p>
@@ -156,7 +155,6 @@ function FeaturedProductCard({ product }) {
             {isVerified && <CheckCircle2 size={10} className="text-sage-500 flex-shrink-0" />}
           </div>
         )}
-
         {product.avg_rating > 0 && (
           <div className="flex items-center gap-1">
             <Star size={10} className="text-warning fill-warning" />
@@ -416,7 +414,6 @@ export default function HomePage() {
           </>
         )}
       </section>
-
       <section className="mt-6 mx-4 mb-4">
         <div
           onClick={() => navigate('/register')}
