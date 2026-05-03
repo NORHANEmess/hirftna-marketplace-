@@ -5,7 +5,7 @@ const { AppError } = require('../middlewares/error.middleware');
 const logger = require('../utils/logger');
 
 const PRODUCT_BASE_COLUMNS = `
-  id, seller_id, category_id, name, description, price, stock,
+  id, seller_id, category_id, name, description, price,
   avg_rating, view_count, is_active, created_at, updated_at,
   price_min, price_max, completion_days, is_featured, is_new
 `.trim();
@@ -538,7 +538,6 @@ const updateProduct = async (userId, productId, updates) => {
     'price_min',
     'price_max',
     'completion_days',
-    'stock',
     'category_id',
     'is_active',
   ];

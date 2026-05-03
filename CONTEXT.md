@@ -1,6 +1,7 @@
 # HIRFTNA MARKETPLACE — Master Project Context
 # This file is the single source of truth for the entire project.
-# Reference this file in every Cursor AI interaction using @CONTEXT.md
+
+# Reference this file in every AI interaction using @CONTEXT.md
 # Update the progress tracker after every completed file.
 
 ---
@@ -8,10 +9,66 @@
 ## PROJECT IDENTITY
 
 - **Name:** Hirftna Marketplace
-- **Type:** Intelligent e-commerce marketplace for artisans
-- **Purpose:** Connects sellers (artisans/small businesses) with clients (buyers)
+- **Type:** Intelligent marketplace with custom-order system for Algerian artisans
+- **Purpose:** Connect artisans and small businesses with clients through a structured, trustworthy system
+- **Core Innovation:** Custom Order System — no direct chat between client and seller; all negotiation happens through the structured order flow
+- **Security Upgrade:** Two-Factor Authentication (2FA via OTP email)
 - **Stage:** MVP Development
-- **Timeline:** 2 months
+- **Timeline:** 1 months
+
+---
+
+## CORE BUSINESS LOGIC (READ FIRST)
+
+```
+✅ No direct chat between client and seller
+✅ All custom interactions go through the Custom Order system
+✅ Chatbot is an assistant ONLY (not a negotiation tool)
+✅ Seller responds via order status (not messaging)
+✅ Wishlist works for BOTH clients AND sellers
+✅ Custom Order replaces the messaging/chat feature entirely
+✅ Final price is determined by the seller AFTER accepting the order
+✅ The "messages" table and any chat feature are REMOVED from this project
+```
+
+---
+
+## CUSTOM ORDER FLOW (CANONICAL)
+
+```
+Step 1 — Client submits a Custom Order
+         (product_id, budget_min, budget_max, deadline,
+          reference_images, delivery_type, payment_method, notes)
+         → Order status: PENDING
+         → Notification → seller: "new_order"
+
+Step 2 — Seller reviews and responds
+         → ACCEPT: status becomes ACCEPTED
+           → Notification → client: "order_accepted"
+         → REJECT: status becomes REJECTED + rejection_reason
+           → Notification → client: "order_rejected"
+
+Step 3 — Seller works on the order
+
+Step 4 — Seller marks order as READY
+         → PATCH /api/v1/orders/:id/ready
+         → Sets: final_price, delivery_method (confirmed), ready_at
+         → Status becomes READY
+         → Notification → client: "order_ready"
+
+Step 5 — Client reviews final details
+         (final price + delivery method shown to client)
+
+Step 6 — Client confirms order completion
+         → PATCH /api/v1/orders/:id/complete
+         → Status becomes COMPLETED
+         → Sets: completed_at
+         → Notification → seller: "order_completed"
+
+Step 7 — BOTH sides rate each other (after completion only)
+         → Client rates Seller → POST /api/v1/reviews/seller
+         → Seller rates Client → POST /api/v1/client-ratings
+```
 
 ---
 
@@ -24,36 +81,40 @@
 - **Validation:** Zod
 - **Logging:** Winston
 - **Auth:** Supabase Auth + JWT verification
+- **2FA:** OTP via email (Resend), in-memory sessions (10min TTL), max 5 attempts
 
 ### Database & Services
 - **Database:** Supabase (PostgreSQL 15)
 - **Auth:** Supabase Auth
-- **Storage:** Supabase Storage
+- **Storage:** Supabase Storage (buckets: product-images, avatars)
 - **Realtime:** Supabase Realtime (notifications)
 
-### Frontend (built after backend)
+### Frontend
 - **Framework:** React 18 (Vite)
 - **Styling:** TailwindCSS
 - **Routing:** React Router v6
 - **Language:** JavaScript
 
-### External Services (added later)
-- **Payments:** Stripe
-- **AI Chatbot:** OpenAI GPT-4o
-- **Email:** Resend
+### External Services
+- **AI Chatbot:** Gemini (free tier) or equivalent free AI API
+- **Payments:** Chargily (Algerian payment gateway — optional, frontend only)
+- **Email:** Resend (OTP + notifications)
+
+> ⚠️ STRIPE IS NOT USED. This is an Algerian platform — use Chargily for payments.
+> ⚠️ OPENAI IS NOT USED. Use Gemini or another free AI for the chatbot.
 
 ---
 
 ## PROJECT STRUCTURE
 
 ```
-C:\Hirftna-marketplace\
-├── CONTEXT.md                  ← you are here
+hirftna-marketplace/
+├── CONTEXT.md                  ← single source of truth
 ├── backend/                    ← Node.js/Express API
 │   ├── src/
 │   │   ├── config/
 │   │   │   ├── env.js          ← validates environment variables
-│   │   │   └── supabase.js     ← Supabase client connections
+│   │   │   └── supabase.js     ← supabasePublic + supabaseAdmin clients
 │   │   ├── controllers/        ← handle req/res, call services
 │   │   ├── routes/             ← define API endpoints
 │   │   ├── services/           ← business logic, DB queries
@@ -61,19 +122,24 @@ C:\Hirftna-marketplace\
 │   │   │   ├── auth.middleware.js      ← verify JWT token
 │   │   │   ├── role.middleware.js      ← check user role
 │   │   │   ├── validate.middleware.js  ← Zod validation
-│   │   │   └── error.middleware.js     ← global error handler
+│   │   │   └── error.middleware.js     ← global error handler + AppError
 │   │   ├── utils/
 │   │   │   ├── logger.js       ← Winston logger
 │   │   │   └── response.js     ← standardized API responses
 │   │   ├── validators/         ← Zod schemas per feature
 │   │   ├── app.js              ← Express app + middleware setup
-│   │   └── server.js           ← entry point, starts server
-│   ├── logs/                   ← auto-generated log files
-│   ├── .env                    ← secret keys (never commit)
-│   ├── .env.example            ← template (safe to commit)
-│   ├── .gitignore
+│   │   └── server.js           ← entry point
+│   ├── logs/
+│   ├── .env
+│   ├── .env.example
 │   └── package.json
-└── frontend/                   ← React app (built later)
+└── frontend/                   ← React app
+    └── src/
+        ├── pages/
+        ├── services/
+        │   └── api.js          ← Axios client + all API methods
+        └── utils/
+            └── validation.js   ← payload parsers
 ```
 
 ---
@@ -81,30 +147,27 @@ C:\Hirftna-marketplace\
 ## SUPABASE CONFIGURATION
 
 ```
-Project URL:      https://azjeomrahtmaeergfffh.supabase.co
-Project ID:       azjeomrahtmaeergfffh
-Region:           EU West
+Project URL:  https://azjeomrahtmaeergfffh.supabase.co
+Project ID:   azjeomrahtmaeergfffh
+Region:       EU West
 ```
 
 ### Storage Buckets
-| Bucket Name | Access | Purpose |
-|-------------|--------|---------|
-| product-images | Public | Product photos |
-| avatars | Public | User/seller profile pictures |
+| Bucket Name    | Access | Purpose                      |
+|----------------|--------|------------------------------|
+| product-images | Public | Product photos               |
+| avatars        | Public | User / seller profile images |
 
 ### Two Supabase Clients (backend only)
 ```javascript
-// 1. Public client → verify user JWT tokens (uses ANON key)
-supabasePublic
-
-// 2. Admin client → all database operations (uses SERVICE ROLE key)
-// NEVER expose service role key to frontend
-supabaseAdmin
+supabasePublic   // verify user JWT tokens (ANON key)
+supabaseAdmin    // all database operations (SERVICE ROLE key)
+// NEVER expose SERVICE ROLE key to frontend
 ```
 
 ---
 
-## DATABASE SCHEMA — ALL 15 TABLES
+## DATABASE SCHEMA — ALL 16 TABLES
 
 ### 1. users
 ```
@@ -113,7 +176,7 @@ email         TEXT  NOT NULL UNIQUE
 full_name     TEXT
 phone         TEXT
 avatar_url    TEXT
-role          TEXT  CHECK (role IN ('client','seller','admin')) DEFAULT 'client'
+role          TEXT  CHECK ('client','seller','admin') DEFAULT 'client'
 created_at    TIMESTAMPTZ DEFAULT now()
 updated_at    TIMESTAMPTZ DEFAULT now()
 ```
@@ -124,8 +187,10 @@ id            UUID  PK
 user_id       UUID  FK → users.id UNIQUE
 shop_name     TEXT  NOT NULL
 description   TEXT
-story         TEXT  (Markdown — "Story of the Seller")
+bio           TEXT
+story         TEXT  (Markdown — artisan backstory)
 location      TEXT
+city          TEXT
 category_id   UUID  FK → categories.id
 avatar_url    TEXT
 is_verified   BOOL  DEFAULT false
@@ -143,50 +208,72 @@ slug          TEXT  NOT NULL UNIQUE
 icon_url      TEXT
 created_at    TIMESTAMPTZ
 ```
-Pre-filled with: Jewelry, Pottery, Textiles, Paintings,
-Leather Goods, Candles & Soap, Food & Honey, Home Decor, Other
+Pre-filled: Jewelry, Pottery, Textiles, Paintings, Leather Goods, Candles & Soap, Food & Honey, Home Decor, Other
 
 ### 4. products
 ```
-id            UUID  PK
-seller_id     UUID  FK → sellers.id
-category_id   UUID  FK → categories.id
-name          TEXT  NOT NULL
-description   TEXT
-price         NUMERIC(10,2) NOT NULL
-stock         INTEGER DEFAULT 0
-avg_rating    NUMERIC(3,2) DEFAULT 0
-view_count    INTEGER DEFAULT 0
-is_active     BOOL  DEFAULT true
-fts           TSVECTOR (auto-generated for full-text search)
-created_at    TIMESTAMPTZ
-updated_at    TIMESTAMPTZ
+id              UUID  PK
+seller_id       UUID  FK → sellers.id
+category_id     UUID  FK → categories.id
+name            TEXT  NOT NULL
+description     TEXT
+price           NUMERIC(10,2)          (legacy / fallback)
+price_min       NUMERIC(10,2)          (minimum price range)
+price_max       NUMERIC(10,2)          (maximum price range)
+completion_days INTEGER                 (estimated days to complete)
+avg_rating      NUMERIC(3,2) DEFAULT 0
+view_count      INTEGER DEFAULT 0
+is_active       BOOL  DEFAULT true
+is_featured     BOOL  DEFAULT false
+is_new          BOOL  DEFAULT false
+fts             TSVECTOR               (auto full-text search)
+created_at      TIMESTAMPTZ
+updated_at      TIMESTAMPTZ
 ```
+> ⚠️ No `stock` field — this is a custom-order platform. Products are made-to-order.
 
 ### 5. product_images
 ```
 id            UUID  PK
 product_id    UUID  FK → products.id
-url           TEXT  NOT NULL (Supabase Storage URL)
-position      INTEGER DEFAULT 0 (0 = cover image)
+image_url     TEXT  NOT NULL  (Supabase Storage URL)
+position      INTEGER DEFAULT 0  (0 = cover image)
 created_at    TIMESTAMPTZ
 ```
 
 ### 6. orders
 ```
-id              UUID  PK
-client_id       UUID  FK → users.id
-seller_id       UUID  FK → sellers.id
-status          TEXT  CHECK ('pending','accepted','rejected','completed')
-total_amount    NUMERIC(10,2)
-delivery_type   TEXT  CHECK ('fast','office_pickup','hand_to_hand')
-payment_method  TEXT  CHECK ('card','cash_on_delivery')
-client_name     TEXT
-client_phone    TEXT
-client_address  TEXT
-notes           TEXT
-created_at      TIMESTAMPTZ
-updated_at      TIMESTAMPTZ
+id               UUID  PK
+client_id        UUID  FK → users.id
+seller_id        UUID  FK → sellers.id
+status           TEXT  CHECK ('pending','accepted','rejected','ready','completed')
+total_amount     NUMERIC(10,2)
+final_price      NUMERIC(10,2)          (set by seller when marking READY)
+delivery_type    TEXT  CHECK ('fast','office_pickup','hand_to_hand')
+payment_method   TEXT  CHECK ('card','cash_on_delivery')
+client_name      TEXT
+client_phone     TEXT
+client_address   TEXT
+notes            TEXT
+budget_min       NUMERIC(10,2)          (client's stated budget range)
+budget_max       NUMERIC(10,2)
+deadline         DATE                   (client's requested deadline)
+reference_images TEXT[]                 (array of image URLs)
+rejection_reason TEXT                   (required if status = rejected)
+is_custom        BOOL  DEFAULT true
+ready_at         TIMESTAMPTZ            (when seller marked READY)
+completed_at     TIMESTAMPTZ            (when client confirmed COMPLETED)
+created_at       TIMESTAMPTZ
+updated_at       TIMESTAMPTZ
+```
+
+**Valid Status Transitions:**
+```
+pending   → accepted | rejected
+accepted  → ready
+ready     → completed
+rejected  → (terminal)
+completed → (terminal)
 ```
 
 ### 7. order_items
@@ -195,7 +282,7 @@ id            UUID  PK
 order_id      UUID  FK → orders.id
 product_id    UUID  FK → products.id
 quantity      INTEGER NOT NULL
-unit_price    NUMERIC(10,2) (snapshot at time of order)
+unit_price    NUMERIC(10,2)  (snapshot at time of order)
 created_at    TIMESTAMPTZ
 ```
 
@@ -210,7 +297,7 @@ created_at    TIMESTAMPTZ
 UNIQUE (product_id, client_id)
 ```
 
-### 9. ratings
+### 9. ratings (seller ratings by clients)
 ```
 id            UUID  PK
 seller_id     UUID  FK → sellers.id
@@ -220,7 +307,20 @@ created_at    TIMESTAMPTZ
 UNIQUE (seller_id, client_id)
 ```
 
-### 10. wishlist
+### 10. client_ratings (client ratings by sellers — NEW)
+```
+id            UUID  PK
+order_id      UUID  FK → orders.id UNIQUE
+seller_id     UUID  FK → sellers.id  (the rater)
+client_id     UUID  FK → users.id    (the rated)
+rating        INTEGER CHECK (1-5)
+comment       TEXT
+created_at    TIMESTAMPTZ
+UNIQUE (order_id, seller_id)
+```
+> Only allowed after order status = 'completed'. One rating per order per seller.
+
+### 11. wishlist
 ```
 id            UUID  PK
 user_id       UUID  FK → users.id
@@ -228,12 +328,20 @@ product_id    UUID  FK → products.id
 created_at    TIMESTAMPTZ
 UNIQUE (user_id, product_id)
 ```
+> Available to all authenticated users (clients AND sellers).
 
-### 11. notifications
+### 12. notifications
 ```
 id            UUID  PK
 user_id       UUID  FK → users.id
-type          TEXT  CHECK ('new_order','order_accepted','order_rejected','message','system')
+type          TEXT  CHECK (
+                'new_order',
+                'order_accepted',
+                'order_rejected',
+                'order_ready',
+                'order_completed',
+                'system'
+              )
 title         TEXT  NOT NULL
 body          TEXT
 is_read       BOOL  DEFAULT false
@@ -241,24 +349,15 @@ meta          JSONB DEFAULT '{}'
 created_at    TIMESTAMPTZ
 ```
 
-### 12. messages
-```
-id            UUID  PK
-user_id       UUID  FK → users.id
-seller_id     UUID  FK → sellers.id
-product_id    UUID  FK → products.id
-role          TEXT  CHECK ('user','assistant')
-content       TEXT  NOT NULL
-created_at    TIMESTAMPTZ
-```
+> ⚠️ The `message` notification type is REMOVED — there is no chat feature.
 
 ### 13. subscriptions
 ```
 id              UUID  PK
 seller_id       UUID  FK → sellers.id UNIQUE
 plan            TEXT  CHECK ('free','chatbot')
-stripe_sub_id   TEXT
-stripe_cust_id  TEXT
+stripe_sub_id   TEXT   (reserved — not used, Chargily is planned)
+stripe_cust_id  TEXT   (reserved)
 is_active       BOOL  DEFAULT false
 started_at      TIMESTAMPTZ
 expires_at      TIMESTAMPTZ
@@ -270,22 +369,28 @@ updated_at      TIMESTAMPTZ
 ```
 id            UUID  PK
 seller_id     UUID  FK → sellers.id
-product_id    UUID  FK → products.id (nullable = promote seller)
+product_id    UUID  FK → products.id  (null = seller-level promotion)
 placement     TEXT  CHECK ('homepage','featured','category_top')
 starts_at     TIMESTAMPTZ
 ends_at       TIMESTAMPTZ
 is_active     BOOL  DEFAULT true
-stripe_pi     TEXT
+stripe_pi     TEXT   (reserved)
 created_at    TIMESTAMPTZ
 ```
 
 ### 15. browsing_events
 ```
 id            UUID  PK
-user_id       UUID  FK → users.id (nullable for visitors)
+user_id       UUID  FK → users.id  (nullable for visitors)
 product_id    UUID  FK → products.id
 event_type    TEXT  CHECK ('view','cart','wishlist','purchase')
 occurred_at   TIMESTAMPTZ DEFAULT now()
+```
+
+### 16. (REMOVED) messages
+```
+REMOVED — there is no direct chat between clients and sellers.
+All communication happens through the Custom Order system.
 ```
 
 ---
@@ -295,19 +400,19 @@ occurred_at   TIMESTAMPTZ DEFAULT now()
 ```
 1. on_auth_user_created
    → fires after INSERT on auth.users
-   → automatically creates a row in public.users
+   → creates a row in public.users automatically
 
 2. trg_product_avg_rating
    → fires after INSERT/UPDATE/DELETE on reviews
-   → automatically recalculates products.avg_rating
+   → recalculates products.avg_rating
 
 3. trg_seller_avg_rating
    → fires after INSERT/UPDATE/DELETE on ratings
-   → automatically recalculates sellers.avg_rating
+   → recalculates sellers.avg_rating
 
 4. trg_seller_subscription
    → fires after INSERT on sellers
-   → automatically creates a free subscription row
+   → creates a free subscription row automatically
 ```
 
 ---
@@ -316,37 +421,48 @@ occurred_at   TIMESTAMPTZ DEFAULT now()
 
 ### visitor (not logged in)
 ```
-✅ GET  /api/v1/products        browse products
-✅ GET  /api/v1/products/:id    view product detail
-✅ GET  /api/v1/sellers/:id     view seller profile
-✅ GET  /api/v1/categories      view categories
+✅ GET  /api/v1/products           browse products (filters + pagination)
+✅ GET  /api/v1/products/:id       view product detail
+✅ GET  /api/v1/sellers            browse verified sellers
+✅ GET  /api/v1/sellers/:id        view seller profile + products
+✅ GET  /api/v1/categories         view categories
+✅ GET  /api/v1/reviews/product/:id  view product reviews
+✅ GET  /api/v1/reviews/seller/:id   view seller ratings
 ❌ cannot place orders
 ❌ cannot write reviews
-❌ cannot rate sellers
+❌ cannot rate sellers or clients
 ```
 
 ### client (logged in, role = 'client')
 ```
 ✅ everything visitors can do
-✅ POST /api/v1/orders          place orders
-✅ GET  /api/v1/orders          view own orders
-✅ POST /api/v1/reviews         write reviews
-✅ POST /api/v1/ratings         rate sellers
-✅ POST /api/v1/wishlist        manage wishlist
-✅ POST /api/v1/chatbot         use AI chatbot
-✅ GET  /api/v1/notifications   view notifications
+✅ POST   /api/v1/orders              place custom orders
+✅ GET    /api/v1/orders              view own orders
+✅ GET    /api/v1/orders/:id          view order detail
+✅ PATCH  /api/v1/orders/:id/complete confirm order completion (→ COMPLETED)
+✅ POST   /api/v1/reviews/product     write product reviews
+✅ POST   /api/v1/reviews/seller      rate sellers (after order completion)
+✅ POST   /api/v1/wishlist            add to wishlist
+✅ GET    /api/v1/wishlist            view wishlist
+✅ DELETE /api/v1/wishlist/:id        remove from wishlist
+✅ POST   /api/v1/chatbot             use AI assistant
+✅ GET    /api/v1/notifications       view notifications
+✅ PATCH  /api/v1/notifications/…     mark read
 ```
 
 ### seller (logged in, role = 'seller')
 ```
 ✅ everything clients can do
-✅ POST   /api/v1/products      create products
-✅ PUT    /api/v1/products/:id  edit own products
-✅ DELETE /api/v1/products/:id  delete own products
-✅ GET    /api/v1/orders        view own shop orders
-✅ PATCH  /api/v1/orders/:id    accept/reject orders
-✅ GET    /api/v1/analytics     view shop analytics
-✅ PUT    /api/v1/sellers/:id   edit own shop profile
+✅ POST   /api/v1/products            create products
+✅ PUT    /api/v1/products/:id        edit own products
+✅ DELETE /api/v1/products/:id        delete own products
+✅ GET    /api/v1/orders              view incoming orders (role-scoped)
+✅ PATCH  /api/v1/orders/:id/status   accept / reject orders
+✅ PATCH  /api/v1/orders/:id/ready    mark order READY + set final_price + delivery
+✅ POST   /api/v1/client-ratings      rate clients after order completion
+✅ GET    /api/v1/analytics           view shop analytics
+✅ POST   /api/v1/sellers             create shop profile
+✅ PUT    /api/v1/sellers/:id         update shop profile
 ```
 
 ### admin (logged in, role = 'admin')
@@ -356,6 +472,115 @@ occurred_at   TIMESTAMPTZ DEFAULT now()
 ✅ PATCH  /api/v1/admin/sellers/:id   verify sellers
 ✅ DELETE /api/v1/admin/products/:id  remove products
 ✅ GET    /api/v1/admin/stats         platform statistics
+✅ POST   /api/v1/categories          create categories
+✅ PUT    /api/v1/categories/:id      update categories
+✅ DELETE /api/v1/categories/:id      delete categories
+```
+
+---
+
+## API ROUTES — COMPLETE LIST
+
+### Auth  `/api/v1/auth`
+```
+POST   /register               Register new account
+POST   /login                  Login (returns token + OTP prompt if 2FA enabled)
+POST   /refresh                Refresh access token
+POST   /verify-otp             Verify OTP code (2FA)
+GET    /me                     Get current user (auth required)
+PUT    /me                     Update profile (auth required)
+POST   /logout                 Logout (auth required)
+POST   /change-password        Change password (auth required)
+```
+
+### Categories  `/api/v1/categories`
+```
+GET    /                       All categories (public)
+GET    /slug/:slug             Get by slug (public)
+GET    /:id                    Get by ID (public)
+POST   /                       Create (admin only)
+PUT    /:id                    Update (admin only)
+DELETE /:id                    Delete (admin only)
+```
+
+### Products  `/api/v1/products`
+```
+GET    /                       Browse (public, filters + pagination)
+GET    /my-products            Own products (seller)
+POST   /                       Create (seller)
+PUT    /:id                    Update (seller)
+DELETE /:id                    Delete (seller)
+GET    /:id                    Detail (public, optional auth for tracking)
+```
+
+### Orders  `/api/v1/orders`
+```
+POST   /                       Create custom order (auth)
+GET    /                       List orders (auth, role-scoped)
+GET    /:id                    Get order (auth, ownership checked)
+PATCH  /:id/status             Accept / reject (seller)
+PATCH  /:id/ready              Mark READY + set final_price + delivery (seller)
+PATCH  /:id/complete           Confirm completion (client)
+```
+
+### Sellers  `/api/v1/sellers`
+```
+GET    /                       Browse verified sellers (public)
+GET    /me                     Own full profile (seller)
+GET    /analytics              Shop analytics (seller)
+POST   /                       Create shop (seller)
+PUT    /:id                    Update shop (seller)
+PATCH  /:id/verify             Verify seller (admin)
+GET    /:id                    Get seller profile (public)
+```
+
+### Reviews & Ratings  `/api/v1/reviews`
+```
+GET    /product/:product_id    Get product reviews (public)
+POST   /product                Create product review (client)
+DELETE /:id                    Delete own review (client)
+GET    /seller/:seller_id      Get seller ratings (public)
+POST   /seller                 Rate seller (client, after completed order)
+```
+
+### Client Ratings  `/api/v1/client-ratings`
+```
+POST   /                       Rate a client (seller, after completed order)
+GET    /client/:client_id      Get ratings for a client (public)
+```
+
+### Wishlist  `/api/v1/wishlist`
+```
+GET    /                       List wishlist (auth, paginated)
+POST   /                       Add item (auth)
+GET    /:product_id/check      Check if in wishlist (auth)
+DELETE /:product_id            Remove item (auth)
+```
+
+### Notifications  `/api/v1/notifications`
+```
+GET    /                       List (auth, paginated)
+GET    /unread-count           Count unread (auth)
+PATCH  /mark-all-read          Mark all as read (auth)
+PATCH  /:id/read               Mark one as read (auth)
+DELETE /:id                    Delete (auth)
+```
+
+### Uploads  `/api/v1/uploads`
+```
+POST   /image                  Upload single image (auth)
+POST   /images                 Upload up to 5 images (auth)
+```
+
+### Chatbot  `/api/v1/chatbot`
+```
+POST   /                       Send message to AI assistant (auth)
+```
+
+### Admin  `/api/v1/admin`
+```
+GET    /users                  List users (admin)
+GET    /stats                  Platform statistics (admin)
 ```
 
 ---
@@ -364,120 +589,91 @@ occurred_at   TIMESTAMPTZ DEFAULT now()
 
 ### URL Structure
 ```
-/api/v1/{resource}          ← always use v1 prefix
-/api/v1/{resource}/:id      ← specific resource
-/api/v1/{resource}/:id/{sub-resource}
-```
-
-### HTTP Methods
-```
-GET    → read data (no body)
-POST   → create new resource
-PUT    → replace entire resource
-PATCH  → update specific fields
-DELETE → remove resource
+/api/v1/{resource}
+/api/v1/{resource}/:id
+/api/v1/{resource}/:id/{action}   ← for state transitions
 ```
 
 ### Standard Response Format
-Every single API response MUST use this format:
-
 ```javascript
 // SUCCESS
-{
-  "success": true,
-  "message": "Products fetched successfully",
-  "data": { ... }          // or array or null
-}
+{ "success": true, "message": "...", "data": { ... } }
 
 // ERROR
-{
-  "success": false,
-  "message": "Product not found",
-  "errors": null           // or validation errors array
-}
+{ "success": false, "message": "...", "errors": null }
 ```
 
 ### Pagination Format
-All list endpoints must support pagination:
 ```javascript
-// Request
-GET /api/v1/products?page=1&limit=20
-
-// Response
+// Request: GET /api/v1/products?page=1&limit=20
+// Response:
 {
   "success": true,
-  "message": "Products fetched",
   "data": {
     "items": [...],
-    "pagination": {
-      "page": 1,
-      "limit": 20,
-      "total": 150,
-      "totalPages": 8,
-      "hasNext": true,
-      "hasPrev": false
-    }
+    "pagination": { "page": 1, "limit": 20, "total": 150, "totalPages": 8, "hasNext": true, "hasPrev": false }
   }
 }
 ```
 
-### Error HTTP Status Codes
+### HTTP Status Codes
 ```
-200 → OK (success)
-201 → Created (new resource)
+200 → OK
+201 → Created
 400 → Bad Request (validation error)
-401 → Unauthorized (not logged in)
-403 → Forbidden (logged in but no permission)
+401 → Unauthorized
+403 → Forbidden
 404 → Not Found
-409 → Conflict (duplicate entry)
-429 → Too Many Requests (rate limited)
+409 → Conflict (duplicate)
+429 → Too Many Requests
 500 → Internal Server Error
 ```
 
 ---
 
-## SECURITY REQUIREMENTS
+## SECURITY
 
-### Every File Must:
+### Two-Factor Authentication (2FA)
 ```
-✅ Never expose sensitive data in responses
-✅ Never trust user input without validation
-✅ Always use try/catch or asyncHandler
-✅ Always check user ownership before update/delete
-✅ Never log sensitive data (passwords, keys, tokens)
+- Enabled via AUTH_OTP_ENABLED=true in .env
+- Flow: login → receive OTP via email (Resend) → POST /auth/verify-otp
+- OTP sessions stored in-memory with 10-minute TTL
+- Max 5 verification attempts per session
+- Session invalidated after successful verification or expiry
 ```
 
 ### Middleware Stack (in order)
 ```
-1. helmet()          → secure HTTP headers
-2. cors()            → only allow CLIENT_URL
-3. hpp()             → HTTP parameter pollution
+1. helmet()          → 15 secure HTTP headers
+2. cors()            → whitelist CLIENT_URL + localhost
+3. hpp()             → HTTP parameter pollution protection
 4. compression()     → gzip responses
-5. express.json()    → parse request body
+5. express.json()    → parse request body (100KB limit)
 6. morgan()          → HTTP request logging
 7. rateLimit()       → limit requests per IP
 8. authenticate      → verify JWT (protected routes)
 9. requireRole()     → check role (role-protected routes)
 10. validate()       → Zod schema validation
 11. controller       → handle the request
-12. errorHandler     → catch all errors (last)
+12. errorHandler     → global catch-all (must be LAST)
 ```
 
 ### Rate Limits
 ```
-Global:     100 requests / 15 minutes / IP
-Auth:       10  requests / 15 minutes / IP
-Chatbot:    20  requests / 1 hour / user
-Uploads:    10  requests / 1 hour / user
+Global:   100 requests / 15 minutes / IP
+Auth:      10 requests / 15 minutes / IP
+Chatbot:   20 requests / 1 hour / user
+Uploads:   10 requests / 1 hour / user
 ```
 
 ### Input Validation Rules
 ```
-All POST/PUT/PATCH requests → validated with Zod
-Query parameters            → sanitized and typed
-File uploads                → type and size checked
-IDs                         → must be valid UUID format
-Strings                     → trimmed and max length set
+All POST/PUT/PATCH → validated with Zod schemas
+Query parameters   → sanitized and typed
+File uploads       → type, extension, magic bytes, size checked (5MB max)
+IDs                → must be valid UUID
+Strings            → trimmed + max length enforced
+User IDs           → NEVER trust client-provided (always use JWT)
 ```
 
 ---
@@ -496,18 +692,21 @@ SUPABASE_SERVICE_ROLE_KEY=your_secret_key
 CLIENT_URL=http://localhost:5173
 JWT_SECRET=hirftna_marketplace_super_secret_key_2026
 
+AUTH_OTP_ENABLED=true
+OTP_EMAIL_FROM=noreply@yourdomain.com
+RESEND_API_KEY=your_resend_key
+
 # Added later:
-OPENAI_API_KEY=
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-RESEND_API_KEY=
+GEMINI_API_KEY=
+CHARGILY_API_KEY=
+CHARGILY_SECRET=
 ```
 
-### Frontend (.env) — built later
+### Frontend (.env)
 ```
 VITE_SUPABASE_URL=https://azjeomrahtmaeergfffh.supabase.co
 VITE_SUPABASE_ANON_KEY=your_publishable_key
-VITE_API_URL=http://localhost:4000
+VITE_API_URL=http://localhost:4000/api/v1
 ```
 
 ---
@@ -516,28 +715,41 @@ VITE_API_URL=http://localhost:4000
 
 ```javascript
 // Files
-auth.controller.js      ← feature.type.js
-auth.service.js
-auth.routes.js
-auth.validator.js
+auth.controller.js       ← feature.type.js
 
 // Functions
-getProducts()           ← camelCase verbs
-createOrder()
-updateSellerProfile()
-deleteProduct()
+createOrder()            ← camelCase verbs
+markOrderReady()
+confirmOrderComplete()
+rateClient()
 
 // Variables
-const userId            ← camelCase
+const userId             ← camelCase
 const sellerId
-const productImages
+const finalPrice
 
 // Constants
-const MAX_FILE_SIZE     ← UPPER_SNAKE_CASE
-const ALLOWED_TYPES
+const MAX_FILE_SIZE      ← UPPER_SNAKE_CASE
+const VALID_TRANSITIONS
 
-// Database queries
-const { data, error }   ← always destructure Supabase response
+// DB queries
+const { data, error }    ← always destructure Supabase response
+
+// req.validated          ← single source of truth in controllers
+const { body, params, query } = req.validated;
+```
+
+---
+
+## FRONTEND–BACKEND ALIGNMENT RULE
+
+```
+✅ Every frontend feature MUST have a matching backend API endpoint
+✅ No fake UI state without real API support
+✅ All order interactions use real order status from backend
+✅ Notifications are real-time or polled from backend (not client-side faked)
+✅ Chatbot responses come from backend (Gemini via backend proxy)
+✅ Payment (Chargily) is frontend-only — no backend webhook needed for MVP
 ```
 
 ---
@@ -546,16 +758,16 @@ const { data, error }   ← always destructure Supabase response
 
 ```
 React (port 5173)
-    ↓ HTTP request with JWT token in header
-    ↓ Authorization: Bearer eyJ...
+    ↓ HTTP with JWT: Authorization: Bearer eyJ...
 Express (port 4000)
-    ↓ auth.middleware verifies token
+    ↓ auth.middleware verifies token with Supabase
+    ↓ requireRole checks role from DB
+    ↓ validate() runs Zod schema on req
     ↓ controller calls service
-    ↓ service queries Supabase
+    ↓ service queries Supabase via supabaseAdmin
 Supabase (cloud)
     ↓ returns data
-    ↓ back through the chain
-React receives response
+React receives standardized response { success, message, data }
 ```
 
 ---
@@ -563,7 +775,7 @@ React receives response
 ## FEATURE BUILD ORDER
 
 ```
-Phase 1 — Foundation COMPLETE ✅
+Phase 1 — Foundation ✅ COMPLETE
 ├── STEP 1  ✅ Project setup & folder structure
 ├── STEP 2  ✅ .gitignore
 ├── STEP 3  ✅ .env + .env.example
@@ -578,89 +790,77 @@ Phase 1 — Foundation COMPLETE ✅
 ├── STEP 12 ✅ src/middlewares/role.middleware.js
 ├── STEP 13 ✅ src/app.js
 └── STEP 14 ✅ src/server.js
-                    ↓
-            🚀 SERVER STARTS HERE
 
-Phase 2 — Authentication
+Phase 2 — Authentication ✅ COMPLETE + 2FA WORKING
 ├── STEP 15 ✅ src/validators/auth.validator.js
-├── STEP 16 ✅ src/services/auth.service.js
+├── STEP 16 ✅ src/services/auth.service.js   (OTP 2FA with Resend)
 ├── STEP 17 ✅ src/controllers/auth.controller.js
-├── STEP 18 ✅ src/routes/auth.routes.js
-                    ↓
-            🧪 TEST IN POSTMAN ✅ DONE
+└── STEP 18 ✅ src/routes/auth.routes.js
 
 Phase 3 — Categories ✅ COMPLETE
 ├── STEP 19 ✅ src/services/category.service.js
 ├── STEP 20 ✅ src/controllers/category.controller.js
 └── STEP 21 ✅ src/routes/category.routes.js
-                    ↓
-            🧪 TEST CATEGORIES IN POSTMAN
 
 Phase 4 — Products ✅ COMPLETE
 ├── STEP 22 ✅ src/validators/product.validator.js
 ├── STEP 23 ✅ src/services/product.service.js
 ├── STEP 24 ✅ src/controllers/product.controller.js
 └── STEP 25 ✅ src/routes/product.routes.js
-                    ↓
-            🧪 TEST PRODUCTS IN POSTMAN
 
-Phase 5 — File Uploads ✅ COMPLETE + TESTED
+Phase 5 — File Uploads ✅ COMPLETE
 ├── STEP 26 ✅ src/services/upload.service.js
 ├── STEP 27 ✅ src/controllers/upload.controller.js
 └── STEP 28 ✅ src/routes/upload.routes.js
 
-Phase 6 — Sellers ✅ COMPLETE + TESTED
+Phase 6 — Sellers ✅ COMPLETE
 ├── STEP 29 ✅ src/validators/seller.validator.js
 ├── STEP 30 ✅ src/services/seller.service.js
 ├── STEP 31 ✅ src/controllers/seller.controller.js
 └── STEP 32 ✅ src/routes/seller.routes.js
-                    ↓
-            🧪 TEST SELLERS IN POSTMAN
 
-Phase 7 — Orders ✅ COMPLETE + TESTED
+Phase 7 — Orders ✅ COMPLETE (needs READY + COMPLETE endpoints)
 ├── STEP 33 ✅ src/validators/order.validator.js
-├── STEP 34 ✅ src/services/order.service.js
-├── STEP 35 ✅ src/controllers/order.controller.js
-└── STEP 36 ✅ src/routes/order.routes.js
-                    ↓
-            🧪 TEST ORDERS IN POSTMAN
+├── STEP 34 ✅ src/services/order.service.js    ← ADD: markReady(), confirmComplete()
+├── STEP 35 ✅ src/controllers/order.controller.js ← ADD: markReady(), confirmComplete()
+└── STEP 36 ✅ src/routes/order.routes.js       ← ADD: PATCH /:id/ready, /:id/complete
 
-Phase 8 — Reviews & Ratings
+Phase 8 — Reviews & Ratings ✅ COMPLETE
 ├── STEP 37 ✅ src/validators/review.validator.js
 ├── STEP 38 ✅ src/services/review.service.js
 ├── STEP 39 ✅ src/controllers/review.controller.js
 └── STEP 40 ✅ src/routes/review.routes.js
 
-Phase 9 — Wishlist
+Phase 9 — Wishlist ✅ COMPLETE
 ├── STEP 41 ✅ src/services/wishlist.service.js
 ├── STEP 42 ✅ src/controllers/wishlist.controller.js
 └── STEP 43 ✅ src/routes/wishlist.routes.js
 
-Phase 10 — Notifications
+Phase 10 — Notifications ✅ COMPLETE (types updated)
 ├── STEP 44 ✅ src/services/notification.service.js
 ├── STEP 45 ✅ src/controllers/notification.controller.js
 └── STEP 46 ✅ src/routes/notification.routes.js
 
-Phase 11 — AI Chatbot
-├── STEP 47 ⬜ src/validators/chatbot.validator.js
-├── STEP 48 ⬜ src/services/chatbot.service.js
-├── STEP 49 ⬜ src/controllers/chatbot.controller.js
-└── STEP 50 ⬜ src/routes/chatbot.routes.js
+Phase 11 — Client Ratings (NEW — seller rates client)
+├── STEP 47 ⬜ src/validators/clientRating.validator.js
+├── STEP 48 ⬜ src/services/clientRating.service.js
+├── STEP 49 ⬜ src/controllers/clientRating.controller.js
+└── STEP 50 ⬜ src/routes/clientRating.routes.js
 
-Phase 12 — Payments (chargily) just in frontend i don't have to do it in backend
-├── STEP 51 ⬜ src/services/payment.service.js
-├── STEP 52 ⬜ src/controllers/payment.controller.js
-└── STEP 53 ⬜ src/routes/payment.routes.js
+Phase 12 — AI Chatbot (Gemini)
+├── STEP 51 ⬜ src/validators/chatbot.validator.js
+├── STEP 52 ⬜ src/services/chatbot.service.js   (Gemini API)
+├── STEP 53 ⬜ src/controllers/chatbot.controller.js
+└── STEP 54 ⬜ src/routes/chatbot.routes.js
 
-Phase 13 — Recommendations it dosn't metter 
-├── STEP 54 ⬜ src/services/recommendation.service.js
-├── STEP 55 ⬜ src/controllers/recommendation.controller.js
-└── STEP 56 ⬜ src/routes/recommendation.routes.js
+Phase 13 — Admin
+├── STEP 55 ⬜ src/services/admin.service.js
+├── STEP 56 ⬜ src/controllers/admin.controller.js
+└── STEP 57 ⬜ src/routes/admin.routes.js
 
-Phase 14 — Admin
-├── STEP 57 ⬜ src/services/admin.service.js
-├── STEP 58 ⬜ src/controllers/admin.controller.js
-└── STEP 59 ⬜ src/routes/admin.routes.js
+Phase 14 — Payments (Chargily — frontend only for MVP)
+└── STEP 58 ⬜ Frontend integration only (no backend needed for MVP)
+
                     ↓
             🧪 FULL API TEST IN POSTMAN
                     ↓
@@ -669,56 +869,30 @@ Phase 14 — Admin
 
 ---
 
-## HOW TO USE THIS FILE WITH CURSOR
-
-### When writing a new file, always start your Cursor prompt with:
-```
-@CONTEXT.md
-
-Now write [filename].
-Already completed files: @logger.js @response.js (etc.)
-
-Requirements:
-[list specific requirements]
-```
-
-### After completing each file:
-1. Change ⬜ to ✅ in the progress tracker above
-2. Save CONTEXT.md
-3. Move to the next step
-
-### When you get an error:
-```
-@CONTEXT.md @[file-with-error].js
-
-I got this error:
-[paste full error message]
-
-Fix it without breaking the existing structure.
-```
-
----
-
 ## COMMON MISTAKES TO AVOID
 
 ```
-❌ Never use req.body without validation
+❌ Never use req.body directly — always use req.validated.body
 ❌ Never return full error details in production
-❌ Never use * in Supabase select for sensitive tables
 ❌ Never skip the ownership check before update/delete
 ❌ Never hardcode any key or URL in code
 ❌ Never commit .env to GitHub
 ❌ Never use supabaseAdmin in frontend
-❌ Never trust client-provided user IDs (use JWT)
+❌ Never trust client-provided user IDs — use JWT
 ❌ Never skip pagination on list endpoints
-❌ Never use synchronous file operations
+❌ Never add stock checks — this is a custom-order platform
+❌ Never allow rating a client unless order status = 'completed'
+❌ Never allow a seller to call /complete — only clients can confirm completion
+❌ Never use Stripe — use Chargily for Algerian payments
+❌ Never add a chat/messaging feature — use the Custom Order system
+❌ Never use OpenAI — use Gemini or a free AI API
 ```
 
 ---
 
 ## POSTMAN TESTING CHECKLIST
 
-After each phase, test:
+After each phase:
 ```
 ✅ Happy path works (correct input → correct response)
 ✅ Missing fields return 400 with clear message
@@ -727,9 +901,12 @@ After each phase, test:
 ✅ Non-existent resource returns 404
 ✅ Duplicate entry returns 409
 ✅ Rate limit returns 429 after threshold
+✅ Order status transitions are enforced (no skipping steps)
+✅ Seller cannot call /complete, client cannot call /ready
+✅ Client ratings only allowed after order is COMPLETED
 ```
 
 ---
 
-*Last updated: Phases 8-10 complete*
-*Next: Frontend Development*
+*Last updated: 2026-05-02*
+*Phases 1–10 complete. Next: Phase 11 (Client Ratings) + Order READY/COMPLETE endpoints*
