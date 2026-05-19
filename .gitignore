@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment variables — NEVER upload this
+.env
+.env.*
+
+# Log files
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project documentation (optional if you don't want to track them)
+PROJECT_DOCUMENTATION.md
+PROJECT_ANALYSIS_REPORT.md
+PRE_DEPLOYMENT_FIXES.md
+FIXES_APPLIED.md
+CONTEXT.md
+BUG_REPORT.md
+
+# Claude workspace
+.claude/
+.claude/worktrees/
