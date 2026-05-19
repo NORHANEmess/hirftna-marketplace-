@@ -24,6 +24,7 @@ BUG_REPORT.md
 
 # Claude workspace
 .claude/
+.claude/worktrees/
 
 # Editor directories and files
 .vscode/*
