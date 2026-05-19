@@ -81,7 +81,7 @@ Step 7 — BOTH sides rate each other (after completion only)
 - **Validation:** Zod
 - **Logging:** Winston
 - **Auth:** Supabase Auth + JWT verification
-- **2FA:** OTP via email (Resend), in-memory sessions (10min TTL), max 5 attempts
+- **2FA:** OTP via email (nodemailer + SMTP), in-memory sessions (10min TTL), max 5 attempts
 
 ### Database & Services
 - **Database:** Supabase (PostgreSQL 15)
@@ -98,7 +98,7 @@ Step 7 — BOTH sides rate each other (after completion only)
 ### External Services
 - **AI Chatbot:** Gemini (free tier) or equivalent free AI API
 - **Payments:** Chargily (Algerian payment gateway — optional, frontend only)
-- **Email:** Resend (OTP + notifications)
+- **Email:** nodemailer + SMTP (OTP + password reset)
 
 > ⚠️ STRIPE IS NOT USED. This is an Algerian platform — use Chargily for payments.
 > ⚠️ OPENAI IS NOT USED. Use Gemini or another free AI for the chatbot.
@@ -367,16 +367,20 @@ updated_at      TIMESTAMPTZ
 
 ### 14. promotions
 ```
-id            UUID  PK
-seller_id     UUID  FK → sellers.id
-product_id    UUID  FK → products.id  (null = seller-level promotion)
-placement     TEXT  CHECK ('homepage','featured','category_top')
-starts_at     TIMESTAMPTZ
-ends_at       TIMESTAMPTZ
-is_active     BOOL  DEFAULT true
-stripe_pi     TEXT   (reserved)
-created_at    TIMESTAMPTZ
+id                UUID  PK
+seller_id         UUID  FK → sellers.id
+product_id        UUID  FK → products.id  (null = seller-level promotion)
+placement         TEXT  CHECK ('hero','browse')
+status            TEXT  CHECK ('pending','active','expired','rejected')  DEFAULT 'pending'
+requested_days    INTEGER  DEFAULT 7
+rejection_reason  TEXT
+starts_at         TIMESTAMPTZ
+ends_at           TIMESTAMPTZ
+is_active         BOOL  DEFAULT false
+stripe_pi         TEXT   (reserved)
+created_at        TIMESTAMPTZ
 ```
+> Migration 003_promotions_extend.sql adds status, requested_days, rejection_reason columns.
 
 ### 15. browsing_events
 ```
@@ -463,18 +467,27 @@ All communication happens through the Custom Order system.
 ✅ GET    /api/v1/analytics           view shop analytics
 ✅ POST   /api/v1/sellers             create shop profile
 ✅ PUT    /api/v1/sellers/:id         update shop profile
+✅ POST   /api/v1/promotions/request  submit promotion request
+✅ GET    /api/v1/promotions/me       view own promotion status
 ```
+> ⚠️ Seller products are hidden from public browse/detail if seller is NOT verified (is_verified=false).
+> Sellers still see their own products via GET /products/my-products.
 
 ### admin (logged in, role = 'admin')
 ```
 ✅ full access to everything
-✅ GET    /api/v1/admin/users         manage users
-✅ PATCH  /api/v1/admin/sellers/:id   verify sellers
-✅ DELETE /api/v1/admin/products/:id  remove products
-✅ GET    /api/v1/admin/stats         platform statistics
-✅ POST   /api/v1/categories          create categories
-✅ PUT    /api/v1/categories/:id      update categories
-✅ DELETE /api/v1/categories/:id      delete categories
+✅ GET    /api/v1/admin/users                   list + filter + search users (paginated)
+✅ GET    /api/v1/admin/products                list ALL products including inactive (paginated)
+✅ GET    /api/v1/admin/stats                   platform statistics + top sellers/products
+✅ PATCH  /api/v1/admin/sellers/:id/verify      verify / revoke seller (is_verified bool)
+✅ DELETE /api/v1/admin/products/:id            force-delete any product
+✅ PATCH  /api/v1/admin/users/:id/role          change user role (cannot set admin via API)
+✅ POST   /api/v1/categories                    create categories
+✅ PUT    /api/v1/categories/:id                update categories
+✅ DELETE /api/v1/categories/:id                delete categories
+✅ GET    /api/v1/admin/promotions              list promotion requests (paginated, filterable by status)
+✅ PATCH  /api/v1/admin/promotions/:id/activate activate a pending promotion (sets ends_at = now + requested_days)
+✅ PATCH  /api/v1/admin/promotions/:id/reject   reject a promotion with reason
 ```
 
 ---
@@ -484,13 +497,15 @@ All communication happens through the Custom Order system.
 ### Auth  `/api/v1/auth`
 ```
 POST   /register               Register new account
-POST   /login                  Login (returns token + OTP prompt if 2FA enabled)
+POST   /login                  Login (returns token; OTP required if 2FA enabled)
 POST   /refresh                Refresh access token
-POST   /verify-otp             Verify OTP code (2FA)
+POST   /verify-otp             Verify OTP code (registration-only; 2FA on register)
 GET    /me                     Get current user (auth required)
 PUT    /me                     Update profile (auth required)
 POST   /logout                 Logout (auth required)
 POST   /change-password        Change password (auth required)
+POST   /forgot-password        Send password-reset email (rate-limited 5/15min)
+POST   /reset-password         Reset password with token (32-byte hex, 15-min TTL)
 ```
 
 ### Categories  `/api/v1/categories`
@@ -574,13 +589,29 @@ POST   /images                 Upload up to 5 images (auth)
 
 ### Chatbot  `/api/v1/chatbot`
 ```
-POST   /                       Send message to AI assistant (auth)
+POST   /                       Send message to AI assistant (auth, 20/hr per user)
+                               Body: { message, conversation_history[] }
+```
+
+### Promotions  `/api/v1/promotions`
+```
+GET    /hero                   Active hero placement ads (public)
+GET    /browse                 Active browse placement ads (public)
+POST   /request                Submit promotion request (seller)
+GET    /me                     Own promotion status (seller)
 ```
 
 ### Admin  `/api/v1/admin`
 ```
-GET    /users                  List users (admin)
-GET    /stats                  Platform statistics (admin)
+GET    /users                       List users paginated, filter by role + search (admin)
+GET    /products                    List ALL products (active + inactive) paginated (admin)
+GET    /stats                       Platform stats: users/products/orders/revenue/top5 (admin)
+PATCH  /sellers/:id/verify          Set is_verified true/false (admin)
+DELETE /products/:id                Force-delete any product (admin)
+PATCH  /users/:id/role              Change user role to client|seller (admin)
+GET    /promotions                  List promotion requests (paginated, filter by status) (admin)
+PATCH  /promotions/:id/activate     Activate promotion → sets is_active=true, starts_at=NOW, ends_at=NOW+days (admin)
+PATCH  /promotions/:id/reject       Reject promotion with rejection_reason (admin)
 ```
 
 ---
@@ -636,7 +667,7 @@ GET    /stats                  Platform statistics (admin)
 ### Two-Factor Authentication (2FA)
 ```
 - Enabled via AUTH_OTP_ENABLED=true in .env
-- Flow: login → receive OTP via email (Resend) → POST /auth/verify-otp
+- Flow: register → receive OTP via email (nodemailer + SMTP) → POST /auth/verify-otp
 - OTP sessions stored in-memory with 10-minute TTL
 - Max 5 verification attempts per session
 - Session invalidated after successful verification or expiry
@@ -693,8 +724,11 @@ CLIENT_URL=http://localhost:5173
 JWT_SECRET=hirftna_marketplace_super_secret_key_2026
 
 AUTH_OTP_ENABLED=true
-OTP_EMAIL_FROM=noreply@yourdomain.com
-RESEND_API_KEY=your_resend_key
+SMTP_HOST=smtp.yourprovider.com
+SMTP_PORT=587
+SMTP_USER=your_smtp_user
+SMTP_PASS=your_smtp_password
+SMTP_FROM=noreply@yourdomain.com
 
 # Added later:
 GEMINI_API_KEY=
@@ -793,7 +827,7 @@ Phase 1 — Foundation ✅ COMPLETE
 
 Phase 2 — Authentication ✅ COMPLETE + 2FA WORKING
 ├── STEP 15 ✅ src/validators/auth.validator.js
-├── STEP 16 ✅ src/services/auth.service.js   (OTP 2FA with Resend)
+├── STEP 16 ✅ src/services/auth.service.js   (OTP 2FA via nodemailer + SMTP)
 ├── STEP 17 ✅ src/controllers/auth.controller.js
 └── STEP 18 ✅ src/routes/auth.routes.js
 
@@ -841,25 +875,53 @@ Phase 10 — Notifications ✅ COMPLETE (types updated)
 ├── STEP 45 ✅ src/controllers/notification.controller.js
 └── STEP 46 ✅ src/routes/notification.routes.js
 
-Phase 11 — Client Ratings (NEW — seller rates client)
-├── STEP 47 ⬜ src/validators/clientRating.validator.js
-├── STEP 48 ⬜ src/services/clientRating.service.js
-├── STEP 49 ⬜ src/controllers/clientRating.controller.js
-└── STEP 50 ⬜ src/routes/clientRating.routes.js
+Phase 11 — Client Ratings (seller rates client) ✅ COMPLETE
+├── STEP 47 ✅ src/validators/clientRating.validator.js
+├── STEP 48 ✅ src/services/clientRating.service.js    (aggregate avg from all rows, not page)
+├── STEP 49 ✅ src/controllers/clientRating.controller.js
+└── STEP 50 ✅ src/routes/clientRating.routes.js       (GET /client/:id is public)
 
-Phase 12 — AI Chatbot (Gemini)
-├── STEP 51 ⬜ src/validators/chatbot.validator.js
-├── STEP 52 ⬜ src/services/chatbot.service.js   (Gemini API)
-├── STEP 53 ⬜ src/controllers/chatbot.controller.js
-└── STEP 54 ⬜ src/routes/chatbot.routes.js
+Phase 12 — AI Chatbot (Gemini) ✅ COMPLETE
+├── STEP 51 ✅ src/validators/chatbot.validator.js      (max 20 history entries, roles: user|assistant)
+├── STEP 52 ✅ src/services/chatbot.service.js          (Gemini 1.5 Flash, converts assistant→model)
+├── STEP 53 ✅ src/controllers/chatbot.controller.js
+└── STEP 54 ✅ src/routes/chatbot.routes.js             (20 req/hr per user via keyGenerator)
 
-Phase 13 — Admin
-├── STEP 55 ⬜ src/services/admin.service.js
-├── STEP 56 ⬜ src/controllers/admin.controller.js
-└── STEP 57 ⬜ src/routes/admin.routes.js
+Phase 13 — Admin ✅ COMPLETE
+├── STEP 55 ✅ src/services/admin.service.js    (getUsers, getProducts, getStats, verifySeller, deleteProduct, updateUserRole, listPromotions, activatePromotion, rejectPromotion)
+├── STEP 56 ✅ src/controllers/admin.controller.js  (+ listPromotions, activatePromotion, rejectPromotion)
+└── STEP 57 ✅ src/routes/admin.routes.js       (+ GET /promotions, PATCH /promotions/:id/activate, PATCH /promotions/:id/reject)
 
-Phase 14 — Payments (Chargily — frontend only for MVP)
-└── STEP 58 ⬜ Frontend integration only (no backend needed for MVP)
+Phase 14 — Auth Polish ✅ COMPLETE
+├── STEP 58 ✅ Forgot password / reset password (POST /auth/forgot-password + /auth/reset-password)
+│              In-memory token store, 15-min TTL, rate-limited 5/15min
+└── STEP 59 ✅ OTP now registration-only (login no longer triggers OTP; 403 if email_confirmed_at is null)
+
+Phase 15 — Payments (Chargily — frontend only for MVP)
+└── STEP 60 ⬜ Frontend integration only (no backend needed for MVP)
+
+Phase 16 — Seller Activation Fee (public product filter) ✅ COMPLETE
+├── STEP 61 ✅ product.service.js — getAllProducts() pre-filters unverified sellers; getProductById() hides from non-admins
+├── STEP 62 ✅ admin.service.js — verifySeller() already sends activation notification (done in Phase 13)
+├── STEP 63 ✅ SellerDashboard.jsx — activation banner when is_verified=false
+└── STEP 64 ✅ SellerProducts.jsx — unverified warning banner
+
+Phase 17 — Promotions Backend ✅ COMPLETE
+├── STEP 65 ✅ backend/migrations/003_promotions_extend.sql — adds status, requested_days, rejection_reason columns + indexes
+├── STEP 66 ✅ src/validators/promotion.validator.js
+├── STEP 67 ✅ src/services/promotion.service.js       (requestPromotion, getMyPromotion, getHeroAds, getBrowseAds)
+├── STEP 68 ✅ src/controllers/promotion.controller.js
+├── STEP 69 ✅ src/routes/promotion.routes.js          (GET /hero, GET /browse public; POST /request, GET /me seller-auth)
+├── STEP 70 ✅ src/app.js                               (registered /api/v1/promotions)
+└── STEP 71 ✅ admin.service.js + admin.controller.js + admin.routes.js (listPromotions, activatePromotion, rejectPromotion)
+
+Phase 18 — Homepage Redesign + Animation System (Frontend) ✅ COMPLETE
+├── STEP 72 ✅ frontend/index.html — Playfair Display (Google Fonts) added alongside Amiri
+├── STEP 73 ✅ tailwind.config.js — font-display now uses Playfair Display (editorial serif)
+├── STEP 74 ✅ src/index.css — full animation system (keyframes + utility classes + scroll reveals + RTL support + reduced-motion)
+├── STEP 75 ✅ src/hooks/useInView.js — IntersectionObserver fire-once hook → [ref, isInView]
+├── STEP 76 ✅ src/pages/HomePage.jsx — complete redesign (split-screen hero, HowItWorksSection, scroll-triggered reveals)
+└── STEP 77 ✅ src/components/product/ProductCard.jsx — hover-lift + animate-heart-beat on wishlist toggle
 
                     ↓
             🧪 FULL API TEST IN POSTMAN
@@ -908,5 +970,11 @@ After each phase:
 
 ---
 
-*Last updated: 2026-05-02*
-*Phases 1–10 complete. Next: Phase 11 (Client Ratings) + Order READY/COMPLETE endpoints*
+*Last updated: 2026-05-19*
+*Phases 1–14 complete (backend). Phases 16–19 complete (seller activation + promotions + homepage redesign/animation + payment flows + error boundary). MVP feature-complete.*
+*Phase 19 (2026-05-19): PaymentModal (seller→platform CCP transfer), PaymentStep (client→seller order completion), ErrorBoundary, loading/error/empty audit, Amiri font, i18n payment keys.*
+*Admin note: role='admin' must be set directly in Supabase DB — cannot be assigned via API.*
+*Chatbot note: requires GEMINI_API_KEY in backend .env.*
+*Promotions note: run migration 003_promotions_extend.sql in Supabase SQL Editor before deploying Phase 17 code.*
+*Seller visibility note: products from unverified sellers are hidden from GET /products and GET /products/:id (non-admin). Sellers see own products via GET /products/my-products.*
+*Payment note: Chargily card payment is SIMULATED (setTimeout 2s) — replace with real Chargily API for production. PaymentModal and PaymentStep are separate components — do NOT merge.*

@@ -7,6 +7,10 @@ const { z } = require('zod');
 // POST /api/v1/reviews
 // ─────────────────────────────────────────────────────────────
 const createReviewSchema = z.object({
+  order_id: z
+    .string({ error: 'Order ID is required' })
+    .uuid({ error: 'Invalid order ID' }),
+
   product_id: z
     .string({ error: 'Product ID is required' })
     .uuid({ error: 'Invalid product ID' }),
@@ -27,11 +31,14 @@ const createReviewSchema = z.object({
 // ─────────────────────────────────────────────────────────────
 // CREATE SELLER RATING SCHEMA
 // POST /api/v1/reviews/seller
+// order_id required — service verifies the order is completed
 // ─────────────────────────────────────────────────────────────
+// seller_id is intentionally absent — the backend derives it from the order.
+// This prevents a client from injecting a different seller_id.
 const createSellerRatingSchema = z.object({
-  seller_id: z
-    .string({ error: 'Seller ID is required' })
-    .uuid({ error: 'Invalid seller ID' }),
+  order_id: z
+    .string({ error: 'Order ID is required' })
+    .uuid({ error: 'Invalid order ID' }),
 
   rating: z
     .number({ error: 'Rating must be a number' })

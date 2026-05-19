@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   AlertCircle,
+  Banknote,
+  Building2,
   Check,
   ChevronLeft,
   ChevronRight,
+  CreditCard,
   Loader2,
   PackageCheck,
+  Truck,
   Upload,
   X,
+  Zap,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI, uploadsAPI } from '../../services/api';
@@ -47,7 +52,9 @@ function OptionCard({ option, selected, onSelect }) {
         selected ? 'border-sage-500 bg-sage-50 ring-1 ring-sage-500/30' : 'border-beige-200 bg-white hover:border-sage-300'
       }`}
     >
-      <span className="text-xl flex-shrink-0">{option.icon}</span>
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${selected ? 'bg-sage-100' : 'bg-cream-200'}`}>
+        <option.icon size={17} className={selected ? 'text-sage-600' : 'text-warm-500'} />
+      </div>
       <div className="flex-1 min-w-0">
         <p className={`text-sm font-semibold ${selected ? 'text-sage-700' : 'text-warm-800'}`}>{option.label}</p>
         <p className="text-[10px] text-warm-400">{option.desc}</p>
@@ -98,17 +105,17 @@ function SuccessState({ onClose, onViewOrders }) {
         <PackageCheck size={36} className="text-sage-500" />
       </div>
       <div>
-        <h3 className="text-lg font-bold text-warm-900 mb-1">{t('customOrder.successTitle')}</h3>
+        <h3 className="text-lg font-bold text-warm-900 mb-1">{t('customOrder.success.title')}</h3>
         <p className="text-sm text-warm-400 leading-relaxed max-w-xs mx-auto">
-          {t('customOrder.successDescription')}
+          {t('customOrder.success.subtitle')}
         </p>
       </div>
       <div className="flex flex-col gap-2 pt-2">
         <button onClick={onViewOrders} className="w-full py-3 bg-sage-500 hover:bg-sage-600 text-white font-semibold text-sm rounded-2xl transition-colors">
-          {t('customOrder.viewOrders')}
+          {t('customOrder.success.viewOrders')}
         </button>
         <button onClick={onClose} className="w-full py-3 bg-cream-200 hover:bg-beige-200 text-warm-700 font-semibold text-sm rounded-2xl transition-colors">
-          {t('customOrder.continueBrowsing')}
+          {t('customOrder.success.continueBrowsing')}
         </button>
       </div>
     </div>
@@ -136,36 +143,36 @@ export default function CustomOrderForm() {
   const deliveryOptions = useMemo(() => ([
     {
       value: 'hand_to_hand',
-      label: t('customOrder.deliveryOptions.hand_to_hand'),
-      desc: t('customOrder.deliveryOptions.hand_to_hand_desc'),
-      icon: 'H',
+      label: t('customOrder.step2.delivery.hand_to_hand'),
+      desc: t('customOrder.step2.delivery.hand_to_hand_desc'),
+      icon: Truck,
     },
     {
       value: 'office_pickup',
-      label: t('customOrder.deliveryOptions.office_pickup'),
-      desc: t('customOrder.deliveryOptions.office_pickup_desc'),
-      icon: 'O',
+      label: t('customOrder.step2.delivery.office_pickup'),
+      desc: t('customOrder.step2.delivery.office_pickup_desc'),
+      icon: Building2,
     },
     {
       value: 'fast',
-      label: t('customOrder.deliveryOptions.fast'),
-      desc: t('customOrder.deliveryOptions.fast_desc'),
-      icon: 'F',
+      label: t('customOrder.step2.delivery.fast'),
+      desc: t('customOrder.step2.delivery.fast_desc'),
+      icon: Zap,
     },
   ]), [t]);
 
   const paymentOptions = useMemo(() => ([
     {
       value: 'cash_on_delivery',
-      label: t('customOrder.paymentOptions.cash_on_delivery'),
-      desc: t('customOrder.paymentOptions.cash_on_delivery_desc'),
-      icon: 'C',
+      label: t('customOrder.step2.payment.cash_on_delivery'),
+      desc: t('customOrder.step2.payment.cash_on_delivery_desc'),
+      icon: Banknote,
     },
     {
       value: 'card',
-      label: t('customOrder.paymentOptions.card'),
-      desc: t('customOrder.paymentOptions.card_desc'),
-      icon: 'P',
+      label: t('customOrder.step2.payment.card'),
+      desc: t('customOrder.step2.payment.card_desc'),
+      icon: CreditCard,
     },
   ]), [t]);
 
@@ -396,7 +403,7 @@ export default function CustomOrderForm() {
             <h2 className="text-base font-bold text-warm-900">{t('customOrder.title')}</h2>
             {product && (
               <p className="text-xs text-warm-400 mt-0.5 truncate max-w-[220px]">
-                {t('customOrder.forProduct', { product: product.name })}
+                {t('customOrder.for', { name: product.name })}
               </p>
             )}
           </div>
@@ -426,15 +433,15 @@ export default function CustomOrderForm() {
               {step === 0 && (
                 <div className="space-y-5">
                   <div className="text-center mb-2">
-                    <h3 className="text-base font-bold text-warm-900">{t('customOrder.detailsTitle')}</h3>
-                    <p className="text-xs text-warm-400 mt-0.5">{t('customOrder.detailsSubtitle')}</p>
+                    <h3 className="text-base font-bold text-warm-900">{t('customOrder.step1.title')}</h3>
+                    <p className="text-xs text-warm-400 mt-0.5">{t('customOrder.step1.subtitle')}</p>
                   </div>
 
-                  <Field label={t('customOrder.requirements')} required error={errors.requirements}>
+                  <Field label={t('customOrder.step1.descLabel')} required error={errors.requirements}>
                     <textarea
                       value={form.requirements}
                       onChange={(event) => setField('requirements', event.target.value)}
-                      placeholder={t('customOrder.requirementsPlaceholder')}
+                      placeholder={t('customOrder.step1.descPlaceholder')}
                       rows={4}
                       className={`w-full px-4 py-3 text-sm bg-cream-100 border rounded-2xl outline-none focus:border-sage-400 resize-none ${
                         errors.requirements ? 'border-danger' : 'border-beige-200'
@@ -443,7 +450,7 @@ export default function CustomOrderForm() {
                     <p className="text-[10px] text-warm-400 text-right">{form.requirements.length}/500</p>
                   </Field>
 
-                  <Field label={t('customOrder.budget')} hint={t('common.optional')} error={errors.budget}>
+                  <Field label={t('customOrder.step1.budgetLabel')} hint={t('common.optional')} error={errors.budget}>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-warm-400">{t('common.currency')}</span>
@@ -451,7 +458,7 @@ export default function CustomOrderForm() {
                           type="number"
                           value={form.budget_min}
                           onChange={(event) => setField('budget_min', event.target.value)}
-                          placeholder={t('customOrder.budgetMin')}
+                          placeholder={t('customOrder.step1.budgetMin')}
                           className="w-full pl-12 pr-4 py-2.5 text-sm bg-cream-100 border border-beige-200 rounded-2xl outline-none focus:border-sage-400"
                         />
                       </div>
@@ -461,14 +468,14 @@ export default function CustomOrderForm() {
                           type="number"
                           value={form.budget_max}
                           onChange={(event) => setField('budget_max', event.target.value)}
-                          placeholder={t('customOrder.budgetMax')}
+                          placeholder={t('customOrder.step1.budgetMax')}
                           className="w-full pl-12 pr-4 py-2.5 text-sm bg-cream-100 border border-beige-200 rounded-2xl outline-none focus:border-sage-400"
                         />
                       </div>
                     </div>
                   </Field>
 
-                  <Field label={t('customOrder.deadline')} hint={t('customOrder.deadlineHint')} error={errors.deadline}>
+                  <Field label={t('customOrder.step1.deadlineLabel')} hint={t('customOrder.step1.deadlineHint')} error={errors.deadline}>
                     <input
                       type="date"
                       value={form.deadline}
@@ -479,8 +486,8 @@ export default function CustomOrderForm() {
                   </Field>
 
                   <Field
-                    label={t('customOrder.referenceImages')}
-                    hint={t('customOrder.referenceImagesHint')}
+                    label={t('customOrder.step1.imagesLabel')}
+                    hint={t('customOrder.step1.imagesHint')}
                     error={errors.reference_images}
                   >
                     <div className="space-y-2">
@@ -508,7 +515,7 @@ export default function CustomOrderForm() {
                             ) : (
                               <>
                                 <Upload size={14} />
-                                <span className="text-[9px]">{t('customOrder.addImage')}</span>
+                                <span className="text-[9px]">{t('customOrder.step1.imagesLimit')}</span>
                               </>
                             )}
                             <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
@@ -523,11 +530,11 @@ export default function CustomOrderForm() {
               {step === 1 && (
                 <div className="space-y-5">
                   <div className="text-center mb-2">
-                    <h3 className="text-base font-bold text-warm-900">{t('customOrder.deliveryTitle')}</h3>
-                    <p className="text-xs text-warm-400 mt-0.5">{t('customOrder.deliverySubtitle')}</p>
+                    <h3 className="text-base font-bold text-warm-900">{t('customOrder.step2.title')}</h3>
+                    <p className="text-xs text-warm-400 mt-0.5">{t('customOrder.step2.subtitle')}</p>
                   </div>
 
-                  <Field label={t('customOrder.deliveryMethod')} required error={errors.delivery_type}>
+                  <Field label={t('customOrder.step2.deliveryLabel')} required error={errors.delivery_type}>
                     <div className="space-y-2">
                       {deliveryOptions.map((option) => (
                         <OptionCard
@@ -540,7 +547,7 @@ export default function CustomOrderForm() {
                     </div>
                   </Field>
 
-                  <Field label={t('customOrder.paymentMethod')} required error={errors.payment_method}>
+                  <Field label={t('customOrder.step2.paymentLabel')} required error={errors.payment_method}>
                     <div className="space-y-2">
                       {paymentOptions.map((option) => (
                         <OptionCard
@@ -558,11 +565,11 @@ export default function CustomOrderForm() {
               {step === 2 && (
                 <div className="space-y-5">
                   <div className="text-center mb-2">
-                    <h3 className="text-base font-bold text-warm-900">{t('customOrder.contactTitle')}</h3>
-                    <p className="text-xs text-warm-400 mt-0.5">{t('customOrder.contactSubtitle')}</p>
+                    <h3 className="text-base font-bold text-warm-900">{t('customOrder.step3.title')}</h3>
+                    <p className="text-xs text-warm-400 mt-0.5">{t('customOrder.step3.subtitle')}</p>
                   </div>
 
-                  <Field label={t('customOrder.fullName')} required error={errors.client_name}>
+                  <Field label={t('customOrder.step3.nameLabel')} required error={errors.client_name}>
                     <input
                       value={form.client_name}
                       onChange={(event) => setField('client_name', event.target.value)}
@@ -572,7 +579,7 @@ export default function CustomOrderForm() {
                     />
                   </Field>
 
-                  <Field label={t('customOrder.phone')} required error={errors.client_phone}>
+                  <Field label={t('customOrder.step3.phoneLabel')} required error={errors.client_phone}>
                     <input
                       value={form.client_phone}
                       onChange={(event) => setField('client_phone', event.target.value)}
@@ -582,7 +589,7 @@ export default function CustomOrderForm() {
                     />
                   </Field>
 
-                  <Field label={t('customOrder.address')} required error={errors.client_address}>
+                  <Field label={t('customOrder.step3.addressLabel')} required error={errors.client_address}>
                     <textarea
                       value={form.client_address}
                       onChange={(event) => setField('client_address', event.target.value)}
@@ -616,7 +623,7 @@ export default function CustomOrderForm() {
                 onClick={handleNext}
                 className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-sage-500 hover:bg-sage-600 text-white text-sm font-semibold rounded-2xl transition-colors"
               >
-                {t('common.next')} <ChevronRight size={15} />
+                {t('customOrder.next')} <ChevronRight size={15} />
               </button>
             ) : (
               <button

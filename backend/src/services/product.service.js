@@ -1,8 +1,9 @@
 'use strict';
 
-const { supabaseAdmin } = require('../config/supabase');
-const { AppError } = require('../middlewares/error.middleware');
-const logger = require('../utils/logger');
+const { supabaseAdmin }            = require('../config/supabase');
+const { AppError }                 = require('../middlewares/error.middleware');
+const logger                       = require('../utils/logger');
+const { updateVerificationStatus } = require('./verification.service');
 
 const PRODUCT_BASE_COLUMNS = `
   id, seller_id, category_id, name, description, price,
@@ -21,7 +22,6 @@ const PRODUCT_IMAGE_COLUMNS = 'id, product_id, image_url, position, created_at';
 
 const isNotFound = (error) =>
   error?.code === 'PGRST116' ||
-  error?.code === '406' ||
   (error?.message || '').includes('0 rows');
 
 const getSortOrder = (sort) => {
@@ -402,9 +402,12 @@ const getAllProducts = async (query) => {
     resolvedCategoryId = matchedCategory.id;
   }
 
+  // Filter products to verified sellers only using an inner join — avoids loading
+  // all seller IDs into memory first.
   let dbQuery = supabaseAdmin
     .from('products')
-    .select(PRODUCT_BASE_COLUMNS, { count: 'exact' })
+    .select(`${PRODUCT_BASE_COLUMNS}, sellers!inner(id)`, { count: 'exact' })
+    .eq('sellers.is_verified', true)
     .eq('is_active', true);
 
   if (resolvedCategoryId) dbQuery = dbQuery.eq('category_id', resolvedCategoryId);
@@ -441,13 +444,18 @@ const getAllProducts = async (query) => {
   };
 };
 
-const getProductById = async (id, userId = null) => {
+const getProductById = async (id, user = null) => {
   if (!id) throw new AppError('Product ID is required', 400);
 
   const product = await fetchSingleProduct(id, { includeInactive: false });
 
+  // Hide products from unverified sellers except for admins
+  if (!product.seller?.is_verified && user?.role !== 'admin') {
+    throw new AppError('Product not found', 404);
+  }
+
   incrementViewCount(id);
-  if (userId) trackBrowsingEvent(userId, id, 'view');
+  if (user?.id) trackBrowsingEvent(user.id, id, 'view');
 
   return product;
 };
@@ -524,6 +532,9 @@ const createProduct = async (userId, productData) => {
 
   logger.info({ message: 'Product created', productId: product.id, sellerId: seller.id });
 
+  // Fire-and-forget: adding a product may satisfy the active-products criterion
+  updateVerificationStatus(seller.id);
+
   return getProductByIdForSeller(product.id);
 };
 
@@ -598,6 +609,9 @@ const deleteProduct = async (userId, productId) => {
   }
 
   logger.info({ message: 'Product soft deleted', productId, sellerId: seller.id });
+
+  // Fire-and-forget: removing a product may drop below the active-products threshold
+  updateVerificationStatus(seller.id);
 };
 
 const getMyProducts = async (userId, query) => {

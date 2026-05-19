@@ -5,6 +5,8 @@ import {
   Camera,
   CheckCircle2,
   ChevronRight,
+  Eye,
+  EyeOff,
   Loader2,
   LogOut,
   Save,
@@ -121,7 +123,7 @@ function AvatarUploader({ currentUrl, fullName, onUpload }) {
 export default function ProfilePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, updateUser, logout, isSeller, changePassword } = useAuth();
+  const { user, updateUser, logout, isSeller, isAdmin, changePassword } = useAuth();
 
   const [form, setForm] = useState({ full_name: '', phone: '', avatar_url: '' });
   const [saving, setSaving] = useState(false);
@@ -130,6 +132,7 @@ export default function ProfilePage() {
   const [pwForm, setPwForm] = useState({ old_password: '', new_password: '', confirm_password: '' });
   const [savingPassword, setSavingPassword] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState({});
+  const [pwShow, setPwShow] = useState({ old: false, new: false, confirm: false });
 
   const [sellerId, setSellerId] = useState(null);
   const [sellerForm, setSellerForm] = useState({
@@ -230,6 +233,7 @@ export default function ProfilePage() {
       const payload = {
         full_name: form.full_name.trim(),
         ...(form.phone && { phone: form.phone }),
+        ...(form.avatar_url && { avatar_url: form.avatar_url }),
       };
 
       await authAPI.updateMe(payload);
@@ -271,6 +275,8 @@ export default function ProfilePage() {
       nextErrors.new_password = t('validation.required');
     } else if (pwForm.new_password.length < 8) {
       nextErrors.new_password = t('validation.passwordMin');
+    } else if (pwForm.old_password && pwForm.new_password === pwForm.old_password) {
+      nextErrors.new_password = t('validation.passwordDifferent');
     }
 
     if (!pwForm.confirm_password) {
@@ -468,67 +474,99 @@ export default function ProfilePage() {
           </div>
         )}
 
-        <div className="bg-white rounded-3xl border border-beige-200 overflow-hidden">
-          <Link to="/orders" className="flex items-center gap-3 px-4 py-4 border-b border-beige-100 hover:bg-cream-100 transition-colors">
-            <div className="w-9 h-9 bg-cream-200 rounded-xl flex items-center justify-center">
-              <ShoppingBag size={16} className="text-sage-600" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-warm-900">{t('profile.myOrders')}</p>
-              <p className="text-[10px] text-warm-400">{t('profile.myOrdersDescription')}</p>
-            </div>
-            <ChevronRight size={15} className="text-warm-400" />
-          </Link>
+        {!isAdmin && (
+          <div className="bg-white rounded-3xl border border-beige-200 overflow-hidden">
+            <Link to="/orders" className="flex items-center gap-3 px-4 py-4 border-b border-beige-100 hover:bg-cream-100 transition-colors">
+              <div className="w-9 h-9 bg-cream-200 rounded-xl flex items-center justify-center">
+                <ShoppingBag size={16} className="text-sage-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-warm-900">{t('profile.myOrders')}</p>
+                <p className="text-[10px] text-warm-400">{t('profile.myOrdersDescription')}</p>
+              </div>
+              <ChevronRight size={15} className="text-warm-400" />
+            </Link>
 
-          <Link to="/wishlist" className="flex items-center gap-3 px-4 py-4 hover:bg-cream-100 transition-colors">
-            <div className="w-9 h-9 bg-cream-200 rounded-xl flex items-center justify-center">
-              <span className="text-base">H</span>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-warm-900">{t('profile.savedProducts')}</p>
-              <p className="text-[10px] text-warm-400">{t('profile.savedProductsDescription')}</p>
-            </div>
-            <ChevronRight size={15} className="text-warm-400" />
-          </Link>
-        </div>
+            <Link to="/wishlist" className="flex items-center gap-3 px-4 py-4 hover:bg-cream-100 transition-colors">
+              <div className="w-9 h-9 bg-cream-200 rounded-xl flex items-center justify-center">
+                <ShoppingBag size={16} className="text-sage-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-warm-900">{t('profile.savedProducts')}</p>
+                <p className="text-[10px] text-warm-400">{t('profile.savedProductsDescription')}</p>
+              </div>
+              <ChevronRight size={15} className="text-warm-400" />
+            </Link>
+          </div>
+        )}
 
         <div className="bg-white rounded-3xl border border-beige-200 p-5 space-y-4">
           <p className="text-xs font-bold text-warm-400 uppercase tracking-widest">{t('auth.changePassword.title')}</p>
 
           <Field label={t('auth.changePassword.oldPassword')} error={passwordErrors.old_password}>
-            <input
-              type="password"
-              value={pwForm.old_password}
-              onChange={(event) => setPasswordField('old_password', event.target.value)}
-              placeholder="••••••••"
-              className={`w-full px-4 py-2.5 text-sm bg-cream-100 border rounded-2xl outline-none focus:border-sage-400 ${
-                passwordErrors.old_password ? 'border-danger' : 'border-beige-200'
-              }`}
-            />
+            <div className="relative">
+              <input
+                type={pwShow.old ? 'text' : 'password'}
+                value={pwForm.old_password}
+                onChange={(event) => setPasswordField('old_password', event.target.value)}
+                placeholder="••••••••"
+                className={`w-full px-4 py-2.5 pr-10 text-sm bg-cream-100 border rounded-2xl outline-none focus:border-sage-400 ${
+                  passwordErrors.old_password ? 'border-danger' : 'border-beige-200'
+                }`}
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setPwShow((s) => ({ ...s, old: !s.old }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors"
+              >
+                {pwShow.old ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
           </Field>
 
           <Field label={t('auth.changePassword.newPassword')} error={passwordErrors.new_password}>
-            <input
-              type="password"
-              value={pwForm.new_password}
-              onChange={(event) => setPasswordField('new_password', event.target.value)}
-              placeholder={t('validation.passwordMin')}
-              className={`w-full px-4 py-2.5 text-sm bg-cream-100 border rounded-2xl outline-none focus:border-sage-400 ${
-                passwordErrors.new_password ? 'border-danger' : 'border-beige-200'
-              }`}
-            />
+            <div className="relative">
+              <input
+                type={pwShow.new ? 'text' : 'password'}
+                value={pwForm.new_password}
+                onChange={(event) => setPasswordField('new_password', event.target.value)}
+                placeholder={t('validation.passwordMin')}
+                className={`w-full px-4 py-2.5 pr-10 text-sm bg-cream-100 border rounded-2xl outline-none focus:border-sage-400 ${
+                  passwordErrors.new_password ? 'border-danger' : 'border-beige-200'
+                }`}
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setPwShow((s) => ({ ...s, new: !s.new }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors"
+              >
+                {pwShow.new ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
           </Field>
 
           <Field label={t('auth.changePassword.confirmPassword')} error={passwordErrors.confirm_password}>
-            <input
-              type="password"
-              value={pwForm.confirm_password}
-              onChange={(event) => setPasswordField('confirm_password', event.target.value)}
-              placeholder={t('auth.register.confirmPasswordPlaceholder')}
-              className={`w-full px-4 py-2.5 text-sm bg-cream-100 border rounded-2xl outline-none focus:border-sage-400 ${
-                passwordErrors.confirm_password ? 'border-danger' : 'border-beige-200'
-              }`}
-            />
+            <div className="relative">
+              <input
+                type={pwShow.confirm ? 'text' : 'password'}
+                value={pwForm.confirm_password}
+                onChange={(event) => setPasswordField('confirm_password', event.target.value)}
+                placeholder={t('auth.register.confirmPlaceholder')}
+                className={`w-full px-4 py-2.5 pr-10 text-sm bg-cream-100 border rounded-2xl outline-none focus:border-sage-400 ${
+                  passwordErrors.confirm_password ? 'border-danger' : 'border-beige-200'
+                }`}
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setPwShow((s) => ({ ...s, confirm: !s.confirm }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors"
+              >
+                {pwShow.confirm ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
           </Field>
 
           <button

@@ -4,7 +4,6 @@
     "en": "English",
     "fr": "Français"
   },
-
   "nav": {
     "home": "الرئيسية",
     "browse": "تصفح",
@@ -19,13 +18,26 @@
     "myProducts": "منتجاتي",
     "myShop": "متجري"
   },
-
   "home": {
     "hero": {
-      "badge": "✦ الحرف اليدوية الجزائرية الأصيلة",
-      "title": "كل قطعة تحكي قصة",
-      "subtitle": "اطلب أعمالاً مخصصة من حرفيين محليين",
-      "cta": "استعرض الحرف"
+      "badge": "الحرف اليدوية الجزائرية الأصيلة",
+      "title": "قلب الحرف الجزائرية",
+      "subtitle": "اكتشف كنوزاً يدوية أصيلة من أمهر الحرفيين في الجزائر",
+      "cta": "تصفح كل الحرف",
+      "searchPlaceholder": "ابحث عن فخار، مجوهرات، منسوجات...",
+      "featuredArtisan": "حرفي مميز",
+      "visitShop": "زيارة المتجر",
+      "noPromotions": {
+        "title": "انضم إلى مجتمع الحرفيين",
+        "sub": "هل أنت حرفي؟ أنشئ متجرك وصل إلى آلاف المشترين.",
+        "cta": "كن بائعاً"
+      },
+      "sellerCta": "كن حرفياً ←",
+      "trust1": "حرف جزائرية أصيلة",
+      "trust2": "حرفيون موثوقون",
+      "trust3": "مصنوع خصيصاً لك",
+      "statArtisans": "حرفي",
+      "statSpecialties": "تخصص"
     },
     "whatIsHirftna": {
       "title": "ما هي حرفتنا؟",
@@ -44,6 +56,10 @@
       "eyebrow": "منتجات مميزة",
       "title": "مختارة خصيصاً لك",
       "seeAll": "عرض الكل",
+      "new": "جديد",
+      "featured": "مميز",
+      "empty": "لا توجد منتجات بعد",
+      "emptySub": "تحقق لاحقاً، الحرفيون يضيفون منتجاتهم.",
       "tabs": {
         "all": "الكل",
         "newest": "الأحدث",
@@ -57,16 +73,21 @@
       "subtitle": "تعرف على الأشخاص الموهوبين الذين يقفون خلف منتجاتك المفضلة.",
       "discoverAll": "اكتشف كل الحرفيين",
       "products": "منتج",
-      "rating": "التقييم"
+      "rating": "التقييم",
+      "empty": "لا يوجد حرفيون بعد"
     },
     "howItWorks": {
-      "title": "كيف تعمل المنصة؟",
-      "step1Title": "تصفح",
-      "step1Desc": "استعرض المنتجات المصنوعة يدوياً",
-      "step2Title": "اطلب",
-      "step2Desc": "أرسل تفاصيل طلبك المخصص",
-      "step3Title": "استلم",
-      "step3Desc": "احصل على قطعتك الفريدة"
+      "eyebrow": "كيف يعمل",
+      "title": "كيف تعمل حرفتنا",
+      "subtitle": "طلبك، بطريقتك",
+      "step1Title": "تصفح واكتشف",
+      "step1Desc": "استعرض المنتجات اليدوية من الحرفيين الجزائريين الموثقين",
+      "step2Title": "اطلب طلبك",
+      "step2Desc": "أرسل طلباً مخصصاً مع متطلباتك وميزانيتك وموعد التسليم",
+      "step3Title": "الحرفي يصنع",
+      "step3Desc": "يصنع حرفيك القطعة بعناية ويبقيك على اطلاع دائم",
+      "step4Title": "أكد وقيّم",
+      "step4Desc": "راجع المنتج النهائي، أكد الاستلام، وقيّم تجربتك"
     },
     "sellerCta": {
       "question": "هل أنت حرفي؟",
@@ -74,7 +95,6 @@
       "button": "أنشئ متجرك"
     }
   },
-
   "browse": {
     "title": "تصفح المنتجات",
     "searchPlaceholder": "ابحث عن منتج أو حرفي...",
@@ -93,13 +113,19 @@
       "price_asc": "السعر: من الأقل",
       "price_desc": "السعر: من الأعلى",
       "rating": "الأعلى تقييماً"
-    }
+    },
+    "featuredProducts": "منتجات مميزة"
   },
-
   "product": {
     "handmade": "✋ مصنوع يدوياً",
     "priceRange": "نطاق السعر",
     "completion": "وقت الإنجاز المتوقع: {{days}} أيام",
+    "daysShort": "{{days}}ي",
+    "badge": {
+      "new": "جديد",
+      "featured": "مميز",
+      "promoted": "مروّج"
+    },
     "requestOrder": "طلب مخصص",
     "requestOrderSub": "طلبك يذهب مباشرة للحرفي للمراجعة",
     "unavailable": "غير متاح",
@@ -110,10 +136,19 @@
       "reviews": "التقييمات",
       "seller": "عن الحرفي"
     },
+    "price": "السعر",
+    "noDescription": "لا يوجد وصف لهذا المنتج.",
     "reviews": {
       "empty": "لا توجد تقييمات بعد",
       "emptySub": "كن أول من يطلب ويقيّم هذا المنتج",
-      "count": "({{count}})"
+      "count": "({{count}})",
+      "checkingSession": "جارٍ التحقق من جلستك...",
+      "loginPrompt": "اترك تقييماً بعد تسجيل الدخول",
+      "signIn": "تسجيل الدخول",
+      "orderPrompt": "هل طلبت هذا المنتج؟",
+      "orderSubBefore": "يمكن تقديم التقييمات من",
+      "orderSubLink": "الطلبات المكتملة",
+      "orderSubAfter": "."
     },
     "seller": {
       "viewProfile": "عرض الملف الكامل"
@@ -133,7 +168,6 @@
     "errorLoad": "تعذّر تحميل هذا المنتج",
     "backToBrowse": "← العودة للتصفح"
   },
-
   "seller": {
     "verified": "موثّق",
     "products": "منتج",
@@ -154,9 +188,13 @@
     },
     "products_empty": "لا توجد منتجات متاحة حالياً",
     "notFound": "الحرفي غير موجود",
-    "errorLoad": "تعذّر تحميل صفحة الحرفي"
+    "errorLoad": "تعذّر تحميل صفحة الحرفي",
+    "since": "منذ {{date}}",
+    "sales": "المبيعات",
+    "productsEmptySub": "لم يضف هذا الحرفي منتجاته بعد",
+    "responseTime": "يرد عادةً في غضون ساعتين",
+    "clientFallback": "عميل"
   },
-
   "order": {
     "title": "طلباتي",
     "total": "{{count}} طلب",
@@ -211,7 +249,6 @@
       "rejecting": "جارٍ الرفض..."
     }
   },
-
   "sellerOrders": {
     "title": "الطلبات",
     "incoming": "الواردة",
@@ -222,7 +259,6 @@
     "purchasesEmpty": "لم تضع أي طلب بعد",
     "purchasesEmptySub": "يمكنك أيضاً الشراء من حرفيين آخرين"
   },
-
   "customOrder": {
     "title": "طلب مخصص",
     "for": "للمنتج: {{name}}",
@@ -287,9 +323,49 @@
       "subtitle": "طلبك المخصص وصل إلى الحرفي. سيراجعه ويرد عليك قريباً.",
       "viewOrders": "عرض طلباتي",
       "continueBrowsing": "متابعة التصفح"
+    },
+    "forProduct": "لمنتج: {{product}}",
+    "detailsTitle": "أخبر الحرفي بما تريد",
+    "detailsSubtitle": "كن دقيقاً قدر الإمكان في اللون والمقاس والخامة.",
+    "requirements": "ماذا تريد؟",
+    "requirementsPlaceholder": "اشرح القطعة المخصصة التي تريد صنعها.",
+    "budget": "الميزانية",
+    "budgetMin": "الحد الأدنى",
+    "budgetMax": "الحد الأقصى",
+    "deadline": "الموعد النهائي",
+    "deadlineHint": "يجب أن يكون في المستقبل",
+    "referenceImages": "صور مرجعية",
+    "referenceImagesHint": "حتى 3 صور",
+    "addImage": "إضافة",
+    "deliveryTitle": "كيف تريد استلامه؟",
+    "deliverySubtitle": "اختر تفضيلات التوصيل والدفع.",
+    "deliveryMethod": "طريقة التوصيل",
+    "paymentMethod": "طريقة الدفع",
+    "contactTitle": "بيانات التواصل",
+    "contactSubtitle": "يحتاج الحرفي لهذه المعلومات للتواصل معك.",
+    "fullName": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "address": "عنوان التوصيل",
+    "successTitle": "تم إرسال الطلب",
+    "successDescription": "تم إرسال طلبك المخصص إلى الحرفي وسيقوم بمراجعته قريباً.",
+    "viewOrders": "عرض طلباتي",
+    "continueBrowsing": "متابعة التصفح",
+    "uploading": "جارٍ الرفع...",
+    "deliveryOptions": {
+      "hand_to_hand": "تسليم يدوي",
+      "office_pickup": "استلام من المكتب",
+      "fast": "توصيل سريع",
+      "hand_to_hand_desc": "مباشرة من الحرفي",
+      "office_pickup_desc": "استلام من مكتب الشريك",
+      "fast_desc": "شحن سريع إلى باب منزلك"
+    },
+    "paymentOptions": {
+      "cash_on_delivery": "الدفع عند الاستلام",
+      "card": "الدفع بالبطاقة",
+      "cash_on_delivery_desc": "ادفع عند الاستلام",
+      "card_desc": "ادفع أونلاين بأمان"
     }
   },
-
   "wishlist": {
     "title": "المنتجات المحفوظة",
     "count_one": "منتج محفوظ",
@@ -300,7 +376,6 @@
     "remove": "إزالة من المحفوظات",
     "save": "حفظ في المفضلة"
   },
-
   "notifications": {
     "title": "الإشعارات",
     "count_one": "إشعار",
@@ -311,18 +386,27 @@
     "sectionEarlier": "السابقة",
     "empty": "أنت على اطلاع بكل شيء!",
     "emptySub": "ستظهر هنا تحديثات الطلبات والتنبيهات",
+    "new_order_body": "لديك طلب مخصص جديد بانتظار مراجعتك",
+    "order_accepted_body": "تم قبول طلبك من قبل الحرفي",
+    "order_rejected_body": "لم يتم قبول طلبك. تحقق من السبب للمزيد من التفاصيل",
+    "order_ready_body": "طلبك جاهز! راجع التفاصيل النهائية وأكد الاستلام",
+    "order_completed_body": "تم تأكيد الطلب — يمكنك الآن تقييم التجربة",
     "types": {
       "new_order": "طلب جديد",
       "order_received": "طلب جديد",
       "order_accepted": "تم قبول الطلب",
       "order_rejected": "تم رفض الطلب",
+      "order_ready": "الطلب جاهز",
       "order_completed": "اكتمل الطلب",
-      "message": "رسالة",
       "system": "إشعار"
     }
   },
-
   "auth": {
+    "otp": {
+      "sentTo": "أرسلنا رمز التحقق إلى",
+      "noCode": "لم تستلم الرمز؟",
+      "tryAgain": "إعادة إرسال الرمز"
+    },
     "login": {
       "title": "أهلاً بعودتك",
       "subtitle": "سجّل دخولك للمتابعة",
@@ -330,15 +414,71 @@
       "emailPlaceholder": "example@email.com",
       "passwordLabel": "كلمة المرور",
       "passwordPlaceholder": "••••••••",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
       "submit": "تسجيل الدخول",
       "submitting": "جارٍ تسجيل الدخول...",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "emailNotVerified": "الرجاء التحقق من بريدك الإلكتروني. تحقق من صندوق الوارد للرمز الذي أرسلناه عند التسجيل.",
+      "verifiedSuccess": "تم التحقق من البريد الإلكتروني! يمكنك الآن تسجيل الدخول.",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
       "noAccount": "ليس لديك حساب؟",
       "createAccount": "إنشاء حساب جديد",
+      "registerPrompt": "جديد في حرفتنا؟",
+      "registerLink": "أنشئ حساباً مجانياً",
+      "agreement": "بتسجيل دخولك، توافق على شروط الاستخدام وسياسة الخصوصية.",
+      "otpTitle": "التحقق بخطوتين",
+      "otpSubtitle": "أدخل الرمز المكوّن من 6 أرقام المُرسَل إلى {{email}}",
+      "otpLabel": "رمز التحقق",
+      "otpPlaceholder": "_ _ _ _ _ _",
+      "otpSubmit": "تحقق من الرمز",
+      "otpSubmitting": "جارٍ التحقق...",
+      "backToLogin": "← العودة لتسجيل الدخول",
       "errors": {
         "emailRequired": "البريد الإلكتروني مطلوب",
         "emailInvalid": "صيغة البريد الإلكتروني غير صحيحة",
         "passwordRequired": "كلمة المرور مطلوبة"
       }
+    },
+    "forgotPassword": {
+      "title": "نسيت كلمة المرور؟",
+      "subtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين",
+      "successTitle": "تحقق من بريدك",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "example@email.com",
+      "submit": "إرسال رابط الإعادة",
+      "submitting": "جارٍ الإرسال...",
+      "successMessage": "إذا كان هذا البريد مسجلاً لدينا، سنرسل إليه رابط إعادة تعيين كلمة المرور.",
+      "backToLogin": "→ العودة لتسجيل الدخول"
+    },
+    "resetPassword": {
+      "title": "تعيين كلمة مرور جديدة",
+      "subtitle": "أدخل كلمة مرور جديدة أدناه",
+      "successTitle": "تم تحديث كلمة المرور!",
+      "newPasswordLabel": "كلمة المرور الجديدة",
+      "confirmPasswordLabel": "تأكيد كلمة المرور",
+      "submit": "تحديث كلمة المرور",
+      "submitting": "جارٍ التحديث...",
+      "successMessage": "تم تحديث كلمة مرورك بنجاح.",
+      "redirecting": "جارٍ التوجيه لتسجيل الدخول خلال 3 ثوانٍ...",
+      "invalidToken": "الرابط غير صالح أو منتهي الصلاحية.",
+      "requestNew": "طلب رابط جديد",
+      "errorExpired": "انتهت صلاحية هذا الرابط. يرجى طلب رابط جديد.",
+      "errorGeneric": "حدث خطأ ما. يرجى المحاولة مجدداً.",
+      "errorPasswordLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل.",
+      "errorPasswordMatch": "كلمتا المرور غير متطابقتين."
+    },
+    "changePassword": {
+      "title": "تغيير كلمة المرور",
+      "oldPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور الجديدة",
+      "submit": "تحديث كلمة المرور",
+      "submitting": "جارٍ التحديث...",
+      "success": "تم تغيير كلمة المرور بنجاح.",
+      "successDescription": "تم تغيير كلمة المرور بنجاح. يرجى تسجيل الدخول مرة أخرى."
     },
     "register": {
       "title": "إنشاء حساب جديد",
@@ -351,21 +491,35 @@
       "passwordPlaceholder": "8 أحرف على الأقل",
       "confirmLabel": "تأكيد كلمة المرور",
       "confirmPlaceholder": "أعد كتابة كلمة المرور",
-      "roleClient": "عميل",
+      "fullName": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "rolePrompt": "أريد أن…",
+      "roleClient": "أشتري",
       "roleClientSub": "أشتري وأطلب",
-      "roleSeller": "حرفي",
+      "roleClientDesc": "اكتشف واطلب منتجات يدوية مخصصة",
+      "roleSeller": "أبيع",
       "roleSellerSub": "أبيع منتجاتي",
+      "roleSellerDesc": "اعرض حرفي واستقبل الطلبات المخصصة",
       "hintClient": "✦ ستتمكن من تصفح المنتجات وطلب قطع مخصصة من الحرفيين",
       "hintSeller": "✦ ستتمكن من إنشاء متجرك وإضافة منتجاتك اليدوية فور التسجيل",
       "terms": "بالتسجيل، أنت توافق على",
       "termsLink": "شروط الاستخدام",
       "and": "و",
       "privacyLink": "سياسة الخصوصية",
+      "loginPrompt": "لديك حساب بالفعل؟",
+      "loginLink": "تسجيل الدخول",
       "hasAccount": "لديك حساب بالفعل؟",
       "signIn": "تسجيل الدخول",
+      "submit": "إنشاء حساب",
       "submitClient": "إنشاء حساب عميل",
       "submitSeller": "إنشاء حساب حرفي",
       "submitting": "جارٍ إنشاء الحساب...",
+      "errorName": "يرجى إدخال اسمك الكامل.",
+      "errorEmail": "يرجى إدخال عنوان بريدك الإلكتروني.",
+      "errorPasswordLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل.",
+      "errorPasswordMatch": "كلمتا المرور غير متطابقتين.",
       "strength": {
         "veryWeak": "ضعيفة جداً",
         "weak": "ضعيفة",
@@ -380,24 +534,53 @@
         "passwordShort": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
         "confirmRequired": "تأكيد كلمة المرور مطلوب",
         "confirmMismatch": "كلمتا المرور غير متطابقتين"
+      },
+      "clientTitle": "أشتري",
+      "clientDescription": "اكتشف واطلب منتجات يدوية مخصصة",
+      "sellerTitle": "أبيع",
+      "sellerDescription": "اعرض حرفك واستقبل طلبات مخصصة",
+      "fullNamePlaceholder": "اسمك الكامل",
+      "confirmPasswordPlaceholder": "أعد كتابة كلمة المرور",
+      "agreement": "بإنشاء الحساب فأنت توافق على شروط الخدمة وسياسة الخصوصية.",
+      "passwordStrength": {
+        "short": "قصيرة جداً",
+        "weak": "ضعيفة",
+        "fair": "متوسطة",
+        "strong": "قوية"
       }
     }
   },
-
   "profile": {
     "title": "ملفي الشخصي",
     "email": "البريد الإلكتروني",
     "nameLabel": "الاسم الكامل",
+    "fullName": "الاسم الكامل",
     "phoneLabel": "رقم الهاتف",
+    "phone": "رقم الهاتف",
     "phoneHint": "اختياري — للتواصل بشأن الطلبات",
+    "photoHint": "اضغط على أيقونة الكاميرا لتغيير صورتك",
     "save": "حفظ",
     "saving": "جارٍ الحفظ...",
     "saved": "تم حفظ الملف الشخصي",
+    "profileSaved": "تم حفظ الملف الشخصي",
     "changePhoto": "اضغط على الكاميرا لتغيير صورتك",
+    "shopInformation": "معلومات المتجر",
+    "saveShop": "حفظ المتجر",
+    "shopName": "اسم المتجر",
+    "shortBio": "نبذة قصيرة",
+    "shortBioHint": "تظهر أسفل اسم متجرك",
+    "category": "الفئة",
+    "city": "المدينة / الولاية",
+    "story": "قصة الحرفي",
+    "fullShopSettings": "إعدادات المتجر الكاملة",
+    "shopNotReady": "ملف المتجر غير جاهز بعد",
+    "shopSaved": "تم حفظ ملف المتجر",
     "myOrders": "طلباتي",
     "myOrdersSub": "عرض وتتبع طلباتك المخصصة",
+    "myOrdersDescription": "عرض وتتبع طلباتك المخصصة",
     "savedProducts": "المنتجات المحفوظة",
     "savedProductsSub": "قائمة المفضلة",
+    "savedProductsDescription": "قائمة المفضلة",
     "changePassword": "تغيير كلمة المرور",
     "currentPassword": "كلمة المرور الحالية",
     "newPassword": "كلمة المرور الجديدة",
@@ -406,9 +589,54 @@
     "updating": "جارٍ التحديث...",
     "passwordChanged": "تم تغيير كلمة المرور",
     "logout": "تسجيل الخروج",
-    "loggingOut": "جارٍ الخروج..."
+    "loggingOut": "جارٍ الخروج...",
+    "sellerAccount": "حساب بائع"
   },
-
+  "payment": {
+    "title": "إتمام الطلب",
+    "amount_to_pay": "المبلغ",
+    "success": "تم الدفع بنجاح!",
+    "completing": "جاري إتمام طلبك...",
+    "cash_title": "الدفع عند الاستلام",
+    "cash_desc": "أكد أنك استلمت المنتج ودفعت للحرفي",
+    "confirm_received": "نعم، استلمت ودفعت",
+    "card_title": "الدفع بالبطاقة",
+    "card_desc": "دفع آمن عبر Chargily",
+    "processing": "جاري المعالجة...",
+    "pay_now": "ادفع الآن",
+    "chargily_note": "مدعوم من Chargily — الدفع الإلكتروني الآمن في الجزائر",
+    "platform_title": "إتمام الدفع",
+    "platform_amount": "المبلغ",
+    "platform_for": "من أجل",
+    "ccp_title": "تحويل CCP / بريدي موب",
+    "ccp_account": "00799999 01234567890",
+    "ccp_name": "HIRFTNA MARKETPLACE",
+    "ccp_note": "بعد التحويل، اضغط أدناه",
+    "card_coming_soon": "قريبًا",
+    "declare_payment": "لقد أتممت التحويل",
+    "declare_note": "سيتحقق المسؤول من الدفع خلال 24 ساعة.",
+    "payment_declared": "تم الإعلان عن الدفع! سيتحقق المسؤول قريبًا.",
+    "activation_fee": "رسوم تفعيل المتجر",
+    "promotion_fee": "رسوم الترقية"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "passwordMin": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+    "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
+    "passwordDifferent": "يجب أن تختلف كلمة المرور الجديدة عن الحالية",
+    "orders": {
+      "requirements": "يرجى وصف ما تريد",
+      "requirementsMax": "لا يمكن أن يتجاوز الوصف 500 حرف",
+      "budgetRange": "يجب أن يكون الحد الأدنى للميزانية أقل من الحد الأقصى",
+      "deliveryMethod": "يرجى اختيار طريقة التوصيل",
+      "paymentMethod": "يرجى اختيار طريقة الدفع",
+      "phone": "يرجى إدخال رقم الهاتف",
+      "phoneShort": "رقم الهاتف قصير جداً",
+      "address": "يرجى إدخال عنوان التوصيل",
+      "addressShort": "يجب أن يكون العنوان 10 أحرف على الأقل",
+      "productMissing": "المنتج غير موجود. يرجى المحاولة مجدداً."
+    }
+  },
   "sellerProfile": {
     "title": "إعدادات المتجر",
     "subtitle": "إدارة ملفك الشخصي كحرفي",
@@ -444,9 +672,15 @@
     "saving": "جارٍ الحفظ...",
     "saved": "تم حفظ الملف بنجاح"
   },
-
   "sellerDashboard": {
     "welcome": "أهلاً بعودتك،",
+    "nav": {
+      "overview": "نظرة عامة",
+      "orders": "الطلبات",
+      "products": "المنتجات",
+      "promotions": "الترقيات",
+      "settings": "إعدادات المتجر"
+    },
     "pendingAlert": "{{count}} طلب في انتظار مراجعتك",
     "stats": {
       "sales": "المبيعات المكتملة",
@@ -466,9 +700,22 @@
     "noOrders": "لا توجد طلبات بعد",
     "noOrdersSub": "شارك رابط متجرك لبدء استقبال الطلبات",
     "viewShop": "عرض",
-    "yourShop": "متجرك العام"
+    "yourShop": "متجرك العام",
+    "wishlist": "قائمة رغباتي",
+    "wishlistSub": "العناصر المحفوظة",
+    "setupTitle": "أنشئ ملف متجرك",
+    "setupSub": "لم تنشئ ملف متجرك بعد. أضف اسم متجرك وتفاصيله لتبدأ في استقبال الطلبات.",
+    "setupAction": "إنشاء ملف المتجر",
+    "customerFallback": "عميل",
+    "customOrderFallback": "طلب مخصص",
+    "signOutSub": "إنهاء جلستك",
+    "boostShop": "عزّز متجري",
+    "boostShopSub": "الظهور في البانر الرئيسي للصفحة الرئيسية",
+    "activationBanner": {
+      "title": "متجرك في انتظار التفعيل",
+      "subtitle": "لن تكون منتجاتك مرئية للعملاء حتى يتم التحقق من حسابك. يستغرق ذلك عادةً 24–48 ساعة."
+    }
   },
-
   "sellerProducts": {
     "title": "منتجاتي",
     "totalActive": "{{total}} منتج · {{active}} نشط",
@@ -476,6 +723,13 @@
     "empty": "لا توجد منتجات بعد",
     "emptySub": "أضف أول منتج يدوي لك لتبدأ البيع",
     "addFirst": "أضف أول منتج",
+    "deleted": "تم حذف المنتج",
+    "added": "تمت إضافة المنتج!",
+    "updated": "تم تحديث المنتج!",
+    "hidden": "تم إخفاء المنتج",
+    "visible": "أصبح المنتج مرئياً الآن",
+    "hideProduct": "إخفاء المنتج",
+    "showProduct": "إظهار المنتج",
     "form": {
       "addTitle": "إضافة منتج جديد",
       "editTitle": "تعديل المنتج",
@@ -495,7 +749,9 @@
       "save": "حفظ التغييرات",
       "add": "إضافة المنتج",
       "saving": "جارٍ الحفظ...",
-      "selectCategory": "اختر..."
+      "selectCategory": "اختر...",
+      "uploadBtn": "رفع",
+      "imagesHint": "{{max}} صور كحد أقصى · JPG, PNG, WebP"
     },
     "delete": {
       "title": "حذف المنتج؟",
@@ -512,9 +768,265 @@
       "delete": "حذف",
       "hide": "إخفاء المنتج",
       "show": "إظهار المنتج"
+    },
+    "unverifiedWarning": "منتجاتك مخفية حالياً عن التصفح العام. ستصبح مرئية بمجرد تفعيل متجرك."
+  },
+  "promotions": {
+    "title": "ترقية متجري",
+    "subtitle": "اجعل متجرك مميزاً في جميع أنحاء المنصة",
+    "currentPromotion": "الترقية الحالية",
+    "status": {
+      "pending": "قيد الانتظار",
+      "active": "نشطة",
+      "expired": "منتهية",
+      "rejected": "مرفوضة"
+    },
+    "starts": "تاريخ البدء",
+    "expires": "تاريخ الانتهاء",
+    "daysLeft": "{{count}} يوم متبقي",
+    "pendingTitle": "في انتظار موافقة الإدارة",
+    "pendingBody": "طلب الترقية قيد المراجعة. سنفعّله في أقرب وقت ممكن.",
+    "rejectedTitle": "تم رفض الترقية",
+    "rejectedReason": "السبب",
+    "boostTitle": "عزّز متجرك",
+    "boostSubtitle": "اوصل إلى كل زائر على حرفتنا",
+    "benefit1": "ظهور في بانر الرئيسية لجميع الزوار",
+    "benefit2": "التناوب مع الحرفيين المميزين الآخرين",
+    "benefit3": "مدة ترقية 30 يوماً",
+    "priceLabel": "ابتداءً من",
+    "price": "تواصل مع الإدارة",
+    "requestCta": "طلب مكان مميز",
+    "adminNote": "سيراجع فريقنا طلبك خلال 24–48 ساعة.",
+    "successTitle": "تم إرسال الطلب!",
+    "successBody": "سنراجع طلب الترقية ونفعّله قريباً.",
+    "heroBadge": "✦ حرفي مميز",
+    "visitShop": "زيارة المتجر",
+    "heroCarouselLabel": "الحرفيون المميزون",
+    "slideN": "الشريحة {{n}}",
+    "featuredSellers": "البائعون المميزون",
+    "boostProduct": {
+      "sectionTitle": "روّج منتجاً",
+      "title": "إبراز منتج محدد",
+      "subtitle": "سلّط الضوء على أفضل أعمالك في نتائج التصفح",
+      "selectProduct": "اختر منتجاً",
+      "selectPlaceholder": "اختر المنتج",
+      "placement": "موضع الإعلان",
+      "placements": {
+        "featured": "مميز (كل الفئات)",
+        "category_top": "أعلى الفئة"
+      },
+      "cta": "طلب تمييز المنتج",
+      "noProducts": "ليس لديك منتجات نشطة للترويج",
+      "selectProductError": "يرجى اختيار منتج أولاً",
+      "successMessage": "تم تقديم طلب تمييز المنتج! سيراجعه فريقنا قريباً."
     }
   },
-
+  "adminPromotions": {
+    "title": "طلبات الترقية",
+    "total": "إجمالي",
+    "tabs": {
+      "all": "الكل",
+      "pending": "قيد الانتظار",
+      "active": "نشطة",
+      "expired": "منتهية"
+    },
+    "status": {
+      "pending": "قيد الانتظار",
+      "active": "نشطة",
+      "expired": "منتهية",
+      "rejected": "مرفوضة"
+    },
+    "placement": "موضع العرض",
+    "duration": "المدة",
+    "requested": "تاريخ الطلب",
+    "expiresOn": "تنتهي {{date}}",
+    "reason": "السبب",
+    "activate": "تفعيل",
+    "reject": "رفض",
+    "cancelPromotion": "إلغاء الترقية",
+    "rejectTitle": "رفض الترقية؟",
+    "rejectReasonPlaceholder": "اشرح سبب رفض هذه الترقية...",
+    "rejectConfirm": "تأكيد الرفض",
+    "empty": "لا توجد ترقيات بعد",
+    "emptySub": "لم يقدّم البائعون طلبات ترقية بعد."
+  },
+  "orders": {
+    "statuses": {
+      "all": "الكل",
+      "pending": "قيد الانتظار",
+      "pendingReview": "قيد المراجعة",
+      "accepted": "مقبول",
+      "rejected": "مرفوض",
+      "ready": "جاهز للتأكيد",
+      "completed": "مكتمل"
+    },
+    "client": {
+      "title": "طلباتي",
+      "summary": "{{count}} طلب",
+      "pendingSummary": "{{count}} تحتاج إجراءً منك",
+      "empty": "لا توجد طلبات بعد",
+      "emptyDescription": "تصفح المنتجات وضع أول طلب مخصص",
+      "emptyFiltered": "لا توجد طلبات بهذا الحالة",
+      "emptyFilteredDescription": "جرب فلتراً مختلفاً",
+      "browse": "ابدأ التصفح"
+    },
+    "seller": {
+      "title": "الطلبات",
+      "incoming": "الواردة",
+      "purchases": "مشترياتي",
+      "pendingReview": "{{count}} طلب (طلبات) تحتاج انتباهك",
+      "emptyIncoming": "لا توجد طلبات واردة بعد",
+      "emptyIncomingDescription": "شارك رابط متجرك لبدء استقبال الطلبات",
+      "emptyPurchases": "لم تضع أي طلبات بعد",
+      "emptyPurchasesDescription": "يمكنك أيضاً الشراء من حرفيين آخرين",
+      "rateClient": "تقييم هذا العميل",
+      "subtitle": "إدارة الطلبات الواردة وتتبع مشترياتك",
+      "incomingTab": "الطلبات الواردة",
+      "pendingReview_other": "{{count}} طلبات تحتاج إلى مراجعتك"
+    },
+    "card": {
+      "orderDescription": "وصف الطلب",
+      "clientBudget": "ميزانية العميل",
+      "requestedDeadline": "الموعد المطلوب",
+      "deliveryMethod": "طريقة التوصيل",
+      "paymentMethod": "طريقة الدفع",
+      "clientPhone": "هاتف العميل",
+      "deliveryAddress": "عنوان التسليم",
+      "referenceImages": "صور مرجعية",
+      "rejectionReason": "سبب الرفض",
+      "finalPriceTitle": "السعر النهائي المحدد من الحرفي",
+      "markReadyTitle": "الطلب منجز — حدد السعر النهائي",
+      "finalPriceLabel": "السعر النهائي",
+      "finalPriceRequired": "الرجاء إدخال سعر نهائي صحيح",
+      "markReady": "تحديد الطلب كجاهز",
+      "confirmMarkReady": "تأكيد وإشعار العميل",
+      "readyForConfirmation": "قام الحرفي بتحديد هذا الطلب كجاهز. يرجى مراجعة السعر النهائي وتأكيد الاستلام.",
+      "confirmCompletion": "تأكيد الاستلام",
+      "confirmComplete": "نعم، استلمته",
+      "accept": "قبول الطلب",
+      "reject": "رفض",
+      "confirmReject": "تأكيد الرفض",
+      "rejectReason": "سبب الرفض",
+      "rejectPlaceholder": "اشرح لماذا لا يمكنك تنفيذ هذا الطلب...",
+      "artisanFallback": "الحرفي",
+      "customerFallback": "العميل",
+      "requestFallback": "طلب مخصص",
+      "updateError": "حدث خطأ، يرجى المحاولة مجدداً.",
+      "placedOn": "أُنشئ في {{date}}",
+      "deliveryLabels": {
+        "hand_to_hand": "يد بيد",
+        "office_pickup": "استلام من المكتب",
+        "fast": "توصيل سريع"
+      },
+      "paymentLabels": {
+        "cash_on_delivery": "الدفع عند الاستلام",
+        "card": "دفع ببطاقة"
+      },
+      "rateSeller": "تقييم الحرفي",
+      "rateProduct": "تقييم المنتج",
+      "sellerRated": "تم تقييم الحرفي ✓",
+      "productReviewed": "تم تقييم المنتج ✓",
+      "updating": "جارٍ التحديث..."
+    }
+  },
+  "reviewSeller": {
+    "title": "تقييم هذا الحرفي",
+    "ratingRequired": "يرجى اختيار تقييم قبل الإرسال",
+    "submit": "إرسال التقييم",
+    "submitting": "جارٍ الإرسال...",
+    "success": "تم إرسال التقييم!",
+    "successSub": "شكراً على ملاحظاتك"
+  },
+  "reviewProduct": {
+    "title": "تقييم هذا المنتج",
+    "ratingRequired": "يرجى اختيار تقييم قبل الإرسال",
+    "commentLabel": "تعليق",
+    "commentHint": "(اختياري)",
+    "commentPlaceholder": "شاركنا تجربتك مع هذا المنتج...",
+    "submit": "إرسال التقييم",
+    "submitting": "جارٍ الإرسال...",
+    "success": "تم إرسال التقييم!",
+    "successSub": "شكراً على ملاحظاتك"
+  },
+  "rateClient": {
+    "title": "تقييم هذا العميل",
+    "ratingRequired": "يرجى اختيار تقييم قبل الإرسال",
+    "commentLabel": "تعليق",
+    "commentHint": "(اختياري)",
+    "commentPlaceholder": "هل كان العميل واضحاً ومهذباً ومتجاوباً؟",
+    "submit": "إرسال التقييم",
+    "success": "تم إرسال التقييم!",
+    "successSub": "شكراً على ملاحظاتك"
+  },
+  "clientProfile": {
+    "title": "ملف العميل",
+    "backButton": "رجوع",
+    "memberSince": "عضو منذ {{date}}",
+    "activeBuyer": "مشتري نشط",
+    "newBuyer": "مشتري جديد",
+    "completedOrders": "الطلبات المكتملة",
+    "avgRating": "متوسط التقييم",
+    "noRatingsYet": "—",
+    "ratingsTitle": "تقييمات البائعين",
+    "noRatings": "لا توجد تقييمات بعد",
+    "noRatingsSub": "لم يتلقَ هذا العميل أي تقييم من البائعين بعد",
+    "recentOrdersTitle": "الطلبات المكتملة الأخيرة",
+    "noRecentOrders": "لا توجد طلبات مكتملة بعد",
+    "productFallback": "طلب مخصص",
+    "shopFallback": "حرفي",
+    "notFound": "العميل غير موجود",
+    "loadingError": "تعذّر تحميل هذا الملف",
+    "retry": "حاول مجدداً"
+  },
+  "chatbot": {
+    "title": "مساعد حرفتنا",
+    "subtitle": "هنا للمساعدة",
+    "open": "فتح المساعد",
+    "close": "إغلاق المساعد",
+    "placeholder": "اسألني أي شيء عن حرفتنا...",
+    "welcome": "مرحبا! أنا مساعد حرفتنا. يمكنني مساعدتك في العثور على المنتجات، شرح كيفية الطلب، أو الإجابة على أي سؤال حول المنصة. كيف يمكنني مساعدتك؟",
+    "fallback": "أنا غير متاح حالياً. يرجى المحاولة مجدداً لاحقاً.",
+    "suggestion1": "كيف تعمل الطلبات؟",
+    "suggestion2": "ما هي الفئات المتاحة؟",
+    "suggestion3": "كيف أتواصل مع البائع؟"
+  },
+  "admin": {
+    "dashboard": "لوحة التحكم",
+    "users": "المستخدمون",
+    "products": "المنتجات",
+    "categories": {
+      "title": "الفئات",
+      "create": "إنشاء فئة",
+      "edit": "تعديل الفئة",
+      "delete": "حذف",
+      "confirmDelete": "حذف الفئة؟",
+      "name": "الاسم",
+      "slug": "المعرف",
+      "iconUrl": "رابط الأيقونة",
+      "createdAt": "تاريخ الإنشاء",
+      "actions": "الإجراءات",
+      "noCategories": "لا توجد فئات بعد",
+      "createSuccess": "تم إنشاء الفئة بنجاح",
+      "updateSuccess": "تم تحديث الفئة بنجاح",
+      "deleteSuccess": "تم حذف الفئة بنجاح",
+      "deleteWarning": "قد تصبح المنتجات في هذه الفئة بدون تصنيف. لا يمكن التراجع عن هذا الإجراء."
+    },
+    "stats": "إحصائيات المنصة",
+    "totalUsers": "إجمالي المستخدمين",
+    "totalProducts": "إجمالي المنتجات",
+    "totalOrders": "إجمالي الطلبات",
+    "totalRevenue": "الإيرادات الإجمالية",
+    "thisMonth": "هذا الشهر",
+    "newUsers": "مستخدمون جدد",
+    "newOrders": "طلبات جديدة",
+    "topSellers": "أفضل البائعين",
+    "topProducts": "أفضل المنتجات",
+    "verifyAction": "توثيق",
+    "revokeAction": "إلغاء التوثيق",
+    "deleteProduct": "حذف المنتج",
+    "confirmDelete": "هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
+    "noData": "لا توجد بيانات بعد"
+  },
   "common": {
     "loading": "جارٍ التحميل...",
     "error": "حدث خطأ غير متوقع، يرجى المحاولة مجدداً",
@@ -522,6 +1034,8 @@
     "back": "رجوع",
     "cancel": "إلغاء",
     "save": "حفظ",
+    "saving": "جارٍ الحفظ...",
+    "optional": "اختياري",
     "edit": "تعديل",
     "delete": "حذف",
     "confirm": "تأكيد",
@@ -541,6 +1055,130 @@
     "minutesAgo": "منذ {{count}} دقيقة",
     "hoursAgo": "منذ {{count}} ساعة",
     "daysAgo": "منذ {{count}} يوم",
-    "logoTagline": "منصة الحرف اليدوية الجزائرية"
+    "anonymous": "مجهول",
+    "notFoundMessage": "عذراً! الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "goBack": "العودة",
+    "weeksAgo": "منذ {{count}} أسبوع",
+    "monthsAgo": "منذ {{count}} شهر",
+    "logoTagline": "منصة الحرف اليدوية الجزائرية",
+    "unknownError": "حدث خطأ غير متوقع. يرجى المحاولة مجدداً.",
+    "appNameArabic": "حرفتنا",
+    "appNameLatin": "MARKETPLACE",
+    "next": "التالي",
+    "memberSince": "عضو منذ",
+    "continue": "متابعة",
+    "all": "الكل"
+  },
+  "bottomNav": {
+    "home": "الرئيسية",
+    "browse": "تصفح",
+    "wishlist": "محفوظة",
+    "login": "دخول",
+    "orders": "طلباتي",
+    "profile": "ملفي",
+    "notifications": "تنبيهات",
+    "dashboard": "لوحة التحكم",
+    "users": "المستخدمون",
+    "products": "المنتجات",
+    "categories": "الفئات"
+  },
+  "topbar": {
+    "homeAria": "الانتقال للصفحة الرئيسية",
+    "search": "بحث",
+    "searchPlaceholder": "ابحث عن منتجات أو حرفيين...",
+    "closeSearch": "إغلاق البحث",
+    "clearSearch": "مسح البحث",
+    "categories": "الفئات",
+    "allCategories": "كل الفئات",
+    "shopByCategory": "تسوق حسب الفئة",
+    "closeMenu": "إغلاق القائمة",
+    "menu": "القائمة",
+    "account": "حسابي",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "wishlist": "المحفوظات",
+    "orders": "الطلبات",
+    "profile": "الملف الشخصي",
+    "notifications": "الإشعارات",
+    "browse": "تصفح المنتجات"
+  },
+  "desktopNav": {
+    "dashboard": "لوحة التحكم",
+    "manageOrders": "إدارة الطلبات",
+    "shopSettings": "إعدادات المتجر",
+    "myProfile": "ملفي الشخصي",
+    "myOrders": "طلباتي",
+    "wishlist": "المحفوظات",
+    "sellerAccount": "حساب الحرفي",
+    "adminAccount": "حساب المشرف",
+    "signOut": "تسجيل الخروج",
+    "guestCta": "إنشاء حساب"
+  },
+  "language": {
+    "english": "English",
+    "arabic": "العربية",
+    "switcher": "تغيير اللغة"
+  },
+  "verification": {
+    "badge": {
+      "label": "موثق",
+      "tooltip": "هذا الحرفي استوفى جميع معايير الجودة"
+    },
+    "banner": {
+      "title": "متجرك لم يتم توثيقه بعد",
+      "subtitle": "أكمل المتطلبات أدناه لتحصل على شارة التوثيق وتكتسب ثقة المشترين."
+    },
+    "card": {
+      "title": "تقدم التوثيق",
+      "hint": "بمجرد استيفاء جميع المعايير، تُمنح الشارة تلقائياً.",
+      "verified": "متجرك موثق ✓"
+    },
+    "criteria": {
+      "activeProducts": "منتج نشط واحد على الأقل",
+      "completedOrders": "على الأقل {{required}} طلبات مكتملة",
+      "avgRating": "متوسط التقييم ≥ {{required}} نجوم",
+      "completeProfile": "ملف متجر مكتمل (الاسم، السيرة، الصورة، الموقع)"
+    }
+  },
+  "adminUsers": {
+    "title": "إدارة المستخدمين",
+    "totalCount": "{{count}} مستخدم إجمالاً",
+    "searchPlaceholder": "ابحث بالاسم أو البريد الإلكتروني...",
+    "tabs": {
+      "all": "الكل",
+      "clients": "العملاء",
+      "sellers": "الحرفيون",
+      "unverifiedSellers": "الحرفيون غير الموثقين"
+    },
+    "joined": "انضم",
+    "unknownUser": "مجهول",
+    "products": "المنتجات",
+    "orders": "الطلبات",
+    "rating": "التقييم",
+    "placed": "طلبات",
+    "completed": "مكتمل",
+    "viewShop": "عرض المتجر",
+    "viewProfile": "عرض الملف",
+    "makeSeller": "ترقية لحرفي",
+    "showing": "عرض {{range}}",
+    "empty": "لا يوجد مستخدمون",
+    "emptySub": "جرّب تعديل البحث أو الفلاتر",
+    "noShopProfile": "لا يوجد ملف متجر بعد",
+    "revokeTitle": "إلغاء التوثيق؟",
+    "revokeBody": "سيؤدي هذا إلى إزالة شارة التوثيق من \"{{name}}\" وإعلامهم. يمكنهم استعادتها باستيفاء المعايير.",
+    "changeRoleTitle": "ترقية إلى حرفي؟",
+    "changeRoleBody": "سيصبح \"{{name}}\" حساب حرفي ويحصل على الوصول إلى لوحة تحكم البائع."
+  },
+  "categories": {
+    "Pottery": "الفخار",
+    "Textiles": "المنسوجات",
+    "Jewelry": "المجوهرات",
+    "Leather Goods": "المصنوعات الجلدية",
+    "Paintings": "اللوحات الفنية",
+    "Candles & Soap": "الشموع والصابون",
+    "Food & Honey": "الطعام والعسل",
+    "Home Decor": "ديكور المنزل",
+    "Other": "أخرى",
+    "sweets": "الحلويات"
   }
 }

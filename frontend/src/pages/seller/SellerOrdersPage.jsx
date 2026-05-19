@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Inbox, ShoppingBag } from 'lucide-react';
 import { extractApiItems, ordersAPI } from '../../services/api';
 import OrderCard from '../../components/order/OrderCard';
+import RateClientModal from '../../components/order/RateClientModal';
 import { useTranslation } from '../../i18n/index.jsx';
+import DashboardSidebar from '../../components/layout/DashboardSidebar';
 
 function OrderSkeleton() {
   return (
@@ -52,12 +54,15 @@ function EmptyState({ viewAs, hasFilter }) {
 
 function OrdersList({ orders, loading, viewAs, statusFilter, onStatusFilter, onOrderUpdated }) {
   const { t } = useTranslation();
+  const [ratingOrder, setRatingOrder] = useState(null); // order being rated
+
   const statusFilters = useMemo(() => ([
-    { value: 'all', label: t('orders.statuses.all') },
-    { value: 'pending', label: t('orders.statuses.pending') },
-    { value: 'accepted', label: t('orders.statuses.accepted') },
+    { value: 'all',       label: t('orders.statuses.all') },
+    { value: 'pending',   label: t('orders.statuses.pending') },
+    { value: 'accepted',  label: t('orders.statuses.accepted') },
+    { value: 'ready',     label: t('orders.statuses.ready') },
     { value: 'completed', label: t('orders.statuses.completed') },
-    { value: 'rejected', label: t('orders.statuses.rejected') },
+    { value: 'rejected',  label: t('orders.statuses.rejected') },
   ]), [t]);
 
   const filteredOrders = statusFilter === 'all'
@@ -79,9 +84,11 @@ function OrdersList({ orders, loading, viewAs, statusFilter, onStatusFilter, onO
                 type="button"
                 onClick={() => onStatusFilter(filter.value)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-all flex-shrink-0 ${
-                  statusFilter === filter.value
-                    ? 'bg-sage-500 text-white border-sage-500'
-                    : 'bg-white text-warm-500 border-beige-200 hover:border-sage-300'
+                  statusFilter === filter.value && filter.value === 'ready'
+                    ? 'bg-info text-white border-info'
+                    : statusFilter === filter.value
+                      ? 'bg-sage-500 text-white border-sage-500'
+                      : 'bg-white text-warm-500 border-beige-200 hover:border-sage-300'
                 }`}
               >
                 {filter.label}
@@ -105,15 +112,41 @@ function OrdersList({ orders, loading, viewAs, statusFilter, onStatusFilter, onO
           : filteredOrders.length === 0
             ? <EmptyState viewAs={viewAs} hasFilter={statusFilter !== 'all'} />
             : filteredOrders.map((order) => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                viewAs={viewAs}
-                onUpdated={onOrderUpdated}
-              />
+              <div key={order.id}>
+                <OrderCard
+                  order={order}
+                  viewAs={viewAs}
+                  onUpdated={onOrderUpdated}
+                />
+                {/* Rate Client button — only for seller on completed incoming orders */}
+                {viewAs === 'seller' && order.status === 'completed' && (
+                  <RateClientButton order={order} onRate={() => setRatingOrder(order)} />
+                )}
+              </div>
             ))}
       </div>
+
+      {ratingOrder && (
+        <RateClientModal
+          order={ratingOrder}
+          onClose={() => setRatingOrder(null)}
+          onRated={() => setRatingOrder(null)}
+        />
+      )}
     </div>
+  );
+}
+
+function RateClientButton({ order, onRate }) {
+  const { t } = useTranslation();
+  return (
+    <button
+      type="button"
+      onClick={onRate}
+      className="w-full mt-1.5 py-2 text-xs font-semibold text-warm-500 bg-cream-100 hover:bg-beige-200 border border-beige-200 rounded-2xl transition-colors flex items-center justify-center gap-1.5"
+    >
+      ★ {t('orders.seller.rateClient')}
+    </button>
   );
 }
 
@@ -124,16 +157,20 @@ export default function SellerOrdersPage() {
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [loadingIncoming, setLoadingIncoming] = useState(true);
   const [loadingPurchases, setLoadingPurchases] = useState(false);
+  const [incomingError, setIncomingError] = useState(false);
+  const purchasesLoaded = useRef(false);
   const [incomingFilter, setIncomingFilter] = useState('all');
   const [purchaseFilter, setPurchaseFilter] = useState('all');
 
   const loadIncoming = useCallback(async () => {
     setLoadingIncoming(true);
+    setIncomingError(false);
     try {
-      const response = await ordersAPI.getAll();
+      const response = await ordersAPI.getAll({ limit: 100 });
       setIncomingOrders(extractApiItems(response, { itemKeys: ['orders'] }));
     } catch {
       setIncomingOrders([]);
+      setIncomingError(true);
     } finally {
       setLoadingIncoming(false);
     }
@@ -142,7 +179,7 @@ export default function SellerOrdersPage() {
   const loadPurchases = useCallback(async () => {
     setLoadingPurchases(true);
     try {
-      const response = await ordersAPI.getAll({ as: 'client' });
+      const response = await ordersAPI.getAll({ as: 'client', limit: 100 });
       setPurchaseOrders(extractApiItems(response, { itemKeys: ['orders'] }));
     } catch {
       setPurchaseOrders([]);
@@ -156,10 +193,11 @@ export default function SellerOrdersPage() {
   }, [loadIncoming]);
 
   useEffect(() => {
-    if (activeTab === 'purchases' && purchaseOrders.length === 0 && !loadingPurchases) {
+    if (activeTab === 'purchases' && !purchasesLoaded.current) {
+      purchasesLoaded.current = true;
       loadPurchases();
     }
-  }, [activeTab, purchaseOrders.length, loadingPurchases, loadPurchases]);
+  }, [activeTab, loadPurchases]);
 
   const handleIncomingUpdated = (updatedOrder) => {
     setIncomingOrders((current) => current.map((order) => (
@@ -173,7 +211,10 @@ export default function SellerOrdersPage() {
     )));
   };
 
-  const pendingCount = incomingOrders.filter((order) => order.status === 'pending').length;
+  // Orders needing seller action: pending (accept/reject) + accepted (mark as ready)
+  const actionCount = incomingOrders.filter(
+    (o) => o.status === 'pending' || o.status === 'accepted'
+  ).length;
 
   const topTabs = [
     { value: 'incoming', label: t('orders.seller.incoming'), icon: Inbox, count: incomingOrders.length },
@@ -181,16 +222,18 @@ export default function SellerOrdersPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-cream-100 pb-28 md:pb-10">
+    <div className="min-h-screen bg-cream-100 md:flex">
+      <DashboardSidebar role="seller" />
+      <div className="flex-1 pb-28 md:pb-10">
       <div className="sticky top-14 z-30 bg-cream-100/95 backdrop-blur-sm border-b border-beige-100">
         <div className="max-w-xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
             <div>
               <h1 className="text-lg font-bold text-warm-900">{t('orders.seller.title')}</h1>
-              {pendingCount > 0 && (
+              {actionCount > 0 && (
                 <p className="text-xs text-warning font-semibold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 bg-warning rounded-full animate-pulse" />
-                  {t('orders.seller.pendingReview', { count: pendingCount })}
+                  {t('orders.seller.pendingReview', { count: actionCount })}
                 </p>
               )}
             </div>
@@ -225,6 +268,15 @@ export default function SellerOrdersPage() {
       </div>
 
       <div className="max-w-xl mx-auto px-4 py-4">
+        {incomingError && activeTab === 'incoming' && (
+          <div className="flex items-center gap-3 bg-red-50 border border-red-100 text-danger text-sm rounded-2xl px-4 py-3 mb-3">
+            <Inbox size={15} className="flex-shrink-0 opacity-60" />
+            <span className="flex-1">{t('common.error')}</span>
+            <button onClick={loadIncoming} className="text-xs font-semibold underline underline-offset-2">
+              {t('common.retry')}
+            </button>
+          </div>
+        )}
         {activeTab === 'incoming' ? (
           <OrdersList
             orders={incomingOrders}
@@ -244,6 +296,7 @@ export default function SellerOrdersPage() {
             onOrderUpdated={handlePurchaseUpdated}
           />
         )}
+      </div>
       </div>
     </div>
   );

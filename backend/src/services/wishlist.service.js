@@ -5,9 +5,6 @@ const { AppError } = require('../middlewares/error.middleware');
 const logger = require('../utils/logger');
 const productService = require('./product.service');
 
-const isNotFound = (error) =>
-  error?.code === 'PGRST116' || error?.code === '406';
-
 const getWishlist = async (userId, query) => {
   const page = Number(query.page) > 0 ? Number(query.page) : 1;
   const limit = Number(query.limit) > 0 ? Number(query.limit) : 20;
@@ -116,7 +113,7 @@ const addToWishlist = async (userId, productId) => {
     throw new AppError('Failed to add to wishlist', 500);
   }
 
-  supabaseAdmin
+  void supabaseAdmin
     .from('browsing_events')
     .insert({ user_id: userId, product_id: productId, event_type: 'wishlist' })
     .then(({ error: eventError }) => {
@@ -128,6 +125,9 @@ const addToWishlist = async (userId, productId) => {
           error: eventError.message,
         });
       }
+    })
+    .catch((err) => {
+      logger.error({ message: 'Unexpected error tracking wishlist event', userId, productId, error: err.message });
     });
 
   logger.info({ message: 'Added to wishlist', userId, productId });

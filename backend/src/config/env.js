@@ -19,10 +19,14 @@ const REQUIRED_ENV_VARS = [
 // OPTIONAL ENV VARS (added later when features are built)
 // ─────────────────────────────────────────────────────────────
 const OPTIONAL_ENV_VARS = [
-  'OPENAI_API_KEY',        // Phase 11 — AI Chatbot
-  'STRIPE_SECRET_KEY',     // Phase 12 — Payments
-  'STRIPE_WEBHOOK_SECRET', // Phase 12 — Payments
-  'RESEND_API_KEY',        // Notifications email
+  'GEMINI_API_KEY',          // Phase 11 — AI Chatbot
+  'CHARGILY_SECRET_KEY',     // Phase 12 — Payments
+  'CHARGILY_WEBHOOK_SECRET', // Phase 12 — Payments
+  'SMTP_HOST',               // Email OTP
+  'SMTP_PORT',               // Email OTP
+  'SMTP_USER',               // Email OTP
+  'SMTP_PASS',               // Email OTP
+  'SMTP_FROM',               // Email OTP
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -142,7 +146,19 @@ const validateEnv = () => {
     process.exit(1);
   }
 
-  // ── Step 7: Warn about unset optional vars ────────────────
+  // ── Step 7: If OTP is enabled, SMTP credentials are required ─
+  const otpEnabled =
+    ['1', 'true'].includes(String(process.env.AUTH_OTP_ENABLED || '').toLowerCase());
+
+  if (otpEnabled && (!isPresent(process.env.SMTP_USER) || !isPresent(process.env.SMTP_PASS))) {
+    logger.error(
+      '❌ AUTH_OTP_ENABLED is true but SMTP_USER or SMTP_PASS is not set. ' +
+      'Add SMTP_USER and SMTP_PASS to your .env file.'
+    );
+    process.exit(1);
+  }
+
+  // ── Step 8: Warn about unset optional vars ────────────────
   // FIX 3 — use isPresent() to catch whitespace-only values
   const missingOptional = OPTIONAL_ENV_VARS.filter(
     (key) => !isPresent(process.env[key])
@@ -189,15 +205,12 @@ const getConfig = () => ({
   jwtSecret: process.env.JWT_SECRET,
 
   // External services (may be undefined until configured)
-  openai: {
-    apiKey: process.env.OPENAI_API_KEY,
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY,
   },
-  stripe: {
-    secretKey:     process.env.STRIPE_SECRET_KEY,
-    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
-  },
-  resend: {
-    apiKey: process.env.RESEND_API_KEY,
+  chargily: {
+    secretKey:     process.env.CHARGILY_SECRET_KEY,
+    webhookSecret: process.env.CHARGILY_WEBHOOK_SECRET,
   },
 });
 

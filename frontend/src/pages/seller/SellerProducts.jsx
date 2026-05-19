@@ -3,7 +3,9 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, Package,
   CheckCircle2, AlertCircle, X, Upload, Loader2,
 } from 'lucide-react';
-import { categoriesAPI, extractApiItems, productsAPI, uploadsAPI } from '../../services/api';
+import { categoriesAPI, extractApiItems, productsAPI, sellersAPI, uploadsAPI } from '../../services/api';
+import { useTranslation } from '../../i18n/index.jsx';
+import DashboardSidebar from '../../components/layout/DashboardSidebar';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatPrice(val) {
@@ -14,8 +16,8 @@ function formatPrice(val) {
 // ─── Toast ────────────────────────────────────────────────────────────────────
 function Toast({ message, type = 'success', onClose }) {
   useEffect(() => {
-    const t = setTimeout(onClose, 3500);
-    return () => clearTimeout(t);
+    const timer = setTimeout(onClose, 3500);
+    return () => clearTimeout(timer);
   }, [onClose]);
 
   return (
@@ -30,17 +32,19 @@ function Toast({ message, type = 'success', onClose }) {
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ active }) {
+  const { t } = useTranslation();
   return (
     <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full
       ${active ? 'bg-sage-100 text-sage-700' : 'bg-cream-200 text-warm-400'}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-sage-500' : 'bg-warm-300'}`} />
-      {active ? 'Active' : 'Hidden'}
+      {active ? t('sellerProducts.status.active') : t('sellerProducts.status.hidden')}
     </span>
   );
 }
 
 // ─── Image Uploader ───────────────────────────────────────────────────────────
 function ImageUploader({ images, onChange, maxImages = 3 }) {
+  const { t } = useTranslation();
   const inputRef  = useRef(null);
   const [uploading, setUploading] = useState(false);
 
@@ -92,7 +96,7 @@ function ImageUploader({ images, onChange, maxImages = 3 }) {
           >
             {uploading
               ? <Loader2 size={18} className="animate-spin" />
-              : <><Upload size={16} /><span className="text-[9px] font-medium">Upload</span></>
+              : <><Upload size={16} /><span className="text-[9px] font-medium">{t('sellerProducts.form.uploadBtn')}</span></>
             }
           </button>
         )}
@@ -106,7 +110,7 @@ function ImageUploader({ images, onChange, maxImages = 3 }) {
         className="hidden"
         onChange={(e) => handleFiles(e.target.files)}
       />
-      <p className="text-[10px] text-warm-400">Max {maxImages} images • JPG, PNG, WebP</p>
+      <p className="text-[10px] text-warm-400">{t('sellerProducts.form.imagesHint', { max: maxImages })}</p>
     </div>
   );
 }
@@ -130,6 +134,7 @@ const EMPTY_FORM = {
 };
 
 function ProductFormModal({ product, categories, onClose, onSaved }) {
+  const { t } = useTranslation();
   const isEdit = !!product;
   const [form,    setForm]    = useState(
     isEdit
@@ -153,10 +158,10 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
 
   function validate() {
     const e = {};
-    if (!form.name.trim())        e.name        = 'Product name is required';
-    if (!form.description.trim()) e.description = 'Description is required';
-    if (!form.price)              e.price       = 'Base price is required';
-    if (!form.category_id)        e.category_id = 'Select a category';
+    if (!form.name.trim())        e.name        = t('validation.required');
+    if (!form.description.trim()) e.description = t('validation.required');
+    if (!form.price)              e.price       = t('validation.required');
+    if (!form.category_id)        e.category_id = t('validation.required');
     return e;
   }
 
@@ -167,7 +172,6 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
     setErrors({});
     setSaving(true);
 
-    // Build payload matching backend schema
     const payload = {
       name:            form.name.trim(),
       description:     form.description.trim(),
@@ -177,7 +181,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
       category_id:     form.category_id,
       completion_days: form.completion_days ? Number(form.completion_days) : undefined,
       is_active:       form.is_active,
-      images:          form.images,  // array of URLs
+      images:          form.images,
     };
 
     try {
@@ -188,7 +192,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
       }
       onSaved();
     } catch (err) {
-      setErrors({ global: err?.response?.data?.message ?? 'Failed to save product' });
+      setErrors({ global: err?.response?.data?.message ?? t('common.error') });
     } finally {
       setSaving(false);
     }
@@ -212,7 +216,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
           {/* Header */}
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-warm-900">
-              {isEdit ? 'Edit Product' : 'Add New Product'}
+              {isEdit ? t('sellerProducts.form.editTitle') : t('sellerProducts.form.addTitle')}
             </h2>
             <button onClick={onClose} className="w-8 h-8 rounded-full bg-cream-200 flex items-center justify-center hover:bg-beige-200 transition-colors">
               <X size={16} className="text-warm-600" />
@@ -228,11 +232,11 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {/* Name */}
             <div>
-              <label className="block text-xs font-semibold text-warm-600 mb-1.5">Product Name *</label>
+              <label className="block text-xs font-semibold text-warm-600 mb-1.5">{t('sellerProducts.form.nameLabel')} *</label>
               <input
                 value={form.name}
                 onChange={e => set('name', e.target.value)}
-                placeholder="e.g. Handwoven Berber Rug"
+                placeholder={t('sellerProducts.form.namePlaceholder')}
                 className={`w-full px-4 py-2.5 text-sm bg-cream-100 border rounded-2xl outline-none focus:border-sage-400 transition-colors
                   ${errors.name ? 'border-danger' : 'border-beige-200'}`}
               />
@@ -241,11 +245,11 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
 
             {/* Description */}
             <div>
-              <label className="block text-xs font-semibold text-warm-600 mb-1.5">Description *</label>
+              <label className="block text-xs font-semibold text-warm-600 mb-1.5">{t('sellerProducts.form.descLabel')} *</label>
               <textarea
                 value={form.description}
                 onChange={e => set('description', e.target.value)}
-                placeholder="Describe your product, materials, dimensions..."
+                placeholder={t('sellerProducts.form.descPlaceholder')}
                 rows={3}
                 className={`w-full px-4 py-2.5 text-sm bg-cream-100 border rounded-2xl outline-none focus:border-sage-400 transition-colors resize-none
                   ${errors.description ? 'border-danger' : 'border-beige-200'}`}
@@ -255,28 +259,28 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
 
             {/* Prices */}
             <div>
-              <label className="block text-xs font-semibold text-warm-600 mb-1.5">Pricing (DZD) *</label>
+              <label className="block text-xs font-semibold text-warm-600 mb-1.5">{t('sellerProducts.form.pricingLabel')} *</label>
               <div className="grid grid-cols-3 gap-2">
                 <div>
                   <input
                     type="number"
                     value={form.price}
                     onChange={e => set('price', e.target.value)}
-                    placeholder="Base"
+                    placeholder={t('sellerProducts.form.basePrice')}
                     className={`w-full px-3 py-2.5 text-sm bg-cream-100 border rounded-2xl outline-none focus:border-sage-400 transition-colors
                       ${errors.price ? 'border-danger' : 'border-beige-200'}`}
                   />
-                  <p className="text-[9px] text-warm-400 mt-1 text-center">Base *</p>
+                  <p className="text-[9px] text-warm-400 mt-1 text-center">{t('sellerProducts.form.basePrice')} *</p>
                 </div>
                 <div>
                   <input type="number" value={form.price_min} onChange={e => set('price_min', e.target.value)}
-                    placeholder="Min" className="w-full px-3 py-2.5 text-sm bg-cream-100 border border-beige-200 rounded-2xl outline-none focus:border-sage-400 transition-colors" />
-                  <p className="text-[9px] text-warm-400 mt-1 text-center">Min Range</p>
+                    placeholder={t('sellerProducts.form.minPrice')} className="w-full px-3 py-2.5 text-sm bg-cream-100 border border-beige-200 rounded-2xl outline-none focus:border-sage-400 transition-colors" />
+                  <p className="text-[9px] text-warm-400 mt-1 text-center">{t('sellerProducts.form.minPrice')}</p>
                 </div>
                 <div>
                   <input type="number" value={form.price_max} onChange={e => set('price_max', e.target.value)}
-                    placeholder="Max" className="w-full px-3 py-2.5 text-sm bg-cream-100 border border-beige-200 rounded-2xl outline-none focus:border-sage-400 transition-colors" />
-                  <p className="text-[9px] text-warm-400 mt-1 text-center">Max Range</p>
+                    placeholder={t('sellerProducts.form.maxPrice')} className="w-full px-3 py-2.5 text-sm bg-cream-100 border border-beige-200 rounded-2xl outline-none focus:border-sage-400 transition-colors" />
+                  <p className="text-[9px] text-warm-400 mt-1 text-center">{t('sellerProducts.form.maxPrice')}</p>
                 </div>
               </div>
               {errors.price && <p className="text-[10px] text-danger mt-1">{errors.price}</p>}
@@ -285,27 +289,27 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
             {/* Category + Completion days */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-warm-600 mb-1.5">Category *</label>
+                <label className="block text-xs font-semibold text-warm-600 mb-1.5">{t('sellerProducts.form.categoryLabel')} *</label>
                 <select
                   value={form.category_id}
                   onChange={e => set('category_id', e.target.value)}
                   className={`w-full px-3 py-2.5 text-sm bg-cream-100 border rounded-2xl outline-none focus:border-sage-400 transition-colors
                     ${errors.category_id ? 'border-danger' : 'border-beige-200'}`}
                 >
-                  <option value="">Select...</option>
+                  <option value="">{t('sellerProducts.form.selectCategory')}</option>
                   {cats.map(c => (
-                    <option key={c.id ?? c.slug} value={c.id ?? c.slug}>{c.name}</option>
+                    <option key={c.id ?? c.slug} value={c.id ?? c.slug}>{t(`categories.${c.name}`, c.name)}</option>
                   ))}
                 </select>
                 {errors.category_id && <p className="text-[10px] text-danger mt-1">{errors.category_id}</p>}
               </div>
               <div>
-                <label className="block text-xs font-semibold text-warm-600 mb-1.5">Completion (days)</label>
+                <label className="block text-xs font-semibold text-warm-600 mb-1.5">{t('sellerProducts.form.completionLabel')}</label>
                 <input
                   type="number"
                   value={form.completion_days}
                   onChange={e => set('completion_days', e.target.value)}
-                  placeholder="e.g. 7"
+                  placeholder="7"
                   className="w-full px-3 py-2.5 text-sm bg-cream-100 border border-beige-200 rounded-2xl outline-none focus:border-sage-400 transition-colors"
                 />
               </div>
@@ -313,7 +317,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
 
             {/* Images */}
             <div>
-              <label className="block text-xs font-semibold text-warm-600 mb-1.5">Product Images</label>
+              <label className="block text-xs font-semibold text-warm-600 mb-1.5">{t('sellerProducts.form.imagesLabel')}</label>
               <ImageUploader
                 images={form.images}
                 onChange={urls => set('images', urls)}
@@ -323,8 +327,8 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
             {/* Active toggle */}
             <div className="flex items-center justify-between py-3 px-4 bg-cream-100 rounded-2xl border border-beige-200">
               <div>
-                <p className="text-sm font-semibold text-warm-800">Visible to buyers</p>
-                <p className="text-[10px] text-warm-400">Toggle to show or hide this product</p>
+                <p className="text-sm font-semibold text-warm-800">{t('sellerProducts.form.visibleLabel')}</p>
+                <p className="text-[10px] text-warm-400">{t('sellerProducts.form.visibleSub')}</p>
               </div>
               <button
                 type="button"
@@ -344,7 +348,10 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
               className="w-full py-3.5 bg-sage-500 hover:bg-sage-600 text-white font-semibold text-sm rounded-2xl
                 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              {saving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : isEdit ? 'Save Changes' : 'Add Product'}
+              {saving
+                ? <><Loader2 size={16} className="animate-spin" /> {t('sellerProducts.form.saving')}</>
+                : isEdit ? t('sellerProducts.form.save') : t('sellerProducts.form.add')
+              }
             </button>
           </form>
         </div>
@@ -355,6 +362,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }) {
 
 // ─── Delete Confirm Modal ─────────────────────────────────────────────────────
 function DeleteModal({ product, onClose, onDeleted }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   async function handleDelete() {
@@ -374,19 +382,19 @@ function DeleteModal({ product, onClose, onDeleted }) {
           <Trash2 size={22} className="text-danger" />
         </div>
         <div className="text-center">
-          <h3 className="text-base font-bold text-warm-900 mb-1">Delete Product?</h3>
+          <h3 className="text-base font-bold text-warm-900 mb-1">{t('sellerProducts.delete.title')}</h3>
           <p className="text-sm text-warm-400">
-            "<span className="text-warm-700 font-medium">{product.name}</span>" will be permanently removed.
+            {t('sellerProducts.delete.body', { name: product.name })}
           </p>
         </div>
         <div className="flex gap-3">
           <button onClick={onClose} className="flex-1 py-2.5 bg-cream-200 text-warm-700 text-sm font-semibold rounded-2xl hover:bg-beige-200 transition-colors">
-            Cancel
+            {t('sellerProducts.delete.cancel')}
           </button>
           <button onClick={handleDelete} disabled={loading}
             className="flex-1 py-2.5 bg-danger text-white text-sm font-semibold rounded-2xl hover:bg-red-700 transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
             {loading ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-            Delete
+            {t('sellerProducts.delete.confirm')}
           </button>
         </div>
       </div>
@@ -396,6 +404,7 @@ function DeleteModal({ product, onClose, onDeleted }) {
 
 // ─── Product Row Card ─────────────────────────────────────────────────────────
 function ProductCard({ product, onEdit, onDelete, onToggle }) {
+  const { t } = useTranslation();
   const [toggling, setToggling] = useState(false);
   const image = product.product_images?.[0]?.image_url ?? product.image_url ?? null;
 
@@ -424,7 +433,7 @@ function ProductCard({ product, onEdit, onDelete, onToggle }) {
         <p className="text-xs text-warm-400 truncate mb-1.5">{product.description}</p>
         <div className="flex items-center gap-3 text-xs text-warm-500">
           <span className="font-semibold text-warm-800">{formatPrice(product.price_min ?? product.price)}</span>
-          {product.completion_days && <span>⏱ {product.completion_days}d</span>}
+          {product.completion_days && <span>⏱ {t('product.daysShort', { days: product.completion_days })}</span>}
           {product.avg_rating > 0 && <span>★ {Number(product.avg_rating).toFixed(1)}</span>}
         </div>
       </div>
@@ -436,7 +445,7 @@ function ProductCard({ product, onEdit, onDelete, onToggle }) {
           onClick={handleToggle}
           disabled={toggling}
           className="w-8 h-8 rounded-xl bg-cream-200 hover:bg-beige-200 flex items-center justify-center transition-colors disabled:opacity-50"
-          title={product.is_active ? 'Hide product' : 'Show product'}
+          title={product.is_active ? t('sellerProducts.hideProduct') : t('sellerProducts.showProduct')}
         >
           {toggling ? <Loader2 size={14} className="animate-spin text-warm-400" /> : product.is_active ? <Eye size={14} className="text-sage-600" /> : <EyeOff size={14} className="text-warm-400" />}
         </button>
@@ -457,9 +466,11 @@ function ProductCard({ product, onEdit, onDelete, onToggle }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function SellerProducts() {
+  const { t } = useTranslation();
   const [products,     setProducts]     = useState([]);
   const [categories,   setCategories]   = useState([]);
   const [loading,      setLoading]      = useState(true);
+  const [isVerified,   setIsVerified]   = useState(null); // null = loading
   const [modal,        setModal]        = useState(null); // 'add' | product object | null
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [toast,        setToast]        = useState(null);
@@ -468,18 +479,17 @@ export default function SellerProducts() {
     setToast({ message, type });
   }
 
-  // Load seller's products
   const loadProducts = useCallback(async () => {
     setLoading(true);
     try {
       const res  = await productsAPI.getMyProducts();
       setProducts(extractApiItems(res, { itemKeys: ['products'] }));
     } catch {
-      showToast('Failed to load products', 'error');
+      showToast(t('common.error'), 'error');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadProducts();
@@ -488,45 +498,65 @@ export default function SellerProducts() {
         setCategories(extractApiItems(response, { itemKeys: ['categories'] }));
       })
       .catch(() => setCategories([]));
+    sellersAPI.getMe()
+      .then((response) => {
+        setIsVerified(response.data?.data?.seller?.is_verified ?? response.data?.data?.is_verified ?? null);
+      })
+      .catch(() => setIsVerified(null));
   }, [loadProducts]);
 
   async function handleToggle(product) {
     try {
       await productsAPI.update(product.id, { is_active: !product.is_active });
       setProducts(prev => prev.map(p => p.id === product.id ? { ...p, is_active: !p.is_active } : p));
-      showToast(product.is_active ? 'Product hidden' : 'Product is now visible');
+      showToast(product.is_active ? t('sellerProducts.hidden') : t('sellerProducts.visible'));
     } catch {
-      showToast('Failed to update product', 'error');
+      showToast(t('common.error'), 'error');
     }
   }
 
   function handleSaved() {
     setModal(null);
     loadProducts();
-    showToast(modal === 'add' ? 'Product added!' : 'Product updated!');
+    showToast(modal === 'add' ? t('sellerProducts.added') : t('sellerProducts.updated'));
   }
 
   const activeCount = products.filter(p => p.is_active).length;
 
   return (
-    <div className="min-h-screen bg-cream-100 pb-28 md:pb-10">
+    <div className="min-h-screen bg-cream-100 md:flex">
+      <DashboardSidebar role="seller" />
+      <div className="flex-1 pb-28 md:pb-10">
       {/* ── Header ── */}
       <div className="sticky top-14 z-30 bg-cream-100/95 backdrop-blur-sm border-b border-beige-100">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-warm-900">My Products</h1>
+            <h1 className="text-lg font-bold text-warm-900">{t('sellerProducts.title')}</h1>
             <p className="text-xs text-warm-400">
-              {loading ? 'Loading...' : `${products.length} total · ${activeCount} active`}
+              {loading
+                ? t('common.loading')
+                : t('sellerProducts.totalActive', { total: products.length, active: activeCount })
+              }
             </p>
           </div>
           <button
             onClick={() => setModal('add')}
             className="flex items-center gap-2 px-4 py-2.5 bg-sage-500 hover:bg-sage-600 text-white text-sm font-semibold rounded-2xl transition-colors shadow-sm"
           >
-            <Plus size={16} /> Add Product
+            <Plus size={16} /> {t('sellerProducts.add')}
           </button>
         </div>
       </div>
+
+      {/* ── Unverified warning ── */}
+      {isVerified === false && (
+        <div className="max-w-2xl mx-auto px-4 pt-4">
+          <div className="bg-warning/10 border border-warning/30 text-warm-700 rounded-2xl px-4 py-3 flex items-center gap-3 text-sm">
+            <AlertCircle size={16} className="text-warning flex-shrink-0" />
+            <span>{t('sellerProducts.unverifiedWarning')}</span>
+          </div>
+        </div>
+      )}
 
       {/* ── Content ── */}
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-3">
@@ -539,13 +569,13 @@ export default function SellerProducts() {
             <div className="w-16 h-16 bg-cream-200 rounded-3xl flex items-center justify-center mx-auto mb-4">
               <Package size={28} className="text-warm-300" />
             </div>
-            <p className="text-warm-800 font-semibold mb-1">No products yet</p>
-            <p className="text-warm-400 text-sm mb-6">Add your first handmade product to start selling</p>
+            <p className="text-warm-800 font-semibold mb-1">{t('sellerProducts.empty')}</p>
+            <p className="text-warm-400 text-sm mb-6">{t('sellerProducts.emptySub')}</p>
             <button
               onClick={() => setModal('add')}
               className="inline-flex items-center gap-2 px-6 py-3 bg-sage-500 text-white text-sm font-semibold rounded-2xl hover:bg-sage-600 transition-colors"
             >
-              <Plus size={16} /> Add Your First Product
+              <Plus size={16} /> {t('sellerProducts.addFirst')}
             </button>
           </div>
         ) : (
@@ -578,7 +608,7 @@ export default function SellerProducts() {
           onDeleted={() => {
             setProducts(prev => prev.filter(p => p.id !== deleteTarget.id));
             setDeleteTarget(null);
-            showToast('Product deleted');
+            showToast(t('sellerProducts.deleted'));
           }}
         />
       )}
@@ -587,6 +617,7 @@ export default function SellerProducts() {
       {toast && (
         <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}
+      </div>
     </div>
   );
 }

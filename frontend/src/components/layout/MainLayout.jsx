@@ -19,10 +19,7 @@ export default function MainLayout() {
     const fetchCount = () => {
       notificationsAPI.getUnreadCount()
         .then((res) => {
-          if (cancelled) {
-            return;
-          }
-
+          if (cancelled) return;
           const payload = extractApiEntity(res) ?? {};
           const count = payload.unreadCount ?? payload.count ?? 0;
           setUnreadCount(Number(count));

@@ -26,11 +26,12 @@ app.use(helmet());
 // Only your React frontend is allowed
 app.use(cors({
   origin: (origin, callback) => {
-    const allowedOrigins = [
-      process.env.CLIENT_URL,
-      'http://localhost:5173',  // Vite default
-      'http://localhost:3000',  // fallback
-    ];
+    const allowedOrigins = [process.env.CLIENT_URL];
+
+    // Allow localhost only in non-production environments
+    if (process.env.NODE_ENV !== 'production') {
+      allowedOrigins.push('http://localhost:5173', 'http://localhost:3000');
+    }
 
     // Allow requests with no origin (Postman, mobile apps)
     if (!origin) return callback(null, true);
@@ -60,8 +61,33 @@ app.use(cors({
 app.use(hpp());
 
 // ─────────────────────────────────────────────────────────────
-// 2. RATE LIMITING
-// Applied early — before parsing body (saves processing)
+// 2. GENERAL MIDDLEWARE
+// ─────────────────────────────────────────────────────────────
+
+// Compression — gzip all responses (faster API)
+app.use(compression());
+
+// Body parsers — parse incoming request data
+app.use(express.json({
+  limit: '100kb', // max request body size (file uploads go through /uploads which uses multipart)
+}));
+app.use(express.urlencoded({
+  extended: true,
+  limit:    '100kb',
+}));
+
+// HTTP request logger — logs every request
+app.use(morgan('combined', {
+  stream: {
+    write: (message) => logger.info(message.trim()),
+  },
+  // Skip health check logs (too noisy)
+  skip: (req) => req.path === '/health',
+}));
+
+// ─────────────────────────────────────────────────────────────
+// 3. RATE LIMITING
+// Applied after body parsing so the body is available if needed
 // ─────────────────────────────────────────────────────────────
 
 // Global rate limit — all API routes
@@ -96,31 +122,6 @@ const authLimiter = rateLimit({
   },
 });
 app.use('/api/v1/auth', authLimiter);
-
-// ─────────────────────────────────────────────────────────────
-// 3. GENERAL MIDDLEWARE
-// ─────────────────────────────────────────────────────────────
-
-// Compression — gzip all responses (faster API)
-app.use(compression());
-
-// Body parsers — parse incoming request data
-app.use(express.json({
-  limit: '10mb', // max request body size
-}));
-app.use(express.urlencoded({
-  extended: true,
-  limit:    '10mb',
-}));
-
-// HTTP request logger — logs every request
-app.use(morgan('combined', {
-  stream: {
-    write: (message) => logger.info(message.trim()),
-  },
-  // Skip health check logs (too noisy)
-  skip: (req) => req.path === '/health',
-}));
 
 // ─────────────────────────────────────────────────────────────
 // 4. HEALTH CHECK
@@ -174,17 +175,20 @@ app.use('/api/v1/auth', require('./routes/auth.routes'));
 // Phase 10 — Notifications (STEP 46)
  app.use('/api/v1/notifications', require('./routes/notification.routes'));
 
-// Phase 11 — AI Chatbot (STEP 50)
-// app.use('/api/v1/chatbot', require('./routes/chatbot.routes'));
+// Phase 11 — Client Ratings (STEP 50)
+app.use('/api/v1/client-ratings', require('./routes/clientRating.routes'));
 
-// Phase 12 — Payments (STEP 53)
-// app.use('/api/v1/payments', require('./routes/payment.routes'));
+// Phase 14 — User Public Profiles
+app.use('/api/v1/users', require('./routes/user.routes'));
 
-// Phase 13 — Recommendations (STEP 56)
-// app.use('/api/v1/recommendations', require('./routes/recommendation.routes'));
+// Phase 12 — AI Chatbot (STEP 54)
+app.use('/api/v1/chatbot', require('./routes/chatbot.routes'));
 
-// Phase 14 — Admin (STEP 59)
-// app.use('/api/v1/admin', require('./routes/admin.routes'));
+// Phase 13 — Admin (STEP 57)
+app.use('/api/v1/admin', require('./routes/admin.routes'));
+
+// Phase 17 — Promotions (STEP 70)
+app.use('/api/v1/promotions', require('./routes/promotion.routes'));
 
 // ─────────────────────────────────────────────────────────────
 // 6. ERROR HANDLERS

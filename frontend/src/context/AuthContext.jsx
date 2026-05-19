@@ -159,8 +159,22 @@ export function AuthProvider({ children }) {
 
     try {
       const response = await authAPI.register(payload);
-      const result = persistSession(response.data?.data);
-      return result;
+      const data = response.data?.data ?? {};
+
+      if (data.requires_otp) {
+        const otpSession = {
+          otp_token: data.otp_token,
+          otp_expires_in: data.otp_expires_in,
+          user: data.user,
+        };
+
+        setPendingOtp(otpSession);
+        return { requiresOtp: true, pendingOtp: otpSession };
+      }
+
+      setPendingOtp(null);
+      const result = persistSession(data);
+      return { ...result, requiresOtp: false };
     } finally {
       setLoading(false);
     }

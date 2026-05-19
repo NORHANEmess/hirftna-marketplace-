@@ -65,6 +65,15 @@ const errorHandler = (err, req, res, next) => {
     return sendError(res, message, status);
   }
 
+  if (err.name === 'MulterError') {
+    const msg = err.code === 'LIMIT_FILE_SIZE'
+      ? 'File too large. Maximum allowed size is 5 MB.'
+      : err.code === 'LIMIT_FILE_COUNT'
+        ? 'Too many files uploaded at once.'
+        : err.message;
+    return sendError(res, msg, 400);
+  }
+
   if (err.name === 'JsonWebTokenError') {
     return sendError(res, 'Invalid token', 401);
   }

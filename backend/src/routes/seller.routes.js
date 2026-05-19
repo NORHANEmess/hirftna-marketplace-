@@ -42,6 +42,15 @@ router.get(
   sellerController.getMySellerProfile
 );
 
+// GET /api/v1/sellers/me/verification-status
+// Criteria progress for the logged-in seller's dashboard
+router.get(
+  '/me/verification-status',
+  authenticate,
+  requireRole('seller'),
+  sellerController.getMyVerificationStatus
+);
+
 // GET /api/v1/sellers/analytics
 // Own shop analytics and metrics
 router.get(

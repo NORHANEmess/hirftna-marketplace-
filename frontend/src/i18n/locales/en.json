@@ -4,7 +4,6 @@
     "en": "English",
     "fr": "Français"
   },
-
   "nav": {
     "home": "Home",
     "browse": "Browse",
@@ -19,13 +18,26 @@
     "myProducts": "My Products",
     "myShop": "My Shop"
   },
-
   "home": {
     "hero": {
-      "badge": "✦ Authentic Algerian Handcraft",
-      "title": "Every piece tells a story",
-      "subtitle": "Commission custom work from local artisans",
-      "cta": "Explore Crafts"
+      "badge": "Authentic Algerian Handcraft",
+      "title": "The Heart of Algerian Craft",
+      "subtitle": "Discover authentic handmade treasures from Algeria's finest artisans",
+      "cta": "Browse All Crafts",
+      "searchPlaceholder": "Search pottery, jewelry, textiles...",
+      "featuredArtisan": "Featured Artisan",
+      "visitShop": "Visit Shop",
+      "noPromotions": {
+        "title": "Join Our Artisan Community",
+        "sub": "Are you a craftsman? Create your shop and reach thousands of buyers.",
+        "cta": "Become a Seller"
+      },
+      "sellerCta": "Become a seller →",
+      "trust1": "Authentic Algerian crafts",
+      "trust2": "Verified artisans",
+      "trust3": "Custom made to order",
+      "statArtisans": "Artisans",
+      "statSpecialties": "Specialties"
     },
     "whatIsHirftna": {
       "title": "What is Hirftna?",
@@ -44,6 +56,10 @@
       "eyebrow": "FEATURED",
       "title": "Handpicked for You",
       "seeAll": "See all",
+      "new": "New",
+      "featured": "Featured",
+      "empty": "No products yet",
+      "emptySub": "Check back soon. Artisans are adding their work.",
       "tabs": {
         "all": "All",
         "newest": "New Arrivals",
@@ -57,16 +73,21 @@
       "subtitle": "Get to know the talented craftspeople behind your favorite products.",
       "discoverAll": "Discover All Artisans",
       "products": "Products",
-      "rating": "Rating"
+      "rating": "Rating",
+      "empty": "No artisans yet"
     },
     "howItWorks": {
-      "title": "How It Works",
-      "step1Title": "Browse",
-      "step1Desc": "Explore handcrafted products",
-      "step2Title": "Request",
-      "step2Desc": "Send your custom order details",
-      "step3Title": "Receive",
-      "step3Desc": "Get your unique handmade piece"
+      "eyebrow": "THE PROCESS",
+      "title": "How Hirftna Works",
+      "subtitle": "Your order, your way",
+      "step1Title": "Browse & Discover",
+      "step1Desc": "Explore handmade products from verified Algerian artisans",
+      "step2Title": "Request Your Order",
+      "step2Desc": "Send a custom order with your requirements, budget, and deadline",
+      "step3Title": "Artisan Creates",
+      "step3Desc": "Your artisan crafts the piece with care and keeps you updated",
+      "step4Title": "Confirm & Rate",
+      "step4Desc": "Review the final product, confirm delivery, and rate your experience"
     },
     "sellerCta": {
       "question": "Are you an artisan?",
@@ -74,7 +95,6 @@
       "button": "Create your shop"
     }
   },
-
   "browse": {
     "title": "Browse Products",
     "searchPlaceholder": "Search for a product or artisan...",
@@ -93,13 +113,19 @@
       "price_asc": "Price: Low → High",
       "price_desc": "Price: High → Low",
       "rating": "Top Rated"
-    }
+    },
+    "featuredProducts": "Featured Products"
   },
-
   "product": {
     "handmade": "✋ Handmade",
     "priceRange": "Price Range",
     "completion": "Estimated completion: {{days}} days",
+    "daysShort": "{{days}}d",
+    "badge": {
+      "new": "New",
+      "featured": "Featured",
+      "promoted": "Promoted"
+    },
     "requestOrder": "Request Custom Order",
     "requestOrderSub": "Your request goes directly to the artisan for review",
     "unavailable": "Unavailable",
@@ -110,10 +136,19 @@
       "reviews": "Reviews",
       "seller": "About the Artisan"
     },
+    "price": "Price",
+    "noDescription": "No description available for this product.",
     "reviews": {
       "empty": "No reviews yet",
       "emptySub": "Be the first to order and review this product",
-      "count": "({{count}})"
+      "count": "({{count}})",
+      "checkingSession": "Checking your session...",
+      "loginPrompt": "Leave a review after you sign in",
+      "signIn": "Sign In",
+      "orderPrompt": "Ordered this product?",
+      "orderSubBefore": "Reviews can be submitted from your",
+      "orderSubLink": "completed orders",
+      "orderSubAfter": "page."
     },
     "seller": {
       "viewProfile": "View Full Profile"
@@ -133,7 +168,6 @@
     "errorLoad": "Could not load this product",
     "backToBrowse": "← Back to Browse"
   },
-
   "seller": {
     "verified": "Verified",
     "products": "Products",
@@ -154,9 +188,13 @@
     },
     "products_empty": "No products available right now",
     "notFound": "Artisan not found",
-    "errorLoad": "Could not load this artisan's page"
+    "errorLoad": "Could not load this artisan's page",
+    "since": "Since {{date}}",
+    "sales": "Sales",
+    "productsEmptySub": "This artisan hasn't listed products yet",
+    "responseTime": "Usually responds within 2 hours",
+    "clientFallback": "Client"
   },
-
   "order": {
     "title": "My Orders",
     "total": "{{count}} orders",
@@ -211,7 +249,6 @@
       "rejecting": "Rejecting..."
     }
   },
-
   "sellerOrders": {
     "title": "Orders",
     "incoming": "Incoming",
@@ -222,7 +259,6 @@
     "purchasesEmpty": "You haven't placed any orders yet",
     "purchasesEmptySub": "You can also buy from other artisans"
   },
-
   "customOrder": {
     "title": "Custom Order Request",
     "for": "For: {{name}}",
@@ -287,9 +323,49 @@
       "subtitle": "Your custom order has been sent to the artisan. They will review it and get back to you soon.",
       "viewOrders": "View My Orders",
       "continueBrowsing": "Continue Browsing"
+    },
+    "forProduct": "For: {{product}}",
+    "detailsTitle": "Tell the artisan what you want",
+    "detailsSubtitle": "Be as specific as possible: color, size, and materials.",
+    "requirements": "What do you want?",
+    "requirementsPlaceholder": "Describe the custom piece you want made.",
+    "budget": "Budget Range",
+    "budgetMin": "Min",
+    "budgetMax": "Max",
+    "deadline": "Deadline",
+    "deadlineHint": "Must be a future date",
+    "referenceImages": "Reference Images",
+    "referenceImagesHint": "Up to 3",
+    "addImage": "Add",
+    "deliveryTitle": "How do you want to receive it?",
+    "deliverySubtitle": "Choose your delivery and payment preferences.",
+    "deliveryMethod": "Delivery Method",
+    "paymentMethod": "Payment Method",
+    "contactTitle": "Your contact details",
+    "contactSubtitle": "The artisan needs this to reach you.",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "address": "Delivery Address",
+    "successTitle": "Order Sent!",
+    "successDescription": "Your custom order has been sent to the artisan. They will review it soon.",
+    "viewOrders": "View My Orders",
+    "continueBrowsing": "Continue Browsing",
+    "uploading": "Uploading...",
+    "deliveryOptions": {
+      "hand_to_hand": "Hand to Hand",
+      "office_pickup": "Office Pickup",
+      "fast": "Fast Delivery",
+      "hand_to_hand_desc": "Direct from artisan",
+      "office_pickup_desc": "Pick up at our partner office",
+      "fast_desc": "Express shipping to your door"
+    },
+    "paymentOptions": {
+      "cash_on_delivery": "Cash on Delivery",
+      "card": "Card Payment",
+      "cash_on_delivery_desc": "Pay when you receive",
+      "card_desc": "Pay online securely"
     }
   },
-
   "wishlist": {
     "title": "Saved Products",
     "count_one": "item saved",
@@ -300,7 +376,6 @@
     "remove": "Remove from wishlist",
     "save": "Save to wishlist"
   },
-
   "notifications": {
     "title": "Notifications",
     "count_one": "notification",
@@ -311,18 +386,27 @@
     "sectionEarlier": "Earlier",
     "empty": "All caught up!",
     "emptySub": "You'll see order updates and alerts here",
+    "new_order_body": "You have a new custom order waiting for your review",
+    "order_accepted_body": "Your order has been accepted by the artisan",
+    "order_rejected_body": "Your order was not accepted. Check the reason for details",
+    "order_ready_body": "Your order is ready! Review the final details and confirm",
+    "order_completed_body": "The order has been confirmed — you can now rate the experience",
     "types": {
       "new_order": "New Order",
       "order_received": "New Order",
       "order_accepted": "Order Accepted",
       "order_rejected": "Order Rejected",
+      "order_ready": "Order Ready",
       "order_completed": "Order Complete",
-      "message": "Message",
       "system": "Notification"
     }
   },
-
   "auth": {
+    "otp": {
+      "sentTo": "We sent a verification code to",
+      "noCode": "Didn't receive the code?",
+      "tryAgain": "Resend code"
+    },
     "login": {
       "title": "Welcome back",
       "subtitle": "Sign in to continue",
@@ -330,15 +414,71 @@
       "emailPlaceholder": "example@email.com",
       "passwordLabel": "Password",
       "passwordPlaceholder": "••••••••",
+      "email": "Email Address",
+      "password": "Password",
       "submit": "Sign In",
       "submitting": "Signing in...",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "forgotPassword": "Forgot password?",
+      "emailNotVerified": "Please verify your email. Check your inbox for the verification code we sent when you registered.",
+      "verifiedSuccess": "Email verified! You can now sign in.",
+      "invalidCredentials": "Invalid email or password.",
       "noAccount": "Don't have an account?",
       "createAccount": "Create a new account",
+      "registerPrompt": "New to Hirftna?",
+      "registerLink": "Create a free account",
+      "agreement": "By signing in you agree to our Terms of Service and Privacy Policy.",
+      "otpTitle": "Two-Step Verification",
+      "otpSubtitle": "Enter the 6-digit code sent to {{email}}",
+      "otpLabel": "Verification Code",
+      "otpPlaceholder": "_ _ _ _ _ _",
+      "otpSubmit": "Verify Code",
+      "otpSubmitting": "Verifying...",
+      "backToLogin": "← Back to login",
       "errors": {
         "emailRequired": "Email address is required",
         "emailInvalid": "Invalid email format",
         "passwordRequired": "Password is required"
       }
+    },
+    "forgotPassword": {
+      "title": "Forgot your password?",
+      "subtitle": "Enter your email and we'll send you a reset link",
+      "successTitle": "Check your inbox",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "example@email.com",
+      "submit": "Send Reset Link",
+      "submitting": "Sending...",
+      "successMessage": "If this email exists, we sent a reset link. Check your inbox.",
+      "backToLogin": "← Back to Login"
+    },
+    "resetPassword": {
+      "title": "Reset your password",
+      "subtitle": "Enter a new password below",
+      "successTitle": "Password updated!",
+      "newPasswordLabel": "New Password",
+      "confirmPasswordLabel": "Confirm New Password",
+      "submit": "Update Password",
+      "submitting": "Updating...",
+      "successMessage": "Your password has been updated successfully.",
+      "redirecting": "Redirecting to login in 3 seconds...",
+      "invalidToken": "Invalid or expired link.",
+      "requestNew": "Request a new reset link",
+      "errorExpired": "This link has expired. Please request a new one.",
+      "errorGeneric": "Something went wrong. Please try again.",
+      "errorPasswordLength": "Password must be at least 8 characters.",
+      "errorPasswordMatch": "Passwords do not match."
+    },
+    "changePassword": {
+      "title": "Change Password",
+      "oldPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "submit": "Update Password",
+      "submitting": "Updating...",
+      "success": "Password changed successfully.",
+      "successDescription": "Password changed successfully. Please log in again."
     },
     "register": {
       "title": "Create a new account",
@@ -351,21 +491,35 @@
       "passwordPlaceholder": "At least 8 characters",
       "confirmLabel": "Confirm Password",
       "confirmPlaceholder": "Repeat your password",
-      "roleClient": "Client",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "rolePrompt": "I want to…",
+      "roleClient": "Buy",
       "roleClientSub": "I buy and order",
-      "roleSeller": "Artisan",
+      "roleClientDesc": "Discover & order custom handmade products",
+      "roleSeller": "Sell",
       "roleSellerSub": "I sell my crafts",
+      "roleSellerDesc": "List my crafts and receive custom orders",
       "hintClient": "✦ You will be able to browse products and place custom orders from artisans",
       "hintSeller": "✦ You will be able to create your shop and add your handmade products right after signing up",
       "terms": "By registering, you agree to",
       "termsLink": "Terms of Service",
       "and": "and",
       "privacyLink": "Privacy Policy",
+      "loginPrompt": "Already have an account?",
+      "loginLink": "Sign In",
       "hasAccount": "Already have an account?",
       "signIn": "Sign In",
+      "submit": "Create Account",
       "submitClient": "Create Client Account",
       "submitSeller": "Create Artisan Account",
       "submitting": "Creating account...",
+      "errorName": "Please enter your full name.",
+      "errorEmail": "Please enter your email address.",
+      "errorPasswordLength": "Password must be at least 8 characters.",
+      "errorPasswordMatch": "Passwords do not match.",
       "strength": {
         "veryWeak": "Very weak",
         "weak": "Weak",
@@ -380,24 +534,53 @@
         "passwordShort": "Password must be at least 8 characters",
         "confirmRequired": "Please confirm your password",
         "confirmMismatch": "Passwords do not match"
+      },
+      "clientTitle": "Buy",
+      "clientDescription": "Discover and order custom handmade products",
+      "sellerTitle": "Sell",
+      "sellerDescription": "List my crafts and receive custom orders",
+      "fullNamePlaceholder": "Your full name",
+      "confirmPasswordPlaceholder": "Repeat your password",
+      "agreement": "By creating an account you agree to our Terms of Service and Privacy Policy.",
+      "passwordStrength": {
+        "short": "Too short",
+        "weak": "Weak",
+        "fair": "Fair",
+        "strong": "Strong"
       }
     }
   },
-
   "profile": {
     "title": "My Profile",
     "email": "Email Address",
     "nameLabel": "Full Name",
+    "fullName": "Full Name",
     "phoneLabel": "Phone Number",
+    "phone": "Phone Number",
     "phoneHint": "Optional — for order contact",
+    "photoHint": "Tap the camera icon to change your photo",
     "save": "Save",
     "saving": "Saving...",
     "saved": "Profile saved",
+    "profileSaved": "Profile saved",
     "changePhoto": "Tap the camera icon to change your photo",
+    "shopInformation": "Shop Information",
+    "saveShop": "Save Shop",
+    "shopName": "Shop Name",
+    "shortBio": "Short Bio",
+    "shortBioHint": "Shown under your shop name",
+    "category": "Category",
+    "city": "City / Wilaya",
+    "story": "Artisan Story",
+    "fullShopSettings": "Full Shop Settings",
+    "shopNotReady": "Shop profile not ready yet",
+    "shopSaved": "Shop profile saved",
     "myOrders": "My Orders",
     "myOrdersSub": "View and track your custom orders",
+    "myOrdersDescription": "View and track your custom orders",
     "savedProducts": "Saved Products",
     "savedProductsSub": "Your wishlist",
+    "savedProductsDescription": "Your wishlist",
     "changePassword": "Change Password",
     "currentPassword": "Current Password",
     "newPassword": "New Password",
@@ -406,9 +589,54 @@
     "updating": "Updating...",
     "passwordChanged": "Password changed",
     "logout": "Sign Out",
-    "loggingOut": "Signing out..."
+    "loggingOut": "Signing out...",
+    "sellerAccount": "Seller Account"
   },
-
+  "payment": {
+    "title": "Complete Order",
+    "amount_to_pay": "Amount",
+    "success": "Payment Successful!",
+    "completing": "Completing your order...",
+    "cash_title": "Cash on Delivery",
+    "cash_desc": "Confirm that you received the product and paid the artisan",
+    "confirm_received": "Yes, I Received & Paid",
+    "card_title": "Card Payment",
+    "card_desc": "Secure payment via Chargily",
+    "processing": "Processing...",
+    "pay_now": "Pay Now",
+    "chargily_note": "Powered by Chargily — Algerian secure payment",
+    "platform_title": "Complete Payment",
+    "platform_amount": "Amount",
+    "platform_for": "For",
+    "ccp_title": "CCP / BaridiMob Transfer",
+    "ccp_account": "00799999 01234567890",
+    "ccp_name": "HIRFTNA MARKETPLACE",
+    "ccp_note": "After transfer, click below",
+    "card_coming_soon": "Coming soon",
+    "declare_payment": "I've Completed the Transfer",
+    "declare_note": "Admin will verify your payment within 24h.",
+    "payment_declared": "Payment declared! Admin will verify shortly.",
+    "activation_fee": "Shop Activation Fee",
+    "promotion_fee": "Promotion Fee"
+  },
+  "validation": {
+    "required": "This field is required",
+    "passwordMin": "Password must be at least 8 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "passwordDifferent": "New password must be different from current password",
+    "orders": {
+      "requirements": "Please describe what you want",
+      "requirementsMax": "Description cannot exceed 500 characters",
+      "budgetRange": "Minimum budget must be less than maximum",
+      "deliveryMethod": "Please select a delivery method",
+      "paymentMethod": "Please select a payment method",
+      "phone": "Please enter a phone number",
+      "phoneShort": "Phone number is too short",
+      "address": "Please enter a delivery address",
+      "addressShort": "Address must be at least 10 characters",
+      "productMissing": "Product not found. Please try again."
+    }
+  },
   "sellerProfile": {
     "title": "Shop Settings",
     "subtitle": "Manage your artisan profile",
@@ -427,7 +655,8 @@
     "avatarSub": "Tap the camera icon to change your photo",
     "storyTitle": "Your Artisan Story",
     "storyHint": "{{count}} characters",
-    "storyExplain": "✦ This appears on your public profile page under \"Story of the Seller\". Tell buyers who you are, how you started, and what makes your craft unique.",    "storyPreview": "Preview",
+    "storyExplain": "✦ This appears on your public profile page under \"Story of the Seller\". Tell buyers who you are, how you started, and what makes your craft unique.",
+    "storyPreview": "Preview",
     "accountInfo": "Account Information",
     "role": "Role",
     "roleSeller": "Artisan / Seller",
@@ -443,9 +672,15 @@
     "saving": "Saving...",
     "saved": "Profile saved successfully"
   },
-
   "sellerDashboard": {
     "welcome": "Welcome back,",
+    "nav": {
+      "overview": "Overview",
+      "orders": "Orders",
+      "products": "Products",
+      "promotions": "Promotions",
+      "settings": "Shop Settings"
+    },
     "pendingAlert": "{{count}} order(s) awaiting your review",
     "stats": {
       "sales": "Completed Sales",
@@ -465,9 +700,22 @@
     "noOrders": "No orders yet",
     "noOrdersSub": "Share your shop link to start receiving orders",
     "viewShop": "View",
-    "yourShop": "Your public shop"
+    "yourShop": "Your public shop",
+    "wishlist": "My Wishlist",
+    "wishlistSub": "Items you've saved",
+    "setupTitle": "Set up your shop profile",
+    "setupSub": "You haven't created your shop profile yet. Add your shop name and details to start receiving orders.",
+    "setupAction": "Create shop profile",
+    "customerFallback": "Customer",
+    "customOrderFallback": "Custom order",
+    "signOutSub": "End your session",
+    "boostShop": "Boost My Shop",
+    "boostShopSub": "Get featured on the homepage hero",
+    "activationBanner": {
+      "title": "Your shop is pending activation",
+      "subtitle": "Your products won't be visible to customers until your account is verified. This usually takes 24–48h."
+    }
   },
-
   "sellerProducts": {
     "title": "My Products",
     "totalActive": "{{total}} products · {{active}} active",
@@ -475,6 +723,13 @@
     "empty": "No products yet",
     "emptySub": "Add your first handmade product to start selling",
     "addFirst": "Add Your First Product",
+    "deleted": "Product deleted",
+    "added": "Product added!",
+    "updated": "Product updated!",
+    "hidden": "Product hidden",
+    "visible": "Product is now visible",
+    "hideProduct": "Hide product",
+    "showProduct": "Show product",
     "form": {
       "addTitle": "Add New Product",
       "editTitle": "Edit Product",
@@ -494,7 +749,9 @@
       "save": "Save Changes",
       "add": "Add Product",
       "saving": "Saving...",
-      "selectCategory": "Select..."
+      "selectCategory": "Select...",
+      "uploadBtn": "Upload",
+      "imagesHint": "Max {{max}} images · JPG, PNG, WebP"
     },
     "delete": {
       "title": "Delete Product?",
@@ -511,16 +768,275 @@
       "delete": "Delete",
       "hide": "Hide product",
       "show": "Show product"
+    },
+    "unverifiedWarning": "Your products are currently hidden from public browsing. They will become visible once your shop is activated."
+  },
+  "promotions": {
+    "title": "Promote My Shop",
+    "subtitle": "Get your shop featured across the platform",
+    "currentPromotion": "Current Promotion",
+    "status": {
+      "pending": "Pending",
+      "active": "Active",
+      "expired": "Expired",
+      "rejected": "Rejected"
+    },
+    "starts": "Start Date",
+    "expires": "End Date",
+    "daysLeft": "{{count}} days remaining",
+    "pendingTitle": "Awaiting Admin Approval",
+    "pendingBody": "Your promotion request is being reviewed. We'll activate it as soon as possible.",
+    "rejectedTitle": "Promotion Rejected",
+    "rejectedReason": "Reason",
+    "boostTitle": "Boost Your Shop",
+    "boostSubtitle": "Reach every visitor on Hirftna",
+    "benefit1": "Hero banner visibility for all visitors",
+    "benefit2": "Rotation with other featured artisans",
+    "benefit3": "30-day active placement",
+    "priceLabel": "Starting from",
+    "price": "Contact admin",
+    "requestCta": "Request Feature Spot",
+    "adminNote": "Your request will be reviewed by our team within 24–48h.",
+    "successTitle": "Request Submitted!",
+    "successBody": "We'll review your promotion request and activate it shortly.",
+    "heroBadge": "✦ Featured Artisan",
+    "visitShop": "Visit Shop",
+    "heroCarouselLabel": "Featured Artisans",
+    "slideN": "Slide {{n}}",
+    "featuredSellers": "Featured Sellers",
+    "boostProduct": {
+      "sectionTitle": "Boost a Product",
+      "title": "Feature a Specific Product",
+      "subtitle": "Highlight your best work in browse results",
+      "selectProduct": "Select a product",
+      "selectPlaceholder": "Choose product",
+      "placement": "Placement",
+      "placements": {
+        "featured": "Featured (All Categories)",
+        "category_top": "Category Top"
+      },
+      "cta": "Request Product Boost",
+      "noProducts": "You have no active products to promote",
+      "selectProductError": "Please select a product first",
+      "successMessage": "Product boost request submitted! Our team will review it shortly."
     }
   },
-
+  "adminPromotions": {
+    "title": "Promotion Requests",
+    "total": "total",
+    "tabs": {
+      "all": "All",
+      "pending": "Pending",
+      "active": "Active",
+      "expired": "Expired"
+    },
+    "status": {
+      "pending": "Pending",
+      "active": "Active",
+      "expired": "Expired",
+      "rejected": "Rejected"
+    },
+    "placement": "Placement",
+    "duration": "Duration",
+    "requested": "Requested",
+    "expiresOn": "Expires {{date}}",
+    "reason": "Reason",
+    "activate": "Activate",
+    "reject": "Reject",
+    "cancelPromotion": "Cancel Promotion",
+    "rejectTitle": "Reject Promotion?",
+    "rejectReasonPlaceholder": "Explain why this promotion is being rejected...",
+    "rejectConfirm": "Reject",
+    "empty": "No promotions yet",
+    "emptySub": "Sellers haven't submitted promotion requests yet."
+  },
+  "orders": {
+    "statuses": {
+      "all": "All",
+      "pending": "Pending",
+      "pendingReview": "Pending Review",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "ready": "Ready to Confirm",
+      "completed": "Completed"
+    },
+    "client": {
+      "title": "My Orders",
+      "summary": "{{count}} orders",
+      "pendingSummary": "{{count}} need your action",
+      "empty": "No orders yet",
+      "emptyDescription": "Browse products and place your first custom order",
+      "emptyFiltered": "No orders with this status",
+      "emptyFilteredDescription": "Try a different filter",
+      "browse": "Start Browsing"
+    },
+    "seller": {
+      "title": "Orders",
+      "incoming": "Incoming",
+      "purchases": "My Purchases",
+      "pendingReview": "{{count}} order(s) need your attention",
+      "emptyIncoming": "No incoming orders yet",
+      "emptyIncomingDescription": "Share your shop link to start receiving orders",
+      "emptyPurchases": "You haven't placed any orders yet",
+      "emptyPurchasesDescription": "You can also buy from other artisans",
+      "rateClient": "Rate this client",
+      "subtitle": "Manage incoming requests and track your purchases",
+      "incomingTab": "Incoming Orders",
+      "pendingReview_other": "{{count}} orders need your review"
+    },
+    "card": {
+      "orderDescription": "Order Description",
+      "clientBudget": "Client Budget",
+      "requestedDeadline": "Requested Deadline",
+      "deliveryMethod": "Delivery Method",
+      "paymentMethod": "Payment Method",
+      "clientPhone": "Client Phone",
+      "deliveryAddress": "Delivery Address",
+      "referenceImages": "Reference Images",
+      "rejectionReason": "Rejection Reason",
+      "finalPriceTitle": "Final Price Set by Artisan",
+      "markReadyTitle": "The order is ready — set the final price",
+      "finalPriceLabel": "Final Price",
+      "finalPriceRequired": "Please enter a valid final price",
+      "markReady": "Mark as Ready",
+      "confirmMarkReady": "Confirm & Notify Client",
+      "readyForConfirmation": "The artisan has marked this order as ready. Please review the final price and confirm completion.",
+      "confirmCompletion": "Confirm Completion",
+      "confirmComplete": "Yes, I received it",
+      "accept": "Accept Order",
+      "reject": "Reject",
+      "confirmReject": "Confirm Rejection",
+      "rejectReason": "Reason for Rejection",
+      "rejectPlaceholder": "Explain why you cannot fulfil this order...",
+      "artisanFallback": "Artisan",
+      "customerFallback": "Customer",
+      "requestFallback": "Custom order request",
+      "updateError": "Something went wrong. Please try again.",
+      "placedOn": "Placed on {{date}}",
+      "deliveryLabels": {
+        "hand_to_hand": "Hand to Hand",
+        "office_pickup": "Office Pickup",
+        "fast": "Fast Delivery"
+      },
+      "paymentLabels": {
+        "cash_on_delivery": "Cash on Delivery",
+        "card": "Card Payment"
+      },
+      "rateSeller": "Rate Artisan",
+      "rateProduct": "Rate Product",
+      "sellerRated": "Artisan Rated ✓",
+      "productReviewed": "Product Reviewed ✓",
+      "updating": "Updating..."
+    }
+  },
+  "reviewSeller": {
+    "title": "Rate this Artisan",
+    "ratingRequired": "Please select a rating before submitting",
+    "submit": "Submit Rating",
+    "submitting": "Submitting...",
+    "success": "Rating submitted!",
+    "successSub": "Thank you for your feedback"
+  },
+  "reviewProduct": {
+    "title": "Review this Product",
+    "ratingRequired": "Please select a rating before submitting",
+    "commentLabel": "Comment",
+    "commentHint": "(optional)",
+    "commentPlaceholder": "Share your experience with this product...",
+    "submit": "Submit Review",
+    "submitting": "Submitting...",
+    "success": "Review submitted!",
+    "successSub": "Thank you for your feedback"
+  },
+  "rateClient": {
+    "title": "Rate this Client",
+    "ratingRequired": "Please select a rating before submitting",
+    "commentLabel": "Comment",
+    "commentHint": "(optional)",
+    "commentPlaceholder": "Was the client clear, polite, and responsive?",
+    "submit": "Submit Rating",
+    "success": "Rating submitted!",
+    "successSub": "Thank you for your feedback"
+  },
+  "clientProfile": {
+    "title": "Client Profile",
+    "backButton": "Back",
+    "memberSince": "Member since {{date}}",
+    "activeBuyer": "Active Buyer",
+    "newBuyer": "New Buyer",
+    "completedOrders": "Completed Orders",
+    "avgRating": "Avg. Rating",
+    "noRatingsYet": "—",
+    "ratingsTitle": "Seller Ratings",
+    "noRatings": "No ratings yet",
+    "noRatingsSub": "This client hasn't been rated by any seller yet",
+    "recentOrdersTitle": "Recent Completed Orders",
+    "noRecentOrders": "No completed orders yet",
+    "productFallback": "Custom Order",
+    "shopFallback": "Artisan",
+    "notFound": "Client not found",
+    "loadingError": "Could not load this profile",
+    "retry": "Try again"
+  },
+  "chatbot": {
+    "title": "Hirftna Assistant",
+    "subtitle": "Here to help",
+    "open": "Open chat assistant",
+    "close": "Close chat assistant",
+    "placeholder": "Ask me anything about Hirftna...",
+    "welcome": "Hi! I'm Hirftna's assistant. I can help you find products, explain how ordering works, or answer any questions about the platform. What can I help you with?",
+    "fallback": "I'm currently unavailable. Please try again later.",
+    "suggestion1": "How does ordering work?",
+    "suggestion2": "What categories are available?",
+    "suggestion3": "How do I contact a seller?"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "products": "Products",
+    "categories": {
+      "title": "Categories",
+      "create": "Create Category",
+      "edit": "Edit Category",
+      "delete": "Delete",
+      "confirmDelete": "Delete Category?",
+      "name": "Name",
+      "slug": "Slug",
+      "iconUrl": "Icon URL",
+      "createdAt": "Created At",
+      "actions": "Actions",
+      "noCategories": "No categories yet",
+      "createSuccess": "Category created successfully",
+      "updateSuccess": "Category updated successfully",
+      "deleteSuccess": "Category deleted successfully",
+      "deleteWarning": "Products in this category may become uncategorized. This action cannot be undone."
+    },
+    "stats": "Platform Stats",
+    "totalUsers": "Total Users",
+    "totalProducts": "Total Products",
+    "totalOrders": "Total Orders",
+    "totalRevenue": "Total Revenue",
+    "thisMonth": "This Month",
+    "newUsers": "New Users",
+    "newOrders": "New Orders",
+    "topSellers": "Top Sellers",
+    "topProducts": "Top Products",
+    "verifyAction": "Verify",
+    "revokeAction": "Revoke",
+    "deleteProduct": "Delete Product",
+    "confirmDelete": "Are you sure you want to remove this product? This action cannot be undone.",
+    "noData": "No data yet"
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong. Please try again.",
+    "unknownError": "An unexpected error occurred. Please try again.",
     "retry": "Retry",
     "back": "Back",
     "cancel": "Cancel",
     "save": "Save",
+    "saving": "Saving...",
+    "optional": "Optional",
     "edit": "Edit",
     "delete": "Delete",
     "confirm": "Confirm",
@@ -540,6 +1056,129 @@
     "minutesAgo": "{{count}}m ago",
     "hoursAgo": "{{count}}h ago",
     "daysAgo": "{{count}}d ago",
-    "logoTagline": "Algerian Handcraft Marketplace"
+    "anonymous": "Anonymous",
+    "notFoundMessage": "Oops! The page you're looking for doesn't exist or has been moved.",
+    "goBack": "Go Back",
+    "weeksAgo": "{{count}}w ago",
+    "monthsAgo": "{{count}}mo ago",
+    "logoTagline": "Algerian Handcraft Marketplace",
+    "appNameArabic": "حرفتنا",
+    "appNameLatin": "MARKETPLACE",
+    "next": "Next",
+    "memberSince": "Member since",
+    "continue": "Continue",
+    "all": "All"
+  },
+  "bottomNav": {
+    "home": "Home",
+    "browse": "Browse",
+    "wishlist": "Saved",
+    "login": "Login",
+    "orders": "Orders",
+    "profile": "Profile",
+    "notifications": "Alerts",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "products": "Products",
+    "categories": "Categories"
+  },
+  "topbar": {
+    "homeAria": "Go to homepage",
+    "search": "Search",
+    "searchPlaceholder": "Search products or artisans...",
+    "closeSearch": "Close search",
+    "clearSearch": "Clear search",
+    "categories": "Categories",
+    "allCategories": "All Categories",
+    "shopByCategory": "Shop by Category",
+    "closeMenu": "Close menu",
+    "menu": "Menu",
+    "account": "My Account",
+    "login": "Sign In",
+    "register": "Sign Up",
+    "wishlist": "Wishlist",
+    "orders": "Orders",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "browse": "Browse products"
+  },
+  "desktopNav": {
+    "dashboard": "Dashboard",
+    "manageOrders": "Manage Orders",
+    "shopSettings": "Shop Settings",
+    "myProfile": "My Profile",
+    "myOrders": "My Orders",
+    "wishlist": "Wishlist",
+    "sellerAccount": "Artisan Account",
+    "adminAccount": "Admin Account",
+    "signOut": "Sign Out",
+    "guestCta": "Create an Account"
+  },
+  "language": {
+    "english": "English",
+    "arabic": "العربية",
+    "switcher": "Switch language"
+  },
+  "verification": {
+    "badge": {
+      "label": "Verified",
+      "tooltip": "This artisan has met all quality criteria"
+    },
+    "banner": {
+      "title": "Your shop is not yet verified",
+      "subtitle": "Complete the requirements below to earn the verified badge and build buyer trust."
+    },
+    "card": {
+      "title": "Verification Progress",
+      "hint": "Once all criteria are met, your badge is awarded automatically.",
+      "verified": "Your shop is verified ✓"
+    },
+    "criteria": {
+      "activeProducts": "At least {{required}} active product",
+      "completedOrders": "At least {{required}} completed orders",
+      "avgRating": "Average rating ≥ {{required}} stars",
+      "completeProfile": "Complete shop profile (name, bio, avatar, location)"
+    }
+  },
+  "adminUsers": {
+    "title": "User Management",
+    "totalCount": "{{count}} users total",
+    "searchPlaceholder": "Search by name or email...",
+    "tabs": {
+      "all": "All",
+      "clients": "Clients",
+      "sellers": "Sellers",
+      "unverifiedSellers": "Unverified Sellers"
+    },
+    "joined": "Joined",
+    "unknownUser": "Unknown",
+    "products": "Products",
+    "orders": "Orders",
+    "rating": "Rating",
+    "placed": "Placed",
+    "completed": "Done",
+    "viewShop": "View Shop",
+    "viewProfile": "View Profile",
+    "makeSeller": "Make Seller",
+    "showing": "Showing {{range}}",
+    "empty": "No users found",
+    "emptySub": "Try adjusting your search or filters",
+    "noShopProfile": "No shop profile yet",
+    "revokeTitle": "Revoke Verification?",
+    "revokeBody": "This will remove the verified badge from \"{{name}}\" and notify them. They can earn it back by completing the criteria.",
+    "changeRoleTitle": "Promote to Seller?",
+    "changeRoleBody": "\"{{name}}\" will become a seller account and gain access to the seller dashboard."
+  },
+  "categories": {
+    "Pottery": "Pottery",
+    "Textiles": "Textiles",
+    "Jewelry": "Jewelry",
+    "Leather Goods": "Leather Goods",
+    "Paintings": "Paintings",
+    "Candles & Soap": "Candles & Soap",
+    "Food & Honey": "Food & Honey",
+    "Home Decor": "Home Decor",
+    "Other": "Other",
+    "sweets": "Sweets"
   }
 }

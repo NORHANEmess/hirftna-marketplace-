@@ -1,8 +1,8 @@
 'use strict';
 
-const categoryService  = require('../services/category.service');
-const { asyncHandler } = require('../middlewares/error.middleware');
-const { sendSuccess }  = require('../utils/response');
+const categoryService              = require('../services/category.service');
+const { asyncHandler, AppError }   = require('../middlewares/error.middleware');
+const { sendSuccess }              = require('../utils/response');
 
 // ─────────────────────────────────────────────────────────────
 // GET ALL CATEGORIES
@@ -66,9 +66,10 @@ const getCategoryBySlug = asyncHandler(async (req, res) => {
 // req.body → validated by categorySchema in routes
 // ─────────────────────────────────────────────────────────────
 const createCategory = asyncHandler(async (req, res) => {
-  // Explicitly extract only allowed fields
-  // Zod already stripped unknown fields — this is extra safety
-  const { name, slug, icon_url } = req.body;
+  if (!req.validated?.body) {
+    throw new AppError('Body validation not applied', 500);
+  }
+  const { name, slug, icon_url } = req.validated.body;
 
   const category = await categoryService.createCategory({
     name,
@@ -92,8 +93,10 @@ const createCategory = asyncHandler(async (req, res) => {
 // req.body → validated by updateCategorySchema in routes
 // ─────────────────────────────────────────────────────────────
 const updateCategory = asyncHandler(async (req, res) => {
-  // Explicitly extract only allowed fields
-  const { name, slug, icon_url } = req.body;
+  if (!req.validated?.body) {
+    throw new AppError('Body validation not applied', 500);
+  }
+  const { name, slug, icon_url } = req.validated.body;
 
   // Build updates with only provided fields
   // Prevents accidental overwrites with undefined values

@@ -20,8 +20,10 @@ import SellerPage   from '../pages/SellerPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
 // ── Auth pages ────────────────────────────────────────────────────────────────
-import LoginPage    from '../pages/auth/LoginPage';
-import RegisterPage from '../pages/auth/RegisterPage';
+import LoginPage           from '../pages/auth/LoginPage';
+import RegisterPage        from '../pages/auth/RegisterPage';
+import ForgotPasswordPage  from '../pages/auth/ForgotPasswordPage';
+import ResetPasswordPage   from '../pages/auth/ResetPasswordPage';
 
 // ── Client pages ──────────────────────────────────────────────────────────────
 import OrdersPage   from '../pages/client/OrdersPage';
@@ -33,9 +35,21 @@ import SellerDashboard   from '../pages/seller/SellerDashboard';
 import SellerOrdersPage  from '../pages/seller/SellerOrdersPage';
 import SellerProfileEdit from '../pages/seller/SellerProfileEdit';
 import SellerProducts    from '../pages/seller/SellerProducts';
+import SellerPromotions  from '../pages/seller/SellerPromotions';
+
+// ── Admin pages ───────────────────────────────────────────────────────────────
+import AdminDashboard    from '../pages/admin/AdminDashboard';
+import AdminUsers        from '../pages/admin/AdminUsers';
+import AdminProducts     from '../pages/admin/AdminProducts';
+import AdminPromotions   from '../pages/admin/AdminPromotions';
+import AdminCategories   from '../pages/admin/AdminCategories';
+
+// ── Chatbot widget ────────────────────────────────────────────────────────────
+import ChatbotWidget from '../components/chatbot/ChatbotWidget';
 
 // ── Shared pages ──────────────────────────────────────────────────────────────
 import NotificationsPage from '../pages/NotificationsPage';
+import ClientProfilePage from '../pages/ClientProfilePage';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ROUTE GUARDS
@@ -74,19 +88,44 @@ function RequireAuth({ children }) {
  * login) because they're already authenticated — just not the right role.
  */
 function RequireSeller({ children }) {
-  const { isSeller, isAuthenticated, loading } = useAuth();
+  const { isSeller, isAdmin, isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
   if (loading) return <div className="min-h-screen bg-cream-100" />;
 
   if (!isAuthenticated) {
-    // Not logged in at all → go to login and preserve the destination
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  if (isAdmin) {
+    return <Navigate to="/admin" replace />;
+  }
+
   if (!isSeller) {
-    // Logged in but wrong role → go home, no redirect loop
     return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
+/**
+ * RequireNotAdmin — blocks admin users from client/seller pages.
+ *
+ * Used for: /orders, /wishlist.
+ * Admin manages these through the admin dashboard, not the client pages.
+ */
+function RequireNotAdmin({ children }) {
+  const { isAdmin, isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) return <div className="min-h-screen bg-cream-100" />;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (isAdmin) {
+    return <Navigate to="/admin" replace />;
   }
 
   return children;
@@ -103,6 +142,29 @@ function GuestOnly({ children }) {
   const { isAuthenticated, loading } = useAuth();
   if (loading) return <div className="min-h-screen bg-cream-100" />;
   if (isAuthenticated) return <Navigate to="/" replace />;
+  return children;
+}
+
+/**
+ * RequireAdmin — the user must be logged in AND have role = 'admin'.
+ *
+ * Used for: /admin/* routes.
+ * Non-admins are sent home; unauthenticated users go to /login.
+ */
+function RequireAdmin({ children }) {
+  const { user, isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) return <div className="min-h-screen bg-cream-100" />;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (user?.role !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 }
 
@@ -124,6 +186,7 @@ function RootLayout() {
     <>
       <MainLayout />
       <CustomOrderForm />
+      <ChatbotWidget />
     </>
   );
 }
@@ -154,6 +217,14 @@ const router = createBrowserRouter([
         path: 'register',
         element: <GuestOnly><RegisterPage /></GuestOnly>,
       },
+      {
+        path: 'forgot-password',
+        element: <GuestOnly><ForgotPasswordPage /></GuestOnly>,
+      },
+      {
+        path: 'reset-password',
+        element: <GuestOnly><ResetPasswordPage /></GuestOnly>,
+      },
 
       // ── Authenticated routes — BOTH clients AND sellers ───────────────────
       //
@@ -166,11 +237,15 @@ const router = createBrowserRouter([
       // RequireAuth covers both roles — this is the correct guard here.
       {
         path: 'wishlist',
-        element: <RequireAuth><WishlistPage /></RequireAuth>,
+        element: <RequireNotAdmin><WishlistPage /></RequireNotAdmin>,
       },
       {
         path: 'notifications',
         element: <RequireAuth><NotificationsPage /></RequireAuth>,
+      },
+      {
+        path: 'client/:id',
+        element: <RequireAuth><ClientProfilePage /></RequireAuth>,
       },
 
       // ── Client routes ─────────────────────────────────────────────────────
@@ -178,7 +253,7 @@ const router = createBrowserRouter([
       // (e.g. /orders shows outgoing orders for sellers via ?as=client param)
       {
         path: 'orders',
-        element: <RequireAuth><OrdersPage /></RequireAuth>,
+        element: <RequireNotAdmin><OrdersPage /></RequireNotAdmin>,
       },
       {
         path: 'profile',
@@ -202,6 +277,33 @@ const router = createBrowserRouter([
       {
         path: 'seller/profile',
         element: <RequireSeller><SellerProfileEdit /></RequireSeller>,
+      },
+      {
+        path: 'seller/promotions',
+        element: <RequireSeller><SellerPromotions /></RequireSeller>,
+      },
+
+      // ── Admin routes ──────────────────────────────────────────────────────
+      // RequireAdmin redirects non-admins to / and unauthenticated users to /login
+      {
+        path: 'admin',
+        element: <RequireAdmin><AdminDashboard /></RequireAdmin>,
+      },
+      {
+        path: 'admin/users',
+        element: <RequireAdmin><AdminUsers /></RequireAdmin>,
+      },
+      {
+        path: 'admin/products',
+        element: <RequireAdmin><AdminProducts /></RequireAdmin>,
+      },
+      {
+        path: 'admin/promotions',
+        element: <RequireAdmin><AdminPromotions /></RequireAdmin>,
+      },
+      {
+        path: 'admin/categories',
+        element: <RequireAdmin><AdminCategories /></RequireAdmin>,
       },
 
       // ── 404 catch-all ─────────────────────────────────────────────────────

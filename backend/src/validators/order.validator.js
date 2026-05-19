@@ -71,7 +71,7 @@ const orderQuerySchema = z.object({
     ),
 
   status: z
-    .enum(['pending', 'accepted', 'rejected', 'completed'])
+    .enum(['pending', 'accepted', 'rejected', 'ready', 'completed'])
     .optional(),
 
   as: z
@@ -79,9 +79,23 @@ const orderQuerySchema = z.object({
     .optional(),
 });
 
+// Seller marks order READY — must provide final_price
+const markReadySchema = z.object({
+  final_price: z
+    .number({ error: 'Final price must be a number' })
+    .positive({ error: 'Final price must be a positive number' }),
+
+  delivery_type: z
+    .enum(['fast', 'office_pickup', 'hand_to_hand'], {
+      error: 'Delivery type must be: fast, office_pickup, or hand_to_hand',
+    })
+    .optional(),
+});
+
 module.exports = {
   createOrderSchema,
   updateOrderStatusSchema,
   orderQuerySchema,
+  markReadySchema,
   quantityField,
 };

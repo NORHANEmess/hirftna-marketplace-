@@ -2,8 +2,8 @@
 import { useEffect } from 'react';
 import i18n from 'i18next';
 import { initReactI18next, I18nextProvider, useTranslation as useI18NextTranslation } from 'react-i18next';
-import ar from '../locales/ar.json';
-import en from '../locales/en.json';
+import ar from './locales/ar.json';
+import en from './locales/en.json';
 
 const STORAGE_KEY = 'hirftna_lang';
 const DEFAULT_LANG = 'ar';

@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   AlertCircle,
   ArrowUpRight,
+  BadgeCheck,
+  CheckCircle2,
   ChevronRight,
   Eye,
   Heart,
@@ -13,10 +15,15 @@ import {
   Plus,
   ShoppingBag,
   Star,
+  Store,
   TrendingUp,
+  XCircle,
 } from 'lucide-react';
 import { extractApiItems, ordersAPI, sellersAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from '../../i18n/index.jsx';
+import DashboardSidebar from '../../components/layout/DashboardSidebar';
+import PaymentModal from '../../components/payment/PaymentModal';
 
 function formatCurrency(value) {
   if (!value && value !== 0) {
@@ -25,7 +32,7 @@ function formatCurrency(value) {
   return `${Number(value).toLocaleString()} DA`;
 }
 
-function formatRelativeTime(dateString) {
+function formatRelativeTime(dateString, t) {
   if (!dateString) {
     return '';
   }
@@ -33,42 +40,45 @@ function formatRelativeTime(dateString) {
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
-  if (minutes < 1) return 'Just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days < 7) return `${days}d ago`;
+  if (minutes < 1) return t('common.justNow');
+  if (minutes < 60) return t('common.minutesAgo', { count: minutes });
+  if (hours < 24) return t('common.hoursAgo', { count: hours });
+  if (days < 7) return t('common.daysAgo', { count: days });
   return new Date(dateString).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-const STATUS_CONFIG = {
-  pending: { label: 'Pending', color: 'text-warning', bg: 'bg-warning/10' },
-  accepted: { label: 'Accepted', color: 'text-sage-600', bg: 'bg-sage-50' },
-  rejected: { label: 'Rejected', color: 'text-danger', bg: 'bg-red-50' },
-  completed: { label: 'Completed', color: 'text-warm-500', bg: 'bg-cream-200' },
+const STATUS_STYLES = {
+  pending:   { color: 'text-warning',  bg: 'bg-warning/10'  },
+  accepted:  { color: 'text-sage-600', bg: 'bg-sage-50'     },
+  rejected:  { color: 'text-danger',   bg: 'bg-red-50'      },
+  completed: { color: 'text-warm-500', bg: 'bg-cream-200'   },
 };
 
-function StatCard({ icon, label, value, sub, accent = false, loading = false }) {
+function StatCard({ icon, label, value, sub, accentColor = 'sage', loading = false }) {
   const Icon = icon;
+  const colors = {
+    sage:   { border: 'border-l-sage-500',   iconBg: 'bg-sage-50',   iconText: 'text-sage-600'   },
+    brick:  { border: 'border-l-brick-500',  iconBg: 'bg-brick-100', iconText: 'text-brick-500'  },
+    indigo: { border: 'border-l-indigo-400', iconBg: 'bg-indigo-50', iconText: 'text-indigo-500' },
+    blue:   { border: 'border-l-blue-400',   iconBg: 'bg-blue-50',   iconText: 'text-blue-500'   },
+    amber:  { border: 'border-l-amber-400',  iconBg: 'bg-amber-50',  iconText: 'text-amber-500'  },
+  };
+  const c = colors[accentColor] ?? colors.sage;
   return (
-    <div className={`text-center relative overflow-hidden rounded-2xl border p-4 flex flex-col gap-2 ${
-      accent ? 'bg-gradient-to-br from-sage-500 to-sage-700 border-sage-600 text-white' : 'bg-white border-beige-200'
-    }`}>
-      {accent && <div className="absolute -top-4 -right-4 w-20 h-20 bg-white/5 rounded-full" />}
-
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${accent ? 'bg-white/20' : 'bg-cream-200'}`}>
-        <Icon size={18} className={accent ? 'text-white' : 'text-sage-600'} />
+    <div className={`bg-white rounded-2xl border border-beige-200 border-l-4 ${c.border} p-4 flex items-center gap-3`}>
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${c.iconBg}`}>
+        <Icon size={18} className={c.iconText} />
       </div>
-
       {loading ? (
-        <div className="space-y-1.5">
-          <div className={`h-6 w-20 rounded-lg animate-pulse ${accent ? 'bg-white/20' : 'bg-beige-200'}`} />
-          <div className={`h-3 w-14 rounded-lg animate-pulse ${accent ? 'bg-white/10' : 'bg-beige-200'}`} />
+        <div className="space-y-1.5 flex-1">
+          <div className="h-5 w-16 rounded-lg animate-pulse bg-beige-200" />
+          <div className="h-3 w-12 rounded-lg animate-pulse bg-beige-200" />
         </div>
       ) : (
-        <div>
-          <p className={`text-xl font-bold leading-none ${accent ? 'text-white' : 'text-warm-900'}`}>{value}</p>
-          <p className={`text-[10px] font-medium mt-1 ${accent ? 'text-white/70' : 'text-warm-400'}`}>{label}</p>
-          {sub && <p className={`text-[9px] mt-0.5 ${accent ? 'text-white/50' : 'text-warm-300'}`}>{sub}</p>}
+        <div className="flex-1 min-w-0">
+          <p className="text-lg font-bold text-warm-900 leading-none">{value}</p>
+          <p className="text-[10px] font-medium text-warm-400 mt-0.5">{label}</p>
+          {sub && <p className="text-[9px] text-warm-300 mt-0.5">{sub}</p>}
         </div>
       )}
     </div>
@@ -97,28 +107,37 @@ function QuickAction({ to, icon, label, desc, primary = false }) {
 }
 
 function OrderRow({ order }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  const config = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
+  const styles = STATUS_STYLES[order.status] ?? STATUS_STYLES.pending;
+  const statusLabel = t(`orders.statuses.${order.status}`) || order.status;
 
   return (
     <div
       onClick={() => navigate('/seller/orders')}
       className="flex items-center gap-3 py-3 border-b border-beige-100 last:border-0 cursor-pointer hover:bg-cream-100 -mx-4 px-4 transition-colors"
     >
-      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${config.bg}`}>
-        <Package size={15} className={config.color} />
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${styles.bg}`}>
+        <Package size={15} className={styles.color} />
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-warm-900 truncate">{order.client_name ?? 'Customer'}</p>
+        <p className="text-sm font-semibold text-warm-900 truncate">
+          {order.client_name ?? t('sellerDashboard.customerFallback')}
+        </p>
         <p className="text-[10px] text-warm-400 truncate">
-          {order.notes ? `${order.notes.slice(0, 45)}${order.notes.length > 45 ? '…' : ''}` : 'Custom order'}
+          {order.notes
+            ? `${order.notes.slice(0, 45)}${order.notes.length > 45 ? '…' : ''}`
+            : t('sellerDashboard.customOrderFallback')
+          }
         </p>
       </div>
 
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
-        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${config.bg} ${config.color}`}>{config.label}</span>
-        <span className="text-[9px] text-warm-400">{formatRelativeTime(order.created_at)}</span>
+        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${styles.bg} ${styles.color}`}>
+          {statusLabel}
+        </span>
+        <span className="text-[9px] text-warm-400">{formatRelativeTime(order.created_at, t)}</span>
       </div>
     </div>
   );
@@ -136,24 +155,59 @@ function Section({ title, action, children }) {
   );
 }
 
+function VerificationCriterion({ criterion, t }) {
+  const labels = {
+    activeProducts:  t('verification.criteria.activeProducts',  { required: criterion.required }),
+    completedOrders: t('verification.criteria.completedOrders', { required: criterion.required }),
+    avgRating:       t('verification.criteria.avgRating',       { required: criterion.required }),
+    completeProfile: t('verification.criteria.completeProfile'),
+  };
+  return (
+    <div className="flex items-center gap-2.5">
+      {criterion.met
+        ? <CheckCircle2 size={15} className="text-sage-500 flex-shrink-0" />
+        : <XCircle size={15} className="text-warm-300 flex-shrink-0" />
+      }
+      <span className={`text-xs ${criterion.met ? 'text-warm-700' : 'text-warm-400'}`}>
+        {labels[criterion.key] ?? criterion.key}
+        {criterion.key !== 'completeProfile' && (
+          <span className="text-warm-400 ml-1">
+            ({criterion.current}/{criterion.required})
+          </span>
+        )}
+      </span>
+    </div>
+  );
+}
+
 export default function SellerDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [analytics, setAnalytics] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
+  const [verificationStatus, setVerificationStatus] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [error, setError] = useState('');
+  const [noProfile, setNoProfile] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [showActivationPayment, setShowActivationPayment] = useState(false);
 
   useEffect(() => {
     sellersAPI.getAnalytics()
       .then((response) => {
         setAnalytics(response.data?.data?.analytics ?? null);
       })
-      .catch(() => setError('Failed to load analytics'))
+      .catch((err) => {
+        if (err?.response?.status === 404) {
+          setNoProfile(true);
+        } else {
+          setError(t('common.error'));
+        }
+      })
       .finally(() => setStatsLoading(false));
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     ordersAPI.getAll({ limit: 5 })
@@ -162,6 +216,12 @@ export default function SellerDashboard() {
       })
       .catch(() => setRecentOrders([]))
       .finally(() => setOrdersLoading(false));
+  }, []);
+
+  useEffect(() => {
+    sellersAPI.getVerificationStatus()
+      .then((response) => setVerificationStatus(response.data?.data ?? null))
+      .catch(() => setVerificationStatus(null));
   }, []);
 
   const totalSales = analytics?.seller?.total_sales ?? 0;
@@ -177,38 +237,53 @@ export default function SellerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-cream-100 pb-28 md:pb-10">
-      <div className="text-center bg-gradient-to-br from-sage-500 to-sage-700 px-4 pt-6 pb-10 mx-3 mt-3 rounded-3xl relative overflow-hidden">
-        <div className="absolute -top-6 -right-6 w-32 h-32 bg-white/5 rounded-full" />
-        <div className="absolute bottom-0 left-8 w-20 h-20 bg-white/5 rounded-full" />
+    <div className="min-h-screen bg-cream-100 md:flex">
+      <DashboardSidebar role="seller" />
 
-        <div className="relative z-10">
-          <p className="text-white/60 text-xs mb-1 tracking-wide">Welcome back,</p>
-          <h1 className="text-white text-2xl font-bold leading-tight mb-1" style={{ fontFamily: "'Amiri', serif" }}>
-            {user?.full_name ?? 'Artisan'}
-          </h1>
-        </div>
-
+      <div className="flex-1 pb-28 md:pb-10">
+      <div className="bg-white border-b border-beige-200 px-4 pt-5 pb-4">
+        <p className="text-[10px] font-medium text-warm-400 uppercase tracking-widest mb-0.5">{t('sellerDashboard.welcome')}</p>
+        <h1 className="text-xl font-bold text-warm-900">
+          {user?.full_name ?? t('sellerDashboard.customerFallback')}
+        </h1>
         {pendingCount > 0 && (
           <button
             type="button"
             onClick={() => navigate('/seller/orders')}
-            className="mt-3 inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2 rounded-full transition-colors"
+            className="mt-2.5 inline-flex items-center gap-2 bg-warning/10 border border-warning/25 text-warning text-xs font-semibold px-3 py-1.5 rounded-full transition-colors hover:bg-warning/15"
           >
             <span className="w-1.5 h-1.5 bg-warning rounded-full animate-pulse" />
-            {pendingCount} order{pendingCount !== 1 ? 's' : ''} awaiting your review
+            {t('sellerDashboard.pendingAlert', { count: pendingCount })}
             <ArrowUpRight size={12} />
           </button>
         )}
       </div>
 
-      <div className="px-4 -mt-5 space-y-5">
+      <div className="px-4 pt-4 space-y-5">
         <div className="grid grid-cols-2 gap-3">
-          <StatCard icon={ShoppingBag} label="Completed Sales" value={totalSales} accent loading={statsLoading} />
-          <StatCard icon={TrendingUp} label="Total Revenue" value={formatCurrency(totalRevenue)} loading={statsLoading} />
-          <StatCard icon={Eye} label="Product Count" value={totalViews.toLocaleString()} loading={statsLoading} />
-          <StatCard icon={Star} label="Average Rating" value={avgRating ? `${Number(avgRating).toFixed(1)} ★` : '—'} loading={statsLoading} />
+          <StatCard icon={ShoppingBag} label={t('sellerDashboard.stats.sales')} value={totalSales} accentColor="brick" loading={statsLoading} />
+          <StatCard icon={TrendingUp} label={t('sellerDashboard.stats.revenue')} value={formatCurrency(totalRevenue)} accentColor="indigo" loading={statsLoading} />
+          <StatCard icon={Eye} label={t('sellerDashboard.stats.views')} value={totalViews.toLocaleString()} accentColor="blue" loading={statsLoading} />
+          <StatCard icon={Star} label={t('sellerDashboard.stats.rating')} value={avgRating ? `${Number(avgRating).toFixed(1)} ★` : '—'} accentColor="amber" loading={statsLoading} />
         </div>
+
+        {noProfile && (
+          <div className="bg-sage-50 border border-sage-200 rounded-2xl p-4 flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-sage-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Store size={16} className="text-sage-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-sage-800">{t('sellerDashboard.setupTitle')}</p>
+              <p className="text-xs text-sage-600 mt-0.5 leading-relaxed">{t('sellerDashboard.setupSub')}</p>
+              <Link
+                to="/seller/profile"
+                className="inline-flex items-center gap-1.5 mt-2.5 text-xs font-semibold text-white bg-sage-500 hover:bg-sage-600 px-3 py-1.5 rounded-xl transition-colors"
+              >
+                {t('sellerDashboard.setupAction')} <ArrowUpRight size={11} />
+              </Link>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-danger text-sm rounded-2xl px-4 py-3">
@@ -217,12 +292,62 @@ export default function SellerDashboard() {
           </div>
         )}
 
-        <Section title="Quick Actions">
+        {/* Activation banner: shop not yet verified — products hidden from public */}
+        {verificationStatus && !verificationStatus.isVerified && (
+          <div className="bg-warning/10 border border-warning/30 rounded-2xl p-4 flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-warning/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <AlertCircle size={16} className="text-warning" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-warm-800">{t('sellerDashboard.activationBanner.title')}</p>
+              <p className="text-xs text-warm-600 mt-0.5 leading-relaxed">{t('sellerDashboard.activationBanner.subtitle')}</p>
+              <button
+                type="button"
+                onClick={() => setShowActivationPayment(true)}
+                className="inline-flex items-center gap-1.5 mt-2.5 text-xs font-semibold text-white bg-warning hover:bg-amber-600 px-3 py-1.5 rounded-xl transition-colors"
+              >
+                {t('payment.activation_fee')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Verification progress card */}
+        {verificationStatus && !verificationStatus.isVerified && (
+          <Section
+            title={
+              <span className="flex items-center gap-2">
+                <BadgeCheck size={15} className="text-sage-500" />
+                {t('verification.card.title')}
+              </span>
+            }
+          >
+            <div className="space-y-2.5 py-3">
+              {(verificationStatus.criteria ?? []).map((criterion) => (
+                <VerificationCriterion key={criterion.key} criterion={criterion} t={t} />
+              ))}
+            </div>
+            <p className="text-[10px] text-warm-400 pb-2 leading-relaxed">
+              {t('verification.card.hint')}
+            </p>
+          </Section>
+        )}
+
+        {/* Verified seller celebration banner */}
+        {verificationStatus?.isVerified && (
+          <div className="bg-sage-50 border border-sage-200 rounded-2xl px-4 py-3 flex items-center gap-3">
+            <BadgeCheck size={18} className="text-sage-600 flex-shrink-0" />
+            <p className="text-sm font-semibold text-sage-800">{t('verification.card.verified')}</p>
+          </div>
+        )}
+
+        <Section title={t('sellerDashboard.quickActions')}>
           <div className="space-y-2 py-2">
-            <QuickAction to="/seller/products" icon={Plus} label="Add New Product" desc="List a new handmade item" primary />
-            <QuickAction to="/seller/orders" icon={ShoppingBag} label="View All Orders" desc="Manage incoming custom orders" />
-            <QuickAction to="/wishlist" icon={Heart} label="My Wishlist" desc="Items you've saved" />
-            <QuickAction to="/seller/profile" icon={LayoutDashboard} label="Edit Shop Profile" desc="Update story, avatar and info" />
+            <QuickAction to="/seller/products" icon={Plus} label={t('sellerDashboard.addProduct')} desc={t('sellerDashboard.addProductSub')} primary />
+            <QuickAction to="/seller/orders" icon={ShoppingBag} label={t('sellerDashboard.viewOrders')} desc={t('sellerDashboard.viewOrdersSub')} />
+            <QuickAction to="/seller/promotions" icon={TrendingUp} label={t('sellerDashboard.boostShop')} desc={t('sellerDashboard.boostShopSub')} />
+            <QuickAction to="/wishlist" icon={Heart} label={t('sellerDashboard.wishlist')} desc={t('sellerDashboard.wishlistSub')} />
+            <QuickAction to="/seller/profile" icon={LayoutDashboard} label={t('sellerDashboard.editProfile')} desc={t('sellerDashboard.editProfileSub')} />
             <button
               type="button"
               onClick={handleLogout}
@@ -233,8 +358,8 @@ export default function SellerDashboard() {
                 {loggingOut ? <Loader2 size={17} className="text-danger animate-spin" /> : <LogOut size={17} className="text-danger" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-warm-800">Sign Out</p>
-                <p className="text-[10px] text-warm-400">End your session</p>
+                <p className="text-sm font-semibold text-warm-800">{t('desktopNav.signOut')}</p>
+                <p className="text-[10px] text-warm-400">{t('sellerDashboard.signOutSub')}</p>
               </div>
               <ChevronRight size={14} className="text-warm-400" />
             </button>
@@ -242,10 +367,10 @@ export default function SellerDashboard() {
         </Section>
 
         <Section
-          title="Recent Orders"
+          title={t('sellerDashboard.recentOrders')}
           action={(
             <Link to="/seller/orders" className="text-xs font-semibold text-sage-600 hover:text-sage-700 flex items-center gap-0.5">
-              See all <ChevronRight size={13} />
+              {t('sellerDashboard.seeAll')} <ChevronRight size={13} />
             </Link>
           )}
         >
@@ -256,8 +381,8 @@ export default function SellerDashboard() {
           ) : recentOrders.length === 0 ? (
             <div className="text-center py-8">
               <Package size={28} className="text-warm-300 mx-auto mb-2" />
-              <p className="text-sm text-warm-400">No orders yet</p>
-              <p className="text-xs text-warm-300 mt-0.5">Share your shop link to start receiving orders</p>
+              <p className="text-sm text-warm-400">{t('sellerDashboard.noOrders')}</p>
+              <p className="text-xs text-warm-300 mt-0.5">{t('sellerDashboard.noOrdersSub')}</p>
             </div>
           ) : (
             recentOrders.map((order) => <OrderRow key={order.id} order={order} />)
@@ -267,18 +392,33 @@ export default function SellerDashboard() {
         {user?.seller_id && (
           <div className="bg-white border border-beige-200 rounded-2xl p-4 flex items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold text-warm-700 mb-0.5">Your public shop</p>
+              <p className="text-xs font-semibold text-warm-700 mb-0.5">{t('sellerDashboard.yourShop')}</p>
               <p className="text-[10px] text-warm-400 truncate">hirftna.dz/sellers/{user.seller_id}</p>
             </div>
             <Link
               to={`/sellers/${user.seller_id}`}
               className="flex items-center gap-1.5 text-xs font-semibold text-sage-600 border border-sage-200 bg-sage-50 hover:bg-sage-100 px-3 py-1.5 rounded-xl transition-colors flex-shrink-0"
             >
-              View <ArrowUpRight size={12} />
+              {t('sellerDashboard.viewShop')} <ArrowUpRight size={12} />
             </Link>
           </div>
         )}
       </div>
+      </div>
+
+      {showActivationPayment && (
+        <PaymentModal
+          amount={5000}
+          description={t('payment.activation_fee')}
+          onPaymentDeclared={() => {
+            setShowActivationPayment(false);
+            sellersAPI.getVerificationStatus()
+              .then((response) => setVerificationStatus(response.data?.data ?? null))
+              .catch(() => {});
+          }}
+          onClose={() => setShowActivationPayment(false)}
+        />
+      )}
     </div>
   );
 }

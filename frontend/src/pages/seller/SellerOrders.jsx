@@ -4,21 +4,24 @@ import { ClipboardList } from 'lucide-react';
 import { extractApiItems, extractApiPagination, ordersAPI } from '../../services/api';
 import OrderCard from '../../components/order/OrderCard';
 import { Spinner } from '../../components/ui/Spinner';
-
-const STATUS_FILTERS = [
-  { value: '', label: 'All' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'accepted', label: 'Accepted' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'rejected', label: 'Rejected' },
-];
+import { useTranslation } from '../../i18n/index.jsx';
+import DashboardSidebar from '../../components/layout/DashboardSidebar';
 
 function OrdersTab({ mode }) {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+
+  const STATUS_FILTERS = [
+    { value: '',          label: t('orders.statuses.all')       },
+    { value: 'pending',   label: t('orders.statuses.pending')   },
+    { value: 'accepted',  label: t('orders.statuses.accepted')  },
+    { value: 'completed', label: t('orders.statuses.completed') },
+    { value: 'rejected',  label: t('orders.statuses.rejected')  },
+  ];
 
   const fetchOrders = useCallback(async (nextPage = 1, append = false) => {
     setLoading(true);
@@ -84,12 +87,13 @@ function OrdersTab({ mode }) {
           <div className="flex flex-col items-center justify-center py-14 text-center">
             <span className="text-5xl mb-3">{mode === 'incoming' ? '📭' : '🛍️'}</span>
             <p className="text-sm font-semibold text-warm-700 mb-1">
-              {mode === 'incoming' ? 'No incoming orders' : 'No purchases yet'}
+              {mode === 'incoming' ? t('orders.seller.emptyIncoming') : t('orders.seller.emptyPurchases')}
             </p>
             <p className="text-xs text-warm-400">
               {mode === 'incoming'
-                ? statusFilter ? 'No orders with this status' : 'New orders will appear here'
-                : 'Orders you place from other sellers appear here'}
+                ? statusFilter ? t('orders.client.emptyFiltered') : t('orders.seller.emptyIncomingDescription')
+                : t('orders.seller.emptyPurchasesDescription')
+              }
             </p>
           </div>
         ) : (
@@ -114,7 +118,7 @@ function OrdersTab({ mode }) {
               }}
               className="btn-outline px-6 py-2 text-sm"
             >
-              Load More
+              {t('browse.loadMore')}
             </button>
           </div>
         )}
@@ -129,20 +133,23 @@ function OrdersTab({ mode }) {
 }
 
 export default function SellerOrdersPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('incoming');
   const tabs = [
-    { key: 'incoming', label: 'Incoming Orders', emoji: '📥' },
-    { key: 'outgoing', label: 'My Purchases', emoji: '🛍️' },
+    { key: 'incoming', label: t('orders.seller.incomingTab'), emoji: '📥' },
+    { key: 'outgoing', label: t('orders.seller.purchases'),   emoji: '🛍️' },
   ];
 
   return (
-    <div className="min-h-screen bg-cream-100">
+    <div className="min-h-screen bg-cream-100 md:flex">
+      <DashboardSidebar role="seller" />
+      <div className="flex-1 pb-28 md:pb-10">
       <div className="px-4 pt-5 pb-3">
         <div className="flex items-center gap-2 mb-1">
           <ClipboardList size={18} className="text-sage-500" />
-          <h1 className="text-xl font-bold text-warm-900">Orders</h1>
+          <h1 className="text-xl font-bold text-warm-900">{t('orders.seller.title')}</h1>
         </div>
-        <p className="text-xs text-warm-400">Manage incoming requests and track your purchases</p>
+        <p className="text-xs text-warm-400">{t('orders.seller.subtitle')}</p>
       </div>
 
       <div className="flex border-b border-beige-200 px-4">
@@ -167,6 +174,7 @@ export default function SellerOrdersPage() {
       <div className="px-4">
         {activeTab === 'incoming' && <OrdersTab mode="incoming" />}
         {activeTab === 'outgoing' && <OrdersTab mode="outgoing" />}
+      </div>
       </div>
     </div>
   );

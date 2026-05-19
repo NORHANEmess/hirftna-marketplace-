@@ -105,8 +105,14 @@ const logger = createLogger({
     new transports.Console({
       format: format.combine(
         format.colorize(),
-        format.printf(({ timestamp, level, message, stack }) => {
-          return `${timestamp} [${level}]: ${stack || message}`;
+        format.printf(({ timestamp, level, message, stack, ...meta }) => {
+          const base = `${timestamp} [${level}]: ${stack || message}`;
+          const extras = Object.keys(meta).filter(
+            (k) => !['service', 'splat'].includes(k)
+          );
+          if (extras.length === 0) return base;
+          const detail = extras.map((k) => `${k}=${JSON.stringify(meta[k])}`).join(' ');
+          return `${base} | ${detail}`;
         })
       )
     }),

@@ -7,7 +7,22 @@ import {
   parseVerifyOtpPayload,
 } from '../utils/validation';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1';
+// IIFE ensures the check runs as part of API_BASE_URL evaluation — cannot be tree-shaken
+const API_BASE_URL = (() => {
+  const url = import.meta.env.VITE_API_URL;
+  if (!url && import.meta.env.PROD) {
+    throw new Error(
+      'VITE_API_URL is not set. The application cannot start. ' +
+      'Configure this environment variable in your Vercel deployment settings.'
+    );
+  }
+  if (!url) {
+    // Dev-only fallback with visible warning
+    // eslint-disable-next-line no-console
+    console.warn('⚠️  VITE_API_URL not set, falling back to http://localhost:4000/api/v1');
+  }
+  return url || 'http://localhost:4000/api/v1';
+})();
 
 const AUTH_STORAGE_KEYS = {
   token: 'hirftna_token',
@@ -122,8 +137,45 @@ export function getCachedUser() {
 
 /* ================= ERRORS ================= */
 
-export function getApiErrorMessage(error, fallback = 'Something went wrong') {
-  return error?.response?.data?.message || error?.message || fallback;
+// Action hints per HTTP status — shown below the error message
+const STATUS_HINTS = {
+  400: 'Please check the form and try again.',
+  401: 'Your session may have expired — please log in again.',
+  403: 'You do not have permission to perform this action.',
+  404: 'The requested resource could not be found.',
+  409: 'Please use a different value and try again.',
+  422: 'Some fields contain invalid data — check the form.',
+  429: 'Too many attempts. Please wait a moment before trying again.',
+  500: 'A server error occurred. Please try again in a moment.',
+  503: 'The service is temporarily unavailable. Please try later.',
+};
+
+/**
+ * Returns { message, hint, status } from any API or network error.
+ * - message: the backend's own message when available, fallback otherwise
+ * - hint:    a short action instruction based on the HTTP status
+ * - status:  the HTTP status code, or null for network errors
+ */
+export function resolveApiError(error, fallback = 'Something went wrong. Please try again.') {
+  // Network / timeout / no connection
+  if (!error?.response) {
+    const msg = String(error?.message || '').toLowerCase();
+    if (error?.code === 'ECONNABORTED' || msg.includes('timeout')) {
+      return { message: 'The request timed out.', hint: 'Check your internet connection and try again.', status: null };
+    }
+    return { message: 'Cannot reach the server.', hint: 'Check your internet connection and try again.', status: null };
+  }
+
+  const status  = error.response.status;
+  const message = error.response.data?.message || fallback;
+  const hint    = STATUS_HINTS[status] ?? null;
+
+  return { message, hint, status };
+}
+
+// Backwards-compatible helpers (used throughout the app)
+export function getApiErrorMessage(error, fallback = 'Something went wrong. Please try again.') {
+  return resolveApiError(error, fallback).message;
 }
 
 export function getApiErrorFields(error) {
@@ -274,30 +326,54 @@ api.interceptors.response.use(
 /* ================= APIs ================= */
 
 export const authAPI = {
-  register: (data) => api.post('/auth/register', parseRegisterPayload(data)),
-  login: (data) => api.post('/auth/login', parseLoginPayload(data)),
-  verifyOtp: (data) => api.post('/auth/verify-otp', parseVerifyOtpPayload(data)),
-  logout: () => api.post('/auth/logout'),
-  getMe: () => api.get('/auth/me'),
+  register:       (data) => api.post('/auth/register', parseRegisterPayload(data)),
+  login:          (data) => api.post('/auth/login', parseLoginPayload(data)),
+  verifyOtp:      (data) => api.post('/auth/verify-otp', parseVerifyOtpPayload(data)),
+  logout:         ()     => api.post('/auth/logout'),
+  getMe:          ()     => api.get('/auth/me'),
+  updateMe:       (data) => api.put('/auth/me', data),
   changePassword: (data) => api.post('/auth/change-password', parseChangePasswordPayload(data)),
+  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  resetPassword:  (token, new_password) => api.post('/auth/reset-password', { token, new_password }),
 };
 
 export const productsAPI = {
-  getAll: (params) => api.get('/products', { params }),
-  getById: (id) => api.get(`/products/${id}`),
+  getAll:        (params)     => api.get('/products', { params }),
+  getById:       (id)         => api.get(`/products/${id}`),
+  getMyProducts: (params)     => api.get('/products/my-products', { params }),
+  create:        (data)       => api.post('/products', data),
+  update:        (id, data)   => api.put(`/products/${id}`, data),
+  delete:        (id)         => api.delete(`/products/${id}`),
 };
 
 export const ordersAPI = {
-  create: (data) => {
-    const payload = parseOrderPayload(data);
-    return api.post('/orders', payload);
-  },
+  create:          (data)       => api.post('/orders', parseOrderPayload(data)),
+  getAll:          (params)     => api.get('/orders', { params }),
+  getById:         (id)         => api.get(`/orders/${id}`),
+  updateStatus:    (id, data)   => api.patch(`/orders/${id}/status`, data),
+  markReady:       (id, data)   => api.patch(`/orders/${id}/ready`, data),
+  confirmComplete: (id)         => api.patch(`/orders/${id}/complete`),
 };
+
+// ================== USERS (public profiles) ==================
+export const usersAPI = {
+  getPublicProfile: (id) => api.get(`/users/${id}/public`),
+};
+
+// ================== CLIENT RATINGS ==================
+export const clientRatingsAPI = {
+  create:      (data)       => api.post('/client-ratings', data),
+  getByClient: (clientId)   => api.get(`/client-ratings/client/${clientId}`),
+};
+
 // ================== CATEGORIES ==================
 export const categoriesAPI = {
-  getAll: () => api.get('/categories'),
-  getById: (id) => api.get(`/categories/${id}`),
-  getBySlug: (slug) => api.get(`/categories/slug/${slug}`),
+  getAll:    ()          => api.get('/categories'),
+  getById:   (id)        => api.get(`/categories/${id}`),
+  getBySlug: (slug)      => api.get(`/categories/slug/${slug}`),
+  create:    (data)      => api.post('/categories', data),
+  update:    (id, data)  => api.put(`/categories/${id}`, data),
+  delete:    (id)        => api.delete(`/categories/${id}`),
 };
 
 // ================== SELLERS ==================
@@ -306,6 +382,7 @@ export const sellersAPI = {
   getById: (id) => api.get(`/sellers/${id}`),
   getMe: () => api.get('/sellers/me'),
   getAnalytics: () => api.get('/sellers/analytics'),
+  getVerificationStatus: () => api.get('/sellers/me/verification-status'),
   create: (data) => api.post('/sellers', data),
   update: (id, data) => api.put(`/sellers/${id}`, data),
 };
@@ -316,9 +393,6 @@ export const reviewsAPI = {
     api.get(`/reviews/product/${id}`, { params }),
 
   getSellerRatings: (id, params) =>
-    api.get(`/reviews/seller/${id}`, { params }),
-
-  getSellerReviews: (id, params) =>
     api.get(`/reviews/seller/${id}`, { params }),
 
   createReview: (data) => api.post('/reviews/product', data),
@@ -379,6 +453,35 @@ export const uploadsAPI = {
     });
   },
 };
+// ================== CHATBOT ==================
+export const chatbotAPI = {
+  sendMessage: (message, conversationHistory = []) =>
+    api.post('/chatbot', { message, conversation_history: conversationHistory }),
+};
+
+// ================== PROMOTIONS ==================
+export const promotionsAPI = {
+  getHeroAds:              ()       => api.get('/promotions/hero'),
+  getBrowseAds:            ()       => api.get('/promotions/browse'),
+  getFeaturedProducts:     (params) => api.get('/promotions/featured-products', { params }),
+  request:                 (data)   => api.post('/promotions/request', data),
+  getMe:                   ()       => api.get('/promotions/me'),
+  getMyProductPromotions:  ()       => api.get('/promotions/my-product-promotions'),
+};
+
+// ================== ADMIN ==================
+export const adminAPI = {
+  getUsers:          (params)               => api.get('/admin/users', { params }),
+  getProducts:       (params)               => api.get('/admin/products', { params }),
+  getStats:          ()                     => api.get('/admin/stats'),
+  verifySeller:      (sellerId, isVerified) => api.patch(`/admin/sellers/${sellerId}/verify`, { is_verified: isVerified }),
+  deleteProduct:     (productId)            => api.delete(`/admin/products/${productId}`),
+  updateUserRole:    (userId, role)         => api.patch(`/admin/users/${userId}/role`, { role }),
+  getPromotions:     (params)               => api.get('/admin/promotions', { params }),
+  activatePromotion: (id)                   => api.patch(`/admin/promotions/${id}/activate`),
+  rejectPromotion:   (id, reason)           => api.patch(`/admin/promotions/${id}/reject`, { rejection_reason: reason }),
+};
+
 export const apiUtils = {
   clearStoredSession,
   storeSession,

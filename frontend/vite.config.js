@@ -3,7 +3,15 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  if (mode === 'production' && !process.env.VITE_API_URL) {
+    throw new Error(
+      '\n\n  ✗ VITE_API_URL is required for production builds.\n' +
+      '    Set it in your Vercel environment variables before deploying.\n'
+    );
+  }
+
+  return {
   plugins: [react()],
 
   resolve: {
@@ -27,4 +35,5 @@ export default defineConfig({
       ],
     },
   },
+  };
 });

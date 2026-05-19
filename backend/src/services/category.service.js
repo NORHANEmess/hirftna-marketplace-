@@ -9,8 +9,7 @@ const logger            = require('../utils/logger');
 // ─────────────────────────────────────────────────────────────
 
 // Supabase returns PGRST116 when .single() finds no rows
-const isNotFound = (error) =>
-  error?.code === 'PGRST116' || error?.code === '406';
+const isNotFound = (error) => error?.code === 'PGRST116';
 
 // Standard columns to select — never SELECT *
 const CATEGORY_COLUMNS = 'id, name, slug, icon_url, created_at';

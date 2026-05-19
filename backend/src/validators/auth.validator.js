@@ -7,7 +7,7 @@ const {
   normalizeLoginPayload,
   normalizeRegisterPayload,
   normalizeVerifyOtpPayload,
-} = require('../../../shared/schemas/auth.schema');
+} = require('../../../shared/schemas/auth.schema.cjs');
 
 const {
   registerSchema: baseRegisterSchema,
@@ -26,6 +26,25 @@ const changePasswordSchema = z.preprocess(
 );
 const verifyOtpSchema = z.preprocess(normalizeVerifyOtpPayload, baseVerifyOtpSchema);
 
+const forgotPasswordSchema = z.object({
+  email: z
+    .string({ error: 'Email is required' })
+    .trim()
+    .toLowerCase()
+    .email({ error: 'Please provide a valid email address' })
+    .max(255, { error: 'Email is too long' }),
+});
+
+const resetPasswordSchema = z.object({
+  token: z
+    .string({ error: 'Reset token is required' })
+    .min(1, { error: 'Reset token is required' }),
+  new_password: z
+    .string({ error: 'Password is required' })
+    .min(8, { error: 'Password must be at least 8 characters' })
+    .max(72, { error: 'Password cannot exceed 72 characters' }),
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
@@ -33,4 +52,6 @@ module.exports = {
   changePasswordSchema,
   refreshTokenSchema,
   verifyOtpSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 };

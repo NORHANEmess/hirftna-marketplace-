@@ -31,9 +31,9 @@ const getAllProducts = asyncHandler(async (req, res) => {
 // Public + optional auth
 // ─────────────────────────────────────────────────────────────
 const getProductById = asyncHandler(async (req, res) => {
-  const userId = req.user?.id || null;
+  const user = req.user || null;
 
-  const product = await productService.getProductById(req.params.id, userId);
+  const product = await productService.getProductById(req.params.id, user);
 
   return sendSuccess(res, { product }, 'Product fetched successfully', 200);
 });

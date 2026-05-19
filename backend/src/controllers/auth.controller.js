@@ -8,7 +8,7 @@ const {
   normalizeLoginPayload,
   normalizeRegisterPayload,
   normalizeVerifyOtpPayload,
-} = require('../../../shared/schemas/auth.schema');
+} = require('../../../shared/schemas/auth.schema.cjs');
 
 const register = asyncHandler(async (req, res) => {
   if (!req.validated?.body) {
@@ -27,12 +27,8 @@ const register = asyncHandler(async (req, res) => {
 
   return sendSuccess(
     res,
-    {
-      user: result.user,
-      token: result.token,
-      refresh_token: result.refresh_token,
-    },
-    'Account created successfully',
+    result,
+    result.requires_otp ? 'OTP verification required' : 'Account created successfully',
     201
   );
 });
@@ -135,6 +131,31 @@ const changePassword = asyncHandler(async (req, res) => {
   );
 });
 
+const forgotPassword = asyncHandler(async (req, res) => {
+  if (!req.validated?.body) {
+    throw new AppError('Body validation not applied', 500);
+  }
+
+  await authService.forgotPassword({ email: req.validated.body.email });
+
+  return sendSuccess(
+    res,
+    null,
+    'If this email exists, we sent a reset link. Check your inbox.'
+  );
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  if (!req.validated?.body) {
+    throw new AppError('Body validation not applied', 500);
+  }
+
+  const { token, new_password } = req.validated.body;
+  await authService.resetPassword({ token, new_password });
+
+  return sendSuccess(res, null, 'Password updated successfully.');
+});
+
 module.exports = {
   register,
   login,
@@ -144,4 +165,6 @@ module.exports = {
   getMe,
   updateProfile,
   changePassword,
+  forgotPassword,
+  resetPassword,
 };

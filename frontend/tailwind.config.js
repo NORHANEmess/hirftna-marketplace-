@@ -5,6 +5,10 @@ export default {
     "./src/**/*.{js,jsx}",
   ],
   theme: {
+    fontFamily: {
+      sans:    ['"Plus Jakarta Sans"', '"Readex Pro"', 'system-ui', 'sans-serif'],
+      display: ['"Plus Jakarta Sans"', '"Readex Pro"', 'system-ui', 'sans-serif'],
+    },
     extend: {
       colors: {
         // ── CREAM & BEIGE BASE ──────────────────────────
@@ -49,15 +53,24 @@ export default {
           800: '#35322A',
           900: '#1C1A14',
         },
+        // ── BRICK RED ACCENT ────────────────────────────
+        brick: {
+          50:  '#FDF5F3',
+          100: '#FAEAE5',
+          200: '#F2D0C5',
+          300: '#E5A999',
+          400: '#C27560',
+          500: '#8B3A2A',
+          600: '#76311F',
+          700: '#5F2719',
+          800: '#4A1E13',
+          900: '#351510',
+        },
         // ── STATUS COLORS ────────────────────────────────
         success: '#5C8A4A',
         warning: '#C4862A',
         danger:  '#C0443A',
         info:    '#3A6EA8',
-      },
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         'xl':  '1rem',
@@ -89,16 +102,20 @@ export default {
         '2xl': '1536px',
       },
       animation: {
-        'fade-in':    'fadeIn 0.3s ease-out',
-        'slide-up':   'slideUp 0.3s ease-out',
-        'slide-down': 'slideDown 0.3s ease-out',
-        'scale-in':   'scaleIn 0.2s ease-out',
+        'fade-in':       'fadeIn 0.3s ease-out',
+        'slide-up':      'slideUp 0.3s ease-out',
+        'slide-down':    'slideDown 0.3s ease-out',
+        'scale-in':      'scaleIn 0.2s ease-out',
+        'ken-burns':     'kenBurns 7s ease-in-out infinite alternate',
+        'progress-fill': 'progressFill 5s linear forwards',
       },
       keyframes: {
-        fadeIn:    { from: { opacity: 0 }, to: { opacity: 1 } },
-        slideUp:   { from: { opacity: 0, transform: 'translateY(12px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
-        slideDown: { from: { opacity: 0, transform: 'translateY(-12px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
-        scaleIn:   { from: { opacity: 0, transform: 'scale(0.95)' }, to: { opacity: 1, transform: 'scale(1)' } },
+        fadeIn:       { from: { opacity: 0 }, to: { opacity: 1 } },
+        slideUp:      { from: { opacity: 0, transform: 'translateY(12px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
+        slideDown:    { from: { opacity: 0, transform: 'translateY(-12px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
+        scaleIn:      { from: { opacity: 0, transform: 'scale(0.95)' }, to: { opacity: 1, transform: 'scale(1)' } },
+        kenBurns:     { '0%': { transform: 'scale(1) translate(0,0)' }, '100%': { transform: 'scale(1.08) translate(-1%,-1%)' } },
+        progressFill: { '0%': { transform: 'scaleX(0)' }, '100%': { transform: 'scaleX(1)' } },
       },
     },
   },

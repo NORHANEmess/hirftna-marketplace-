@@ -30,17 +30,16 @@ const addToWishlist = asyncHandler(async (req, res) => {
 });
 
 const removeFromWishlist = asyncHandler(async (req, res) => {
-  await wishlistService.removeFromWishlist(
-    req.user.id,
-    req.validated.params.product_id
-  );
+  const { product_id } = req.validated?.params ?? req.params;
+  await wishlistService.removeFromWishlist(req.user.id, product_id);
   return sendSuccess(res, null, 'Removed from wishlist', 200);
 });
 
 const checkWishlist = asyncHandler(async (req, res) => {
+  const { product_id } = req.validated?.params ?? req.params;
   const inWishlist = await wishlistService.isInWishlist(
     req.user.id,
-    req.validated.params.product_id
+    product_id
   );
   return sendSuccess(
     res,

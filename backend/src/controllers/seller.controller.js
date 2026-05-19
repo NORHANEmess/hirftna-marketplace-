@@ -1,6 +1,7 @@
 'use strict';
 
 const sellerService              = require('../services/seller.service');
+const verificationService        = require('../services/verification.service');
 const { asyncHandler, AppError } = require('../middlewares/error.middleware');
 const { sendSuccess, sendCollection } = require('../utils/response');
 
@@ -170,6 +171,18 @@ const getSellerAnalytics = asyncHandler(async (req, res) => {
   return sendSuccess(res, { analytics }, 'Analytics fetched successfully', 200);
 });
 
+// ─────────────────────────────────────────────────────────────
+// GET MY VERIFICATION STATUS
+// GET /api/v1/sellers/me/verification-status
+// Seller only — returns criteria progress for dashboard UI
+// ─────────────────────────────────────────────────────────────
+const getMyVerificationStatus = asyncHandler(async (req, res) => {
+  const seller = await sellerService.getMySellerProfile(req.user.id);
+  const status = await verificationService.getVerificationStatus(seller.id);
+
+  return sendSuccess(res, status, 'Verification status fetched successfully', 200);
+});
+
 module.exports = {
   getAllSellers,
   getSellerById,
@@ -178,4 +191,5 @@ module.exports = {
   updateSeller,
   verifySeller,
   getSellerAnalytics,
+  getMyVerificationStatus,
 };

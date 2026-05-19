@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Package, ShoppingBag } from 'lucide-react';
+import { AlertCircle, Package, ShoppingBag } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { extractApiItems, ordersAPI } from '../../services/api';
 import OrderCard from '../../components/order/OrderCard';
@@ -43,7 +43,8 @@ function EmptyState({ hasFilter }) {
           onClick={() => navigate('/browse')}
           className="inline-flex items-center gap-2 px-6 py-3 bg-sage-500 text-white text-sm font-semibold rounded-2xl hover:bg-sage-600 transition-colors"
         >
-          <ShoppingBag size={15} /> {t('orders.client.browse')}
+          <ShoppingBag size={15} />
+          {t('orders.client.browse')}
         </button>
       )}
     </div>
@@ -55,24 +56,27 @@ export default function OrdersPage() {
   const [searchParams] = useSearchParams();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
   const highlightId = searchParams.get('id') ?? null;
 
   const statusTabs = useMemo(() => ([
-    { value: 'all', label: t('orders.statuses.all') },
-    { value: 'pending', label: t('orders.statuses.pending') },
-    { value: 'accepted', label: t('orders.statuses.accepted') },
+    { value: 'all',       label: t('orders.statuses.all') },
+    { value: 'pending',   label: t('orders.statuses.pending') },
+    { value: 'accepted',  label: t('orders.statuses.accepted') },
+    { value: 'ready',     label: t('orders.statuses.ready') },
     { value: 'completed', label: t('orders.statuses.completed') },
-    { value: 'rejected', label: t('orders.statuses.rejected') },
+    { value: 'rejected',  label: t('orders.statuses.rejected') },
   ]), [t]);
 
   const loadOrders = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const response = await ordersAPI.getAll();
+      const response = await ordersAPI.getAll({ limit: 100 });
       setOrders(extractApiItems(response, { itemKeys: ['orders'] }));
     } catch {
-      setOrders([]);
+      setError(t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -92,7 +96,8 @@ export default function OrdersPage() {
     )));
   };
 
-  const pendingCount = orders.filter((order) => order.status === 'pending').length;
+  // Count orders that need client action: ready = final price set, waiting for confirmation
+  const actionCount = orders.filter((o) => o.status === 'pending' || o.status === 'ready').length;
 
   return (
     <div className="min-h-screen bg-cream-100 pb-28 md:pb-10">
@@ -103,7 +108,11 @@ export default function OrdersPage() {
               <h1 className="text-lg font-bold text-warm-900">{t('orders.client.title')}</h1>
               <p className="text-xs text-warm-400">
                 {loading ? t('common.loading') : t('orders.client.summary', { count: orders.length })}
-                {pendingCount > 0 && ` · ${t('orders.client.pendingSummary', { count: pendingCount })}`}
+                {actionCount > 0 && (
+                  <span className="text-warning font-semibold">
+                    {` · ${t('orders.client.pendingSummary', { count: actionCount })}`}
+                  </span>
+                )}
               </p>
             </div>
           </div>
@@ -120,9 +129,13 @@ export default function OrdersPage() {
                   type="button"
                   onClick={() => setActiveTab(tab.value)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-all duration-150 flex-shrink-0 ${
-                    activeTab === tab.value
-                      ? 'bg-sage-500 text-white border-sage-500 shadow-sm'
-                      : 'bg-white text-warm-500 border-beige-200 hover:border-sage-300'
+                    activeTab === tab.value && tab.value === 'ready'
+                      ? 'bg-info text-white border-info shadow-sm'
+                      : activeTab === tab.value
+                        ? 'bg-sage-500 text-white border-sage-500 shadow-sm'
+                        : tab.value === 'ready' && orders.filter((o) => o.status === 'ready').length > 0
+                          ? 'bg-blue-50 text-info border-blue-200 hover:border-info'
+                          : 'bg-white text-warm-500 border-beige-200 hover:border-sage-300'
                   }`}
                 >
                   {tab.label}
@@ -142,7 +155,15 @@ export default function OrdersPage() {
       </div>
 
       <div className="max-w-xl mx-auto px-4 py-4 space-y-3">
-        {loading
+        {error ? (
+          <div className="flex items-center gap-3 bg-red-50 border border-red-100 text-danger text-sm rounded-2xl px-4 py-3">
+            <AlertCircle size={15} className="flex-shrink-0" />
+            <span className="flex-1">{error}</span>
+            <button onClick={loadOrders} className="text-xs font-semibold underline underline-offset-2">
+              {t('common.retry')}
+            </button>
+          </div>
+        ) : loading
           ? Array.from({ length: 4 }).map((_, index) => <OrderSkeleton key={index} />)
           : filteredOrders.length === 0
             ? <EmptyState hasFilter={activeTab !== 'all'} />

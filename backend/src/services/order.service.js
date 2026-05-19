@@ -1,8 +1,9 @@
 'use strict';
 
-const { supabaseAdmin } = require('../config/supabase');
-const { AppError }      = require('../middlewares/error.middleware');
-const logger            = require('../utils/logger');
+const { supabaseAdmin }        = require('../config/supabase');
+const { AppError }             = require('../middlewares/error.middleware');
+const logger                   = require('../utils/logger');
+const { updateVerificationStatus } = require('./verification.service');
 
 // ─────────────────────────────────────────────────────────────
 // CONSTANTS
@@ -16,6 +17,7 @@ const ORDER_COLUMNS = `
   client_id, seller_id,
   budget_min, budget_max, deadline,
   reference_images, rejection_reason, is_custom,
+  final_price, ready_at, completed_at,
   client:users (
     id, full_name, email, phone, avatar_url
   ),
@@ -34,10 +36,14 @@ const ORDER_COLUMNS = `
   )
 `.trim();
 
-// Valid status transitions
+// Valid status transitions — enforces the canonical custom order flow:
+// pending → accepted/rejected (seller decides)
+// accepted → ready           (seller marks ready + sets final_price)
+// ready → completed          (CLIENT confirms — never the seller)
 const VALID_TRANSITIONS = {
   pending:   ['accepted', 'rejected'],
-  accepted:  ['completed'],
+  accepted:  ['ready'],
+  ready:     ['completed'],
   rejected:  [],
   completed: [],
 };
@@ -45,8 +51,7 @@ const VALID_TRANSITIONS = {
 // ─────────────────────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────────────────────
-const isNotFound = (error) =>
-  error?.code === 'PGRST116' || error?.code === '406';
+const isNotFound = (error) => error?.code === 'PGRST116';
 
 // Fire-and-forget — never blocks order creation
 const createNotification = async ({ userId, type, title, body, meta }) => {
@@ -112,12 +117,6 @@ const validateOrderItems = async (items) => {
   }
 
   const sellerId = sellerIds[0];
-
-  // Seller must be verified
-  const seller = products[0]?.seller;
-  if (!seller?.is_verified) {
-    throw new AppError('Cannot place orders from unverified sellers', 400);
-  }
 
   // Build validated items using price as reference price (not charged directly)
   // total_amount is informational — actual price is negotiated for custom orders
@@ -426,7 +425,7 @@ const updateOrderStatus = async (userId, orderId, { status, rejection_reason }) 
     throw new AppError('Failed to update order status', 500);
   }
 
-  // Notify client
+  // Notify client (accepted / rejected only — ready/completed have their own functions)
   const notificationMap = {
     accepted: {
       type:  'order_accepted',
@@ -439,11 +438,6 @@ const updateOrderStatus = async (userId, orderId, { status, rejection_reason }) 
       body:  rejection_reason
         ? `تم رفض طلبك: ${rejection_reason}`
         : 'تم رفض طلبك من قِبل الحرفي',
-    },
-    completed: {
-      type:  'order_completed',
-      title: 'اكتمل طلبك! 🎉',
-      body:  'تم الانتهاء من طلبك المخصص',
     },
   };
 
@@ -473,9 +467,155 @@ const updateOrderStatus = async (userId, orderId, { status, rejection_reason }) 
   return updatedOrder;
 };
 
+// ─────────────────────────────────────────────────────────────
+// MARK ORDER READY
+// Seller only — called after working on the order.
+// Sets final_price (what the client will pay) and confirms delivery_type.
+// Transitions: accepted → ready
+// ─────────────────────────────────────────────────────────────
+const markReady = async (userId, orderId, { final_price, delivery_type }) => {
+  // Resolve seller profile
+  const { data: seller, error: sellerError } = await supabaseAdmin
+    .from('sellers')
+    .select('id')
+    .eq('user_id', userId)
+    .single();
+
+  if (sellerError || !seller) throw new AppError('Seller profile not found', 404);
+
+  // Fetch order
+  const { data: order, error: orderError } = await supabaseAdmin
+    .from('orders')
+    .select('id, status, client_id, seller_id')
+    .eq('id', orderId)
+    .single();
+
+  if (orderError) {
+    if (isNotFound(orderError)) throw new AppError('Order not found', 404);
+    throw new AppError('Failed to fetch order', 500);
+  }
+
+  if (order.seller_id !== seller.id) {
+    throw new AppError('You do not have permission to update this order', 403);
+  }
+
+  if (order.status !== 'accepted') {
+    throw new AppError(
+      `Order must be in "accepted" status to mark as ready. Current status: "${order.status}"`,
+      400
+    );
+  }
+
+  const updateData = {
+    status:        'ready',
+    final_price,
+    ready_at:      new Date().toISOString(),
+    updated_at:    new Date().toISOString(),
+  };
+
+  if (delivery_type) updateData.delivery_type = delivery_type;
+
+  const { data: updatedOrder, error: updateError } = await supabaseAdmin
+    .from('orders')
+    .update(updateData)
+    .eq('id', orderId)
+    .select(ORDER_COLUMNS)
+    .single();
+
+  if (updateError) {
+    logger.error({ message: 'Failed to mark order ready', orderId, error: updateError.message });
+    throw new AppError('Failed to mark order as ready', 500);
+  }
+
+  // Notify client
+  createNotification({
+    userId: order.client_id,
+    type:   'order_ready',
+    title:  'طلبك جاهز للتأكيد! 🎉',
+    body:   `السعر النهائي: ${final_price} DA — قم بتأكيد الاستلام`,
+    meta:   { orderId, final_price },
+  });
+
+  logger.info({ message: 'Order marked ready', orderId, sellerId: seller.id, final_price });
+
+  return updatedOrder;
+};
+
+// ─────────────────────────────────────────────────────────────
+// CONFIRM ORDER COMPLETE
+// Client only — confirms receipt and finalises the order.
+// Transitions: ready → completed
+// ─────────────────────────────────────────────────────────────
+const confirmComplete = async (userId, orderId) => {
+  // Fetch order
+  const { data: order, error: orderError } = await supabaseAdmin
+    .from('orders')
+    .select('id, status, client_id, seller_id')
+    .eq('id', orderId)
+    .single();
+
+  if (orderError) {
+    if (isNotFound(orderError)) throw new AppError('Order not found', 404);
+    throw new AppError('Failed to fetch order', 500);
+  }
+
+  if (order.client_id !== userId) {
+    throw new AppError('Only the client who placed this order can confirm completion', 403);
+  }
+
+  if (order.status !== 'ready') {
+    throw new AppError(
+      `Order must be in "ready" status for the client to confirm completion. Current status: "${order.status}"`,
+      400
+    );
+  }
+
+  const { data: updatedOrder, error: updateError } = await supabaseAdmin
+    .from('orders')
+    .update({
+      status:       'completed',
+      completed_at: new Date().toISOString(),
+      updated_at:   new Date().toISOString(),
+    })
+    .eq('id', orderId)
+    .select(ORDER_COLUMNS)
+    .single();
+
+  if (updateError) {
+    logger.error({ message: 'Failed to confirm order completion', orderId, error: updateError.message });
+    throw new AppError('Failed to confirm order completion', 500);
+  }
+
+  // Notify seller
+  const { data: seller } = await supabaseAdmin
+    .from('sellers')
+    .select('user_id')
+    .eq('id', order.seller_id)
+    .single();
+
+  if (seller) {
+    createNotification({
+      userId: seller.user_id,
+      type:   'order_completed',
+      title:  'اكتمل الطلب! ✅',
+      body:   'قام العميل بتأكيد استلام الطلب — يمكنك الآن تقييم العميل',
+      meta:   { orderId },
+    });
+  }
+
+  logger.info({ message: 'Order completed', orderId, clientId: userId });
+
+  // Fire-and-forget: completing an order may satisfy the verification criteria
+  updateVerificationStatus(order.seller_id);
+
+  return updatedOrder;
+};
+
 module.exports = {
   createOrder,
   getOrderById,
   getAllOrders,
   updateOrderStatus,
+  markReady,
+  confirmComplete,
 };

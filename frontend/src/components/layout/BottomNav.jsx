@@ -4,9 +4,13 @@ import {
   ClipboardList,
   Heart,
   Home,
+  LayoutDashboard,
+  Package,
   Search,
   ShoppingBag,
+  Tag,
   User,
+  Users,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '../../hooks/useAuth';
@@ -39,7 +43,7 @@ function NavItem({ item, isActive, onClick, unreadCount }) {
           )}
         />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 px-0.5 bg-danger rounded-full flex items-center justify-center text-[8px] font-bold text-white leading-none border border-white">
+          <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 px-0.5 bg-brick-500 rounded-full flex items-center justify-center text-[8px] font-bold text-white leading-none border border-white">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -60,7 +64,7 @@ function NavItem({ item, isActive, onClick, unreadCount }) {
 export default function BottomNav({ unreadCount = 0 }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, isSeller } = useAuth();
+  const { isAuthenticated, isAdmin, isSeller } = useAuth();
   const { t } = useTranslation();
 
   const visitorNav = [
@@ -86,11 +90,21 @@ export default function BottomNav({ unreadCount = 0 }) {
     { icon: User, label: t('bottomNav.profile'), path: '/seller/dashboard', auth: true },
   ];
 
-  const navItems = isSeller
-    ? sellerNav
-    : isAuthenticated
-      ? clientNav
-      : visitorNav;
+  const adminNav = [
+    { icon: LayoutDashboard, label: t('bottomNav.dashboard'), path: '/admin', auth: true },
+    { icon: Users, label: t('bottomNav.users'), path: '/admin/users', auth: true },
+    { icon: Package, label: t('bottomNav.products'), path: '/admin/products', auth: true },
+    { icon: Tag, label: t('bottomNav.categories'), path: '/admin/categories', auth: true },
+    { icon: User, label: t('bottomNav.profile'), path: '/profile', auth: true },
+  ];
+
+  const navItems = isAdmin
+    ? adminNav
+    : isSeller
+      ? sellerNav
+      : isAuthenticated
+        ? clientNav
+        : visitorNav;
 
   const handleNavigation = (item) => {
     if (item.auth && !isAuthenticated) {

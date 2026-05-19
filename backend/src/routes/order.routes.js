@@ -10,6 +10,7 @@ const {
   createOrderSchema,
   updateOrderStatusSchema,
   orderQuerySchema,
+  markReadySchema,
 } = require('../validators/order.validator');
 
 const router = Router();
@@ -61,8 +62,7 @@ router.get(
 // ─────────────────────────────────────────────────────────────
 
 // PATCH /api/v1/orders/:id/status
-// Accept or reject an order
-// Defined after other order routes for readability
+// Accept or reject an order (seller only)
 router.patch(
   '/:id/status',
   authenticate,
@@ -70,6 +70,28 @@ router.patch(
   validateId(),
   validate({ body: updateOrderStatusSchema }),
   orderController.updateOrderStatus
+);
+
+// PATCH /api/v1/orders/:id/ready
+// Seller marks order ready + sets final_price (seller only)
+// Transition: accepted → ready
+router.patch(
+  '/:id/ready',
+  authenticate,
+  requireRole('seller'),
+  validateId(),
+  validate({ body: markReadySchema }),
+  orderController.markReady
+);
+
+// PATCH /api/v1/orders/:id/complete
+// The order buyer confirms receipt (any authenticated user who is the order's client_id)
+// Transition: ready → completed — ownership enforced in service layer
+router.patch(
+  '/:id/complete',
+  authenticate,
+  validateId(),
+  orderController.confirmComplete
 );
 
 module.exports = router;

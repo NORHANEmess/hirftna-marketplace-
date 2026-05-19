@@ -11,7 +11,7 @@
 - **Type:** Custom-order artisan marketplace — NOT traditional e-commerce
 - **Key Concept:** Products are custom, prices are ranges, orders are requests
 - **Frontend Stack:** React 18 + Vite + TailwindCSS + React Router v6 + i18next
-- **Backend:** Node.js/Express on port 4000 — all 40+ endpoints complete
+- **Backend:** Node.js/Express on port 4000 — all 60+ endpoints complete (Phases 1–14)
 - **Design:** Warm cream/beige palette, sage green accent, rounded corners, soft shadows, mobile-first, RTL-ready
 
 ---
@@ -51,6 +51,25 @@ Badges:    .badge + variants: sage cream success warning danger info
 Nav:       .pill-nav .pill-nav-track .pill-nav-tab .pill-nav-badge  ← floating bottom pill
 Utilities: .text-balance .no-scrollbar .snap-x-mandatory .snap-start
 Skeleton:  .skeleton  ← animated loading placeholder
+```
+
+### Animation System (src/index.css — added 2026-05-17)
+```
+Keyframes:  fadeInUp, fadeInDown, fadeInLeft, fadeInRight, heartBeat
+Classes:    .animate-fade-in-up  .animate-fade-in-down  .animate-fade-in-left  .animate-fade-in-right
+            .animate-heart-beat
+Delays:     .delay-75  .delay-100  .delay-150  .delay-200  .delay-300  .delay-400  .delay-500
+Hover:      .hover-lift          → translateY(-4px) + deeper shadow on hover
+Scroll:     .reveal + .in-view   → opacity+translateY transition (Intersection Observer)
+Motion:     prefers-reduced-motion disables ALL animations globally
+RTL:        [dir="rtl"] swaps fadeInLeft ↔ fadeInRight automatically
+```
+
+### Typography
+```
+font-sans:    Inter (body text, UI)
+font-display: Playfair Display (hero headlines, section headings, seller names)
+             → serif, editorial feel, added to index.html Google Fonts link
 ```
 
 ---
@@ -133,7 +152,15 @@ const ORDER_STATUS = {
 const isVisitor = !user
 const isClient  = user?.role === 'client'
 const isSeller  = user?.role === 'seller'   // seller can ALSO place orders as buyer
-const isAdmin   = user?.role === 'admin'
+const isAdmin   = user?.role === 'admin'    // admin role set directly in DB only
+```
+
+### Route Guards (router/index.jsx)
+```
+RequireAuth   → any authenticated user (client OR seller) — wishlist, orders, profile, notifications
+RequireSeller → authenticated + role=seller — /seller/* routes
+GuestOnly     → not authenticated — /login, /register, /forgot-password, /reset-password
+RequireAdmin  → authenticated + role=admin — /admin, /admin/users, /admin/products
 ```
 
 ### Bottom Nav (Mobile Floating Pill) — role-aware
@@ -156,61 +183,79 @@ Logo | Categories dropdown | Search bar | [Wishlist] [Orders] [Notifications bad
 frontend/src/
 ├── assets/
 ├── components/
+│   ├── auth/
+│   │   └── (auth sub-components if any)
+│   ├── chatbot/
+│   │   └── ChatbotWidget.jsx   ✅ floating widget (authenticated users only), Gemini backend
 │   ├── layout/
 │   │   ├── MainLayout.jsx      ✅ wraps all pages, polls unread count every 60s
 │   │   ├── TopBar.jsx          ✅ logo + search + categories dropdown + desktop nav
 │   │   ├── DesktopNav.jsx      ✅ desktop icons (wishlist, orders, notifications, profile)
 │   │   └── BottomNav.jsx       ✅ mobile floating pill, role-aware
 │   ├── product/
-│   │   ├── ProductCard.jsx     ✅ price range + wishlist toggle + Request CTA
+│   │   ├── ProductCard.jsx     ✅ price range + wishlist toggle + Request CTA + hover-lift + heart pulse animation
 │   │   ├── ProductCardSkeleton.jsx ✅
 │   │   ├── ProductGrid.jsx     ✅
 │   │   └── ProductSkeleton.jsx ✅ full-page loading grid
 │   ├── order/
 │   │   ├── CustomOrderForm.jsx ✅ global modal, listens for "open-order-form" event
-│   │   ├── OrderCard.jsx       ✅ expandable card, accept/reject actions for seller
-│   │   └── OrderStatusBadge.jsx ✅ status pill with icon
+│   │   ├── OrderCard.jsx       ✅ accept/reject/ready/complete + rate both parties
+│   │   ├── OrderStatusBadge.jsx ✅ pending/accepted/rejected/ready/completed
+│   │   └── RateClientModal.jsx ✅ seller rates client after completed order
 │   ├── seller/
 │   │   └── (seller components embedded in seller pages for now)
 │   └── ui/
 │       ├── Badge.jsx           ✅ sage/cream/warning/danger/info/success variants
 │       ├── LanguageSwitcher.jsx ✅ AR/EN toggle with RTL support
-│       ├── Modal.jsx           ✅ (exists)
+│       ├── Modal.jsx           ✅
 │       ├── Spinner.jsx         ✅ xs/sm/md/lg/xl sizes
-│       └── StarRating.jsx      ✅ read-only + interactive (for review forms)
+│       ├── StarRating.jsx      ✅ read-only + interactive (for review forms)
+│       └── Toast.jsx           ✅ shared toast notification (replaces 3 local copies)
 ├── pages/
-│   ├── HomePage.jsx            ✅ hero + categories + featured products + sellers
+│   ├── HomePage.jsx            ✅ split-screen hero (HeroLeft+HeroRight) + HowItWorksSection (4-step scroll-animated) + featured products (staggered reveals) + sellers
 │   ├── BrowsePage.jsx          ✅ search + category/price/sort filters + grid + pagination
 │   ├── ProductPage.jsx         ✅ gallery + reviews + seller info + wishlist + Request btn
 │   ├── SellerPage.jsx          ✅ public profile + story + products + ratings tabs
+│   ├── ClientProfilePage.jsx   ✅ public client profile (viewable by sellers)
 │   ├── NotFoundPage.jsx        ✅ 404 page
 │   ├── NotificationsPage.jsx   ✅ shared notifications (new / earlier split)
 │   ├── auth/
-│   │   ├── LoginPage.jsx       ✅ email/password + OTP verification step
-│   │   └── RegisterPage.jsx    ✅ role selection + password strength
+│   │   ├── LoginPage.jsx       ✅ email/password only (no OTP step); verified banner on redirect
+│   │   ├── RegisterPage.jsx    ✅ role selection + password strength + OTP verification
+│   │   ├── ForgotPasswordPage.jsx ✅ send reset email
+│   │   └── ResetPasswordPage.jsx  ✅ reset with token from email link
 │   ├── client/
-│   │   ├── OrdersPage.jsx      ✅ placed orders with status filter tabs
-│   │   ├── WishlistPage.jsx    ✅ saved products grid
-│   │   ├── ProfilePage.jsx     ✅ profile + password change + seller shop edit (if seller)
-│   │   └── NotificationsPage.jsx ✅ client-specific notifications (RTL Arabic labels)
-│   └── seller/
-│       ├── SellerDashboard.jsx ✅ stats + recent orders + quick actions
-│       ├── SellerProducts.jsx  ✅ product CRUD (create/edit/delete/toggle visibility + images)
-│       ├── SellerOrdersPage.jsx ✅ incoming + outgoing (as buyer) tabs
-│       └── SellerProfileEdit.jsx ✅ shop profile + story + avatar upload
+│   │   ├── OrdersPage.jsx      ✅ placed orders with status filter tabs + complete action
+│   │   ├── WishlistPage.jsx    ✅ saved products grid + error toast
+│   │   └── ProfilePage.jsx     ✅ profile + password change + seller shop edit (if seller)
+│   ├── seller/
+│   │   ├── SellerDashboard.jsx  ✅ stats + recent orders + quick actions + activation banner + boost link
+│   │   ├── SellerProducts.jsx   ✅ product CRUD (create/edit/delete/toggle) + unverified warning banner
+│   │   ├── SellerOrdersPage.jsx ✅ incoming + outgoing (as buyer) tabs + ready action
+│   │   ├── SellerProfileEdit.jsx ✅ shop profile + story + avatar upload (error toast)
+│   │   └── SellerPromotions.jsx ✅ submit/view promotion request (pending/active/expired/rejected states)
+│   └── admin/
+│       ├── AdminDashboard.jsx   ✅ stat cards + bar charts + top sellers/products + Promotions nav link
+│       ├── AdminUsers.jsx       ✅ paginated user list + role filter + verify/revoke seller
+│       ├── AdminProducts.jsx    ✅ paginated ALL products (active+inactive) + delete modal
+│       └── AdminPromotions.jsx  ✅ list + activate/reject promotions with confirm modal
+├── components/
+│   └── hero/
+│       └── HeroCarousel.jsx    ✅ auto-advancing hero carousel (touch swipe, reduced-motion, dots)
 ├── context/
-│   ├── AuthContext.jsx         ✅ user, login, logout, OTP, changePassword
+│   ├── AuthContext.jsx         ✅ user, login, logout, OTP, changePassword, forgotPassword, resetPassword
 │   └── CartContext.jsx         ⛔ EMPTY — no cart in this platform, DELETE OR IGNORE
 ├── hooks/
 │   ├── useApi.js               ✅ returns all API modules (useApi hook)
-│   └── useAuth.js              ✅ re-exports useAuth from AuthContext
+│   ├── useAuth.js              ✅ re-exports useAuth from AuthContext
+│   └── useInView.js            ✅ IntersectionObserver hook — fire-once pattern → returns [ref, isInView]
 ├── router/
-│   └── index.jsx               ✅ all routes + RequireAuth + RequireSeller + GuestOnly guards
+│   └── index.jsx               ✅ all routes + RequireAuth + RequireSeller + GuestOnly + RequireAdmin
 ├── i18n/
 │   ├── index.jsx               ✅ i18next setup, LanguageProvider, useTranslation hook
 │   └── locales/
-│       ├── ar.json             ✅ Arabic translations (RTL)
-│       └── en.json             ✅ English translations
+│       ├── ar.json             ✅ Arabic translations (RTL) — includes chatbot.* + admin.* + auth.*
+│       └── en.json             ✅ English translations — includes chatbot.* + admin.* + auth.*
 ├── services/
 │   └── api.js                  ✅ Axios client + all API modules (see below)
 └── utils/
@@ -224,20 +269,24 @@ frontend/src/
 ## API MODULES IN api.js (COMPLETE LIST)
 
 ```javascript
-authAPI:          register, login, verifyOtp, logout, getMe, updateMe, changePassword
+authAPI:          register, login, verifyOtp, logout, getMe, updateMe, changePassword,
+                  forgotPassword, resetPassword
 productsAPI:      getAll, getById, getMyProducts, create, update, delete
-ordersAPI:        getAll, getById, create, updateStatus
-                  ⬜ markReady(id, { final_price, delivery_type })   ← ADD
-                  ⬜ confirmComplete(id)                              ← ADD
+ordersAPI:        getAll, getById, create, updateStatus, markReady, confirmComplete
 categoriesAPI:    getAll, getById, getBySlug
-sellersAPI:       getAll, getById, getMe, getAnalytics, create, update
+sellersAPI:       getAll, getById, getMe, getAnalytics, getVerificationStatus, create, update
 reviewsAPI:       getProductReviews, getSellerRatings, getSellerReviews,
                   createReview, createRating, deleteReview
 wishlistAPI:      getAll, add, remove, check
 notificationsAPI: getAll, getUnreadCount, markRead, markAllRead, delete
 uploadsAPI:       uploadImage, uploadImages
-clientRatingsAPI: ⬜ create({ order_id, client_id, rating, comment })  ← ADD
-                  ⬜ getByClient(client_id)                             ← ADD
+clientRatingsAPI: create({ order_id, client_id, rating, comment }), getByClient(clientId)
+chatbotAPI:       sendMessage(message, conversationHistory)
+promotionsAPI:    getHeroAds(), getBrowseAds(), request(data), getMe()
+adminAPI:         getUsers(params), getProducts(params), getStats(),
+                  verifySeller(sellerId, isVerified), deleteProduct(productId),
+                  updateUserRole(userId, role),
+                  getPromotions(params), activatePromotion(id), rejectPromotion(id, reason)
 ```
 
 ---
@@ -248,12 +297,14 @@ clientRatingsAPI: ⬜ create({ order_id, client_id, rating, comment })  ← ADD
 // AUTH
 POST   /auth/register
 POST   /auth/login
-POST   /auth/verify-otp
+POST   /auth/verify-otp          (registration OTP only — not used on login)
 POST   /auth/logout
 GET    /auth/me
 PUT    /auth/me
 POST   /auth/change-password
 POST   /auth/refresh
+POST   /auth/forgot-password     (rate-limited 5/15min; sends reset email)
+POST   /auth/reset-password      (32-byte hex token, 15-min TTL)
 
 // PRODUCTS
 GET    /products                      → browse (public, filters + pagination)
@@ -281,8 +332,8 @@ GET    /orders                        → list (role-scoped: client sees own, se
 GET    /orders?as=client              → seller's own placed orders (as buyer)
 GET    /orders/:id                    → detail (ownership checked)
 PATCH  /orders/:id/status             → accept | reject (seller)
-PATCH  /orders/:id/ready              → mark READY + final_price (seller)    ⬜ ADD to api.js
-PATCH  /orders/:id/complete           → confirm completion (client)           ⬜ ADD to api.js
+PATCH  /orders/:id/ready              → mark READY + final_price (seller)
+PATCH  /orders/:id/complete           → confirm completion (client)
 
 // REVIEWS & RATINGS
 GET    /reviews/product/:id           → product reviews (public)
@@ -291,9 +342,9 @@ POST   /reviews/product               → create product review (client)
 POST   /reviews/seller                → rate seller (client, after completed order)
 DELETE /reviews/:id                   → delete own review (client)
 
-// CLIENT RATINGS (NEW)
-POST   /client-ratings                → seller rates client (after completed order)  ⬜ ADD to api.js
-GET    /client-ratings/client/:id     → view client's ratings (public)              ⬜ ADD to api.js
+// CLIENT RATINGS
+POST   /client-ratings                → seller rates client (after completed order)
+GET    /client-ratings/client/:id     → view client's ratings (public)
 
 // WISHLIST
 GET    /wishlist                      → list (auth)
@@ -311,6 +362,27 @@ DELETE /notifications/:id             → delete (auth)
 // UPLOADS
 POST   /uploads/image                 → single image (auth)
 POST   /uploads/images                → up to 5 images (auth)
+
+// CHATBOT
+POST   /chatbot                       → send message (auth, 20/hr per user)
+                                        Body: { message, conversation_history[] }
+
+// PROMOTIONS
+GET    /promotions/hero               → active hero placement ads (public)
+GET    /promotions/browse             → active browse placement ads (public)
+POST   /promotions/request            → submit promotion request (seller)
+GET    /promotions/me                 → own promotion status (seller)
+
+// ADMIN (all require role=admin)
+GET    /admin/users                        → list users paginated (role + search filter)
+GET    /admin/products                     → list ALL products (active + inactive) paginated
+GET    /admin/stats                        → platform stats (users/products/orders/revenue/top5)
+PATCH  /admin/sellers/:id/verify           → set is_verified true/false
+DELETE /admin/products/:id                 → force-delete any product
+PATCH  /admin/users/:id/role               → change role to client|seller (not admin)
+GET    /admin/promotions                   → list promotion requests (paginated, filter by status)
+PATCH  /admin/promotions/:id/activate      → activate promotion (sets is_active=true + ends_at)
+PATCH  /admin/promotions/:id/reject        → reject promotion with rejection_reason
 ```
 
 ---
@@ -352,10 +424,13 @@ POST   /uploads/images                → up to 5 images (auth)
    → On 401, api.js pauses requests and refreshes token
    → All queued requests replay with new token after refresh
 
-4. OTP / 2FA
-   → Login returns { requiresOtp: true } if 2FA enabled
-   → LoginPage switches to OTP input step
-   → POST /auth/verify-otp → returns full session
+4. OTP / 2FA (registration-only)
+   → RegisterPage collects email/password → POST /auth/register
+   → If AUTH_OTP_ENABLED=true, OTP email sent (nodemailer + SMTP)
+   → RegisterPage shows inline OTP input → POST /auth/verify-otp
+   → On success: navigate('/login', { state: { verified: true } })
+   → LoginPage shows green verified banner if state.verified
+   → Login never triggers OTP — 403 returned if email not confirmed
 
 5. Seller Dual Role
    → Sellers can place orders as buyers
@@ -431,51 +506,116 @@ Phase 5 — Public Pages ✅ COMPLETE
 └── F26 ✅ NotFoundPage.jsx
 
 Phase 6 — Auth Pages ✅ COMPLETE
-├── F27 ✅ LoginPage.jsx (email/password + OTP step)
-└── F28 ✅ RegisterPage.jsx (role selection + password strength)
+├── F27 ✅ LoginPage.jsx (email/password only; verified banner from register; 403 amber warning)
+├── F28 ✅ RegisterPage.jsx (role selection + password strength + OTP verify inline)
+├── F29 ✅ ForgotPasswordPage.jsx (GuestOnly, send reset email)
+└── F30 ✅ ResetPasswordPage.jsx (GuestOnly, validates hex token, new password form)
 
 Phase 7 — Custom Order System ✅ COMPLETE
-├── F29 ✅ CustomOrderForm.jsx (global modal, 3-step, budget/deadline/reference images)
-├── F30 ✅ OrderCard.jsx (expandable, accept/reject for seller)
-└── F31 ✅ OrderStatusBadge.jsx (pending/accepted/rejected/ready/completed)
+├── F31 ✅ CustomOrderForm.jsx (global modal, 3-step, budget/deadline/reference images)
+├── F32 ✅ OrderCard.jsx (accept/reject/ready/complete + rate seller + rate client)
+│          canRateSeller checks user.role === 'client' (sellers viewing don't see it)
+└── F33 ✅ OrderStatusBadge.jsx (pending/accepted/rejected/ready/completed)
 
 Phase 8 — Client Pages ✅ COMPLETE
-├── F32 ✅ OrdersPage.jsx (client's placed orders + status filter)
-├── F33 ✅ WishlistPage.jsx (saved products)
-├── F34 ✅ ProfilePage.jsx (profile + password + seller shop edit)
-└── F35 ✅ client/NotificationsPage.jsx (Arabic RTL labels)
+├── F34 ✅ OrdersPage.jsx (client's placed orders + status filter + confirm complete)
+├── F35 ✅ WishlistPage.jsx (saved products + error toast on load failure)
+└── F36 ✅ ProfilePage.jsx (profile + password + seller shop edit)
 
 Phase 9 — Seller Pages ✅ COMPLETE
-├── F36 ✅ SellerDashboard.jsx (stats + recent orders + quick actions)
-├── F37 ✅ SellerProducts.jsx (CRUD + image upload + visibility toggle)
-├── F38 ✅ SellerOrdersPage.jsx (incoming + outgoing tabs)
-└── F39 ✅ SellerProfileEdit.jsx (shop + story + avatar)
+├── F37 ✅ SellerDashboard.jsx (stats + recent orders + quick actions)
+├── F38 ✅ SellerProducts.jsx (CRUD + image upload + visibility toggle)
+├── F39 ✅ SellerOrdersPage.jsx (incoming + outgoing tabs + mark ready action)
+└── F40 ✅ SellerProfileEdit.jsx (shop + story + avatar; AvatarUploader has onError → toast)
 
 Phase 10 — Router & i18n ✅ COMPLETE
-├── F40 ✅ router/index.jsx (all routes + role guards + global CustomOrderForm)
-├── F41 ✅ i18n/index.jsx (i18next, AR + EN, RTL)
-└── F42 ✅ i18n/locales/ar.json + en.json
+├── F41 ✅ router/index.jsx (all routes + RequireAuth + RequireSeller + GuestOnly + RequireAdmin)
+├── F42 ✅ i18n/index.jsx (i18next, AR + EN, RTL)
+└── F43 ✅ i18n/locales/ar.json + en.json (includes chatbot.* + admin.* + auth.* keys)
 
-Phase 11 — Order READY / COMPLETE Flow (NEW — needs work)
-├── F43 ⬜ Add ordersAPI.markReady() to api.js
-├── F44 ⬜ Add ordersAPI.confirmComplete() to api.js
-├── F45 ⬜ Update OrderCard.jsx — seller sees "Mark as Ready" button (when accepted)
-├── F46 ⬜ Update OrderCard.jsx — client sees "Confirm Completion" button (when ready)
-├── F47 ⬜ Update OrderStatusBadge — add 'ready' status
-└── F48 ⬜ Update OrdersPage + SellerOrdersPage — handle new statuses
+Phase 11 — Order READY / COMPLETE + Client Ratings ✅ COMPLETE
+├── F44 ✅ ordersAPI.markReady + confirmComplete added to api.js
+├── F45 ✅ OrderCard.jsx — seller "Mark as Ready" (accepted), client "Confirm Complete" (ready)
+├── F46 ✅ RateClientModal.jsx — seller rates client after completed order
+└── F47 ✅ clientRatingsAPI added to api.js (create + getByClient)
 
-Phase 12 — Client Ratings (seller rates client — NEW)
-├── F49 ⬜ Add clientRatingsAPI to api.js (create + getByClient)
-├── F50 ⬜ RateClientModal.jsx — seller rates client after COMPLETED order
-└── F51 ⬜ Update SellerOrdersPage — show "Rate Client" button on completed orders
+Phase 12 — AI Chatbot ✅ COMPLETE
+├── F48 ✅ ChatbotWidget.jsx — floating sage button (bottom-right, authenticated only)
+│          Panel: 380px desktop / full-width mobile / 500px height
+│          Typing indicator, suggestion chips, conversation history, Enter to send
+└── F49 ✅ chatbotAPI.sendMessage added to api.js
 
-Phase 13 — Notifications Polish (NEW types)
-└── F52 ⬜ Handle 'order_ready' and 'order_completed' notification types in UI
+Phase 13 — Admin Dashboard ✅ COMPLETE
+├── F50 ✅ AdminDashboard.jsx at /admin (RequireAdmin) — stat cards + charts + top5 tables + Promotions nav link
+├── F51 ✅ AdminUsers.jsx at /admin/users — paginated, role filter, verify/revoke seller
+├── F52 ✅ AdminProducts.jsx at /admin/products — all products (active+inactive), delete modal
+└── F53 ✅ adminAPI (getUsers, getProducts, getStats, verifySeller, deleteProduct, updateUserRole, getPromotions, activatePromotion, rejectPromotion)
 
-Phase 14 — Final Polish
-├── F53 ⬜ Full backend integration test (all flows end-to-end)
-├── F54 ⬜ Responsive design review (mobile → tablet → desktop)
-└── F55 ⬜ Error boundaries + loading state review
+Phase 14 — UI Polish ✅ COMPLETE
+├── F54 ✅ Toast.jsx shared component at components/ui/Toast.jsx
+├── F55 ✅ WishlistPage + NotificationsPage — error toast on load failure
+└── F56 ✅ SellerProfileEdit — AvatarUploader onError prop shows toast
+
+Phase 16 — Seller Activation + Promotions ✅ COMPLETE
+├── F57 ✅ SellerDashboard.jsx — activation banner (is_verified=false), "Boost My Shop" quick action
+├── F58 ✅ SellerProducts.jsx — unverified warning banner
+├── F59 ✅ SellerPromotions.jsx at /seller/promotions (RequireSeller) — submit/view promotion status
+├── F60 ✅ HeroCarousel.jsx — auto-advancing carousel with touch swipe + reduced-motion support
+├── F61 ✅ HomePage.jsx — hero carousel when promotions active, static hero fallback
+├── F62 ✅ BrowsePage.jsx — promoted sellers strip above product grid
+├── F63 ✅ AdminPromotions.jsx at /admin/promotions (RequireAdmin) — list + activate/reject
+├── F64 ✅ router/index.jsx — /seller/promotions + /admin/promotions routes added
+└── F65 ✅ promotionsAPI added to api.js (getHeroAds, getBrowseAds, request, getMe)
+
+Phase 17 — Final Polish ✅ COMPLETE (2026-05-19)
+├── F66 ✅ Full payment flow — two separate components:
+│          PaymentModal (seller → platform): src/components/payment/PaymentModal.jsx
+│            Opened from SellerDashboard activation banner ("Pay Activation Fee")
+│            Opened after SellerPromotions hero request success
+│            CCP/BaridiMob transfer details; Chargily card disabled (coming soon)
+│          PaymentStep (client → seller): src/components/order/OrderCard.jsx
+│            Intercepts "Confirm Complete" on READY orders
+│            Cash: confirm received + paid → calls confirmComplete
+│            Card: simulated 2s spinner → success → auto-calls confirmComplete
+├── F67 ✅ Logo verified: Amiri font added to index.html Google Fonts
+│          LogoMark updated to use i18n keys: common.appNameArabic / common.appNameLatin
+│          common.appNameArabic = "حرفتنا", common.appNameLatin = "MARKETPLACE"
+│          i18n keys updated in both en.json and ar.json
+├── F68 ✅ ErrorBoundary: src/components/ErrorBoundary.jsx (class component)
+│          Wraps entire app in App.jsx — catches all unhandled render errors
+│          Shows friendly error UI with Refresh Page button
+├── F69 ✅ Loading/error/empty states added to ALL pages:
+│          OrdersPage (client): added error state + retry button
+│          BrowsePage: added fetchError state + error UI with retry
+│          NotificationsPage: added fetchError state + Arabic error message
+│          SellerOrdersPage: added incomingError state + retry button
+│          (All other pages already had full 3-state coverage)
+└── F70 ✅ payment.* i18n keys added to en.json + ar.json (27 keys total)
+
+Phase 18 — Homepage Redesign + Animation System ✅ COMPLETE (2026-05-17)
+├── F69 ✅ index.html — Playfair Display (Google Fonts) added alongside Amiri
+├── F70 ✅ tailwind.config.js — font-display: Playfair Display (editorial serif)
+├── F71 ✅ src/index.css — full animation system:
+│          Keyframes: fadeInUp, fadeInDown, fadeInLeft, fadeInRight, heartBeat
+│          Classes: .animate-fade-in-up/down/left/right, .animate-heart-beat
+│          Delays: .delay-75/100/150/200/300/400/500
+│          .hover-lift (translateY -4px + shadow, GPU-safe)
+│          .reveal + .in-view (scroll-triggered via IntersectionObserver)
+│          prefers-reduced-motion disables ALL animations globally
+│          [dir="rtl"] swaps fadeInLeft ↔ fadeInRight
+├── F72 ✅ src/hooks/useInView.js — IntersectionObserver fire-once hook → [ref, isInView]
+├── F73 ✅ src/pages/HomePage.jsx — complete redesign:
+│          Split-screen hero (50/50 desktop, stacked mobile)
+│          HeroLeft: Playfair Display headline + search bar → /browse?search= + CTA
+│          HeroRight: featured artisan card from heroAds (random) with fallback
+│          HeroSkeleton during loading; entrance animations staggered
+│          HowItWorksSection: 4-step scroll-triggered (useInView), SVG icons, step circles
+│          WhatIsHirftna: scroll-triggered fade-in
+│          Featured products + seller cards: staggered reveal via useInView
+│          HeroCarousel removed from HomePage (moved to promotions-only context)
+└── F74 ✅ src/components/product/ProductCard.jsx:
+           .hover-lift replaces manual hover:-translate-y-0.5 + transition-all
+           .animate-heart-beat fires on wishlist toggle (300ms pulse, reverts via setTimeout)
 ```
 
 ---
@@ -495,31 +635,23 @@ Product: "Handmade Pottery Bowl"
 
 ---
 
-## BACKEND ALIGNMENT — WHAT STILL NEEDS WIRING
+## DESIGN CONSTRAINTS (INTENTIONAL — NOT BUGS)
 
-### Backend endpoints NOT yet in api.js (must add):
-```javascript
-// In api.js — ordersAPI:
-markReady:       (id, body) => api.patch(`/orders/${id}/ready`, body)
-confirmComplete: (id)       => api.patch(`/orders/${id}/complete`)
-
-// In api.js — new clientRatingsAPI object:
-clientRatingsAPI: {
-  create:      (body)      => api.post('/client-ratings', body),
-  getByClient: (clientId)  => api.get(`/client-ratings/client/${clientId}`)
-}
 ```
-
-### Backend endpoints that DON'T EXIST yet (must build first):
-```
-PATCH /orders/:id/ready       → order.service.markReady()   ← not built yet
-PATCH /orders/:id/complete    → order.service.confirmComplete() ← not built yet
-POST  /client-ratings         → clientRating.service.create()  ← not built yet
-GET   /client-ratings/client/:id                               ← not built yet
+- requireRole('client') on /complete: sellers who buy cannot confirm completion
+- POST /reviews/seller requires role=client: sellers who buy cannot rate sellers
+- OTP only on registration: AUTH_OTP_ENABLED=false disables all OTP behavior
+- ChatbotWidget only for authenticated users: guests don't see it
+- Admin role cannot be assigned via API: must be set directly in Supabase DB
+- AdminProducts.jsx uses GET /admin/products (all products): NOT the public endpoint
+- canRateSeller in OrderCard checks user.role === 'client': sellers don't see it
 ```
 
 ---
 
-*Last updated: 2026-05-02*
-*Phases 1–10 complete (48 files). Next: Phase 11 (Order Ready/Complete flow) + Phase 12 (Client Ratings)*
-*Backend: Phases 1–10 complete. Phases 11 (client ratings) + order ready/complete endpoints still needed.*
+*Last updated: 2026-05-19*
+*Frontend Phases 1–14, 16, 17, and 18 complete. All backend endpoints wired. MVP feature-complete.*
+*Admin account: set role='admin' directly in Supabase DB. Chatbot: requires GEMINI_API_KEY in backend .env.*
+*Animation note: all animations respect prefers-reduced-motion. RTL swaps fadeInLeft ↔ fadeInRight automatically.*
+*Payment: PaymentModal (seller→platform) and PaymentStep (client→seller) are SEPARATE components — do NOT merge.*
+*Chargily card payment is SIMULATED (setTimeout 2s) — replace with real Chargily API redirect for production.*

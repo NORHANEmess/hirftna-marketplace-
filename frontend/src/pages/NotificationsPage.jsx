@@ -1,31 +1,50 @@
 import { useState, useEffect } from 'react';
-import { Bell, Check, BellOff } from 'lucide-react';
+import { Bell, BellOff, Check, CheckCircle2, Gift, Package, Star, XCircle } from 'lucide-react';
 import { extractApiItems, notificationsAPI } from '../services/api';
+import Toast from '../components/ui/Toast';
 import { formatRelativeTime } from '../utils/formatPrice';
-import { Spinner } from '../components/ui/Spinner'; // FIX: default export, not named
-// clsx removed — not needed for this level of conditional styling
+import { Spinner } from '../components/ui/Spinner';
+import { useTranslation } from '../i18n/index.jsx';
+
+// ─── i18n content map — keeps DB body out of the UI ──────────────────────────
+function getNotificationContent(notification, t) {
+  const bodyKeyMap = {
+    new_order:       'notifications.new_order_body',
+    order_received:  'notifications.new_order_body',
+    order_accepted:  'notifications.order_accepted_body',
+    order_rejected:  'notifications.order_rejected_body',
+    order_ready:     'notifications.order_ready_body',
+    order_completed: 'notifications.order_completed_body',
+  };
+
+  const title = t(`notifications.types.${notification.type}`) || t('notifications.types.system');
+  const bodyKey = bodyKeyMap[notification.type];
+  const body = bodyKey
+    ? t(bodyKey)
+    : (notification.body || notification.message || '');
+
+  return { title, body };
+}
 
 // ─── Type config ──────────────────────────────────────────────────────────────
-// FIX: 'new_order' renamed to match backend type values from Project Brain doc
-const TYPE_ICONS = {
-  new_order:       { emoji: '📦', bg: 'bg-blue-50'   },
-  order_received:  { emoji: '📦', bg: 'bg-blue-50'   }, // backend may use either
-  order_accepted:  { emoji: '✅', bg: 'bg-green-50'  },
-  order_rejected:  { emoji: '❌', bg: 'bg-red-50'    },
-  order_completed: { emoji: '🎉', bg: 'bg-purple-50' },
-  message:         { emoji: '💬', bg: 'bg-cream-200' },
-  system:          { emoji: '🔔', bg: 'bg-cream-200' },
+const TYPE_CONFIG = {
+  new_order:       { Icon: Package,      bg: 'bg-blue-50',   iconColor: 'text-blue-500'   },
+  order_received:  { Icon: Package,      bg: 'bg-blue-50',   iconColor: 'text-blue-500'   },
+  order_accepted:  { Icon: CheckCircle2, bg: 'bg-sage-50',   iconColor: 'text-sage-500'   },
+  order_rejected:  { Icon: XCircle,      bg: 'bg-red-50',    iconColor: 'text-danger'      },
+  order_ready:     { Icon: Gift,         bg: 'bg-indigo-50', iconColor: 'text-indigo-500' },
+  order_completed: { Icon: Star,         bg: 'bg-purple-50', iconColor: 'text-purple-500' },
+  system:          { Icon: Bell,         bg: 'bg-cream-200', iconColor: 'text-warm-500'   },
 };
 
 // ─── Single Notification Item ─────────────────────────────────────────────────
 function NotifItem({ notif, onMarkRead }) {
-  const config  = TYPE_ICONS[notif.type] ?? TYPE_ICONS.system;
+  const { t } = useTranslation();
+  const config  = TYPE_CONFIG[notif.type] ?? TYPE_CONFIG.system;
+  const { Icon } = config;
   const isUnread = !notif.is_read;
 
-  // FIX: backend sends a single `message` field, not `title` + `body`
-  // We support both shapes so this works regardless of backend version
-  const title = notif.title   ?? notif.message ?? 'Notification';
-  const body  = notif.body    ?? null; // only shown if backend sends it separately
+  const { title, body } = getNotificationContent(notif, t);
 
   return (
     <div
@@ -38,7 +57,7 @@ function NotifItem({ notif, onMarkRead }) {
     >
       {/* Icon bubble */}
       <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${config.bg}`}>
-        <span className="text-lg">{config.emoji}</span>
+        <Icon size={18} className={config.iconColor} />
       </div>
 
       {/* Text content */}
@@ -46,16 +65,15 @@ function NotifItem({ notif, onMarkRead }) {
         <p className={`text-sm leading-snug mb-0.5 ${isUnread ? 'font-semibold text-warm-900' : 'text-warm-700'}`}>
           {title}
         </p>
-        {/* Only render body paragraph if the backend sends it */}
         {body && (
           <p className="text-xs text-warm-500 leading-relaxed mb-1">{body}</p>
         )}
-        <p className="text-[10px] text-warm-400">{formatRelativeTime(notif.created_at)}</p>
+        <p className="text-[10px] text-warm-400">{formatRelativeTime(notif.created_at, t)}</p>
       </div>
 
       {/* Unread indicator dot */}
       {isUnread && (
-        <div className="w-2 h-2 bg-sage-500 rounded-full mt-1.5 flex-shrink-0" />
+        <div className="w-2 h-2 bg-brick-500 rounded-full mt-1.5 flex-shrink-0" />
       )}
     </div>
   );
@@ -72,20 +90,23 @@ function SectionLabel({ children }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function NotificationsPage() {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [loading,       setLoading]       = useState(true);
   const [marking,       setMarking]       = useState(false);
+  const [toast,         setToast]         = useState(null);
 
   useEffect(() => {
     notificationsAPI.getAll({ limit: 30 })
       .then((res) => {
-        // FIX: correct response path — your backend returns { success, data: [...] }
-        // not { success, data: { notifications: [...] } }
         setNotifications(extractApiItems(res, { itemKeys: ['notifications'] }));
       })
-      .catch(() => setNotifications([]))
+      .catch(() => {
+        setNotifications([]);
+        setToast({ message: t('common.error'), type: 'error' });
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   // ── Mark single as read — optimistic update ──
   const handleMarkRead = async (id) => {
@@ -134,9 +155,9 @@ export default function NotificationsPage() {
         <div>
           <div className="flex items-center gap-2 mb-0.5">
             <Bell size={18} className="text-sage-500" />
-            <h1 className="text-xl font-bold text-warm-900">Notifications</h1>
+            <h1 className="text-xl font-bold text-warm-900">{t('notifications.title')}</h1>
             {unreadCount > 0 && (
-              <span className="text-xs font-bold bg-sage-500 text-white px-1.5 py-0.5 rounded-full">
+              <span className="text-xs font-bold bg-brick-500 text-white px-1.5 py-0.5 rounded-full">
                 {unreadCount}
               </span>
             )}
@@ -144,7 +165,7 @@ export default function NotificationsPage() {
           <p className="text-xs text-warm-400">
             {loading
               ? '...'
-              : `${notifications.length} notification${notifications.length !== 1 ? 's' : ''}`
+              : `${notifications.length} ${notifications.length === 1 ? t('notifications.count_one') : t('notifications.count_other')}`
             }
           </p>
         </div>
@@ -158,7 +179,7 @@ export default function NotificationsPage() {
               bg-sage-50 border border-sage-100 px-3 py-1.5 rounded-xl transition-colors disabled:opacity-50"
           >
             <Check size={12} />
-            {marking ? 'Marking...' : 'Mark all read'}
+            {marking ? t('notifications.marking') : t('notifications.markAllRead')}
           </button>
         )}
       </div>
@@ -177,8 +198,8 @@ export default function NotificationsPage() {
         {!loading && notifications.length === 0 && (
           <div className="flex flex-col items-center py-14 text-center px-4">
             <BellOff size={36} className="text-warm-300 mb-3" />
-            <p className="text-sm font-semibold text-warm-700 mb-1">All caught up!</p>
-            <p className="text-xs text-warm-400">You'll see order updates and alerts here</p>
+            <p className="text-sm font-semibold text-warm-700 mb-1">{t('notifications.empty')}</p>
+            <p className="text-xs text-warm-400">{t('notifications.emptySub')}</p>
           </div>
         )}
 
@@ -188,7 +209,7 @@ export default function NotificationsPage() {
             {/* New (unread) section */}
             {unread.length > 0 && (
               <div>
-                <SectionLabel>New — {unread.length}</SectionLabel>
+                <SectionLabel>{t('notifications.sectionNew', { count: unread.length })}</SectionLabel>
                 {unread.map((notif) => (
                   <NotifItem key={notif.id} notif={notif} onMarkRead={handleMarkRead} />
                 ))}
@@ -199,7 +220,7 @@ export default function NotificationsPage() {
             {read.length > 0 && (
               <div>
                 {/* Only show "Earlier" label if there's also a "New" section above */}
-                {unread.length > 0 && <SectionLabel>Earlier</SectionLabel>}
+                {unread.length > 0 && <SectionLabel>{t('notifications.sectionEarlier')}</SectionLabel>}
                 {read.map((notif) => (
                   <NotifItem key={notif.id} notif={notif} onMarkRead={handleMarkRead} />
                 ))}
@@ -208,6 +229,10 @@ export default function NotificationsPage() {
           </>
         )}
       </div>
+
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+      )}
     </div>
   );
 }

@@ -4,8 +4,7 @@ const { supabaseAdmin } = require('../config/supabase');
 const { AppError }      = require('../middlewares/error.middleware');
 const logger            = require('../utils/logger');
 
-const isNotFound = (error) =>
-  error?.code === 'PGRST116' || error?.code === '406';
+const isNotFound = (error) => error?.code === 'PGRST116';
 
 // ─────────────────────────────────────────────────────────────
 // GET MY NOTIFICATIONS

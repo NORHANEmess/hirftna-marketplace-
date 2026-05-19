@@ -73,10 +73,32 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   const messages = {
     accepted: 'Order accepted successfully',
     rejected: 'Order rejected successfully',
-    completed: 'Order marked as completed',
   };
 
   return sendSuccess(res, { order }, messages[status] || 'Order status updated', 200);
+});
+
+// PATCH /api/v1/orders/:id/ready  — seller sets final_price, transitions accepted → ready
+const markReady = asyncHandler(async (req, res) => {
+  if (!req.validated?.body) {
+    throw new AppError('Body validation not applied', 500);
+  }
+
+  const { final_price, delivery_type } = req.validated.body;
+
+  const order = await orderService.markReady(
+    req.user.id,
+    req.params.id,
+    { final_price, delivery_type }
+  );
+
+  return sendSuccess(res, { order }, 'Order marked as ready. Client has been notified.', 200);
+});
+
+// PATCH /api/v1/orders/:id/complete  — client confirms completion, transitions ready → completed
+const confirmComplete = asyncHandler(async (req, res) => {
+  const order = await orderService.confirmComplete(req.user.id, req.params.id);
+  return sendSuccess(res, { order }, 'Order completed successfully. You can now rate each other.', 200);
 });
 
 module.exports = {
@@ -84,4 +106,6 @@ module.exports = {
   getAllOrders,
   getOrderById,
   updateOrderStatus,
+  markReady,
+  confirmComplete,
 };

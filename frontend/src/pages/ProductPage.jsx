@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   Star, Heart, CheckCircle2, Clock, ChevronLeft,
-  ChevronRight, Package, Truck, ShieldCheck, MessageSquare,
+  ChevronRight, MessageSquare, Package, Truck, ShieldCheck,
 } from 'lucide-react';
 import {
   extractApiEntity,
@@ -13,23 +13,25 @@ import {
 } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { formatProductPrice } from '../components/product/ProductCard';
+import { useTranslation } from '../i18n/index.jsx';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function formatRelativeTime(dateStr) {
+function formatRelativeTime(dateStr, t) {
   if (!dateStr) return '';
   const diff  = Date.now() - new Date(dateStr).getTime();
   const mins  = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days  = Math.floor(diff / 86400000);
-  if (mins  < 1)  return 'Just now';
-  if (mins  < 60) return `${mins}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days  < 7)  return `${days}d ago`;
+  if (mins  < 1)  return t('common.justNow');
+  if (mins  < 60) return t('common.minutesAgo', { count: mins });
+  if (hours < 24) return t('common.hoursAgo', { count: hours });
+  if (days  < 7)  return t('common.daysAgo', { count: days });
   return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
 // ─── Image Gallery ────────────────────────────────────────────────────────────
 function ImageGallery({ images, name }) {
+  const { t } = useTranslation();
   const [active, setActive] = useState(0);
   const list = images?.length ? images : [{ image_url: null }];
 
@@ -44,18 +46,18 @@ function ImageGallery({ images, name }) {
           <img
             src={list[active].image_url}
             alt={name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">
-            🧶
+          <div className="w-full h-full flex items-center justify-center">
+            <Package size={48} className="text-beige-300" />
           </div>
         )}
 
         {/* Handmade badge */}
         <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-sage-600
           text-[10px] font-bold px-2.5 py-1 rounded-full border border-sage-100">
-          ✋ Handmade
+          {t('product.handmade')}
         </span>
 
         {/* Navigation arrows — only if multiple images */}
@@ -109,8 +111,8 @@ function ImageGallery({ images, name }) {
                 }`}
             >
               {img.image_url
-                ? <img src={img.image_url} alt="" className="w-full h-full object-cover" />
-                : <div className="w-full h-full bg-cream-200 flex items-center justify-center">🧶</div>
+                ? <img src={img.image_url} alt="" className="w-full h-full object-contain" />
+                : <div className="w-full h-full bg-cream-200 flex items-center justify-center"><Package size={16} className="text-beige-300" /></div>
               }
             </button>
           ))}
@@ -122,11 +124,12 @@ function ImageGallery({ images, name }) {
 
 // ─── Trust Badges ─────────────────────────────────────────────────────────────
 function TrustBadges({ completionDays }) {
+  const { t } = useTranslation();
   const badges = [
-    { icon: ShieldCheck, label: 'Quality Guaranteed' },
-    { icon: Package,     label: 'Custom Made'        },
-    { icon: Clock,       label: completionDays ? `${completionDays} days to complete` : 'Flexible timeline' },
-    { icon: Truck,       label: 'Flexible Delivery'  },
+    { icon: ShieldCheck, label: t('product.trust.quality') },
+    { icon: Package,     label: t('product.trust.custom')  },
+    { icon: Clock,       label: completionDays ? t('product.trust.timeline', { days: completionDays }) : t('product.trust.flexTimeline') },
+    { icon: Truck,       label: t('product.trust.delivery') },
   ];
   return (
     <div className="grid grid-cols-2 gap-2">
@@ -159,46 +162,38 @@ function Stars({ rating, size = 12 }) {
   );
 }
 
-function RatingPicker({ value, onChange, disabled = false }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      {[1, 2, 3, 4, 5].map((score) => (
-        <button
-          key={score}
-          type="button"
-          disabled={disabled}
-          onClick={() => onChange(score)}
-          className="transition-transform disabled:opacity-60 hover:scale-105"
-        >
-          <Star
-            size={18}
-            className={score <= value ? 'text-warning fill-warning' : 'text-beige-200 fill-beige-200'}
-          />
-        </button>
-      ))}
-    </div>
-  );
-}
-
 // ─── Review Card ──────────────────────────────────────────────────────────────
 function ReviewCard({ review }) {
+  const { t } = useTranslation();
+  const client = review.client;
+  const initial = client?.full_name?.[0]?.toUpperCase();
   return (
     <div className="py-4 border-b border-beige-100 last:border-0">
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-cream-200 flex items-center
-            justify-center text-sm flex-shrink-0">
-            {review.user?.full_name?.[0]?.toUpperCase() ?? '👤'}
+          <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+            {client?.avatar_url ? (
+              <img
+                src={client.avatar_url}
+                alt={client.full_name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-sage-300 to-sage-500
+                flex items-center justify-center text-white text-xs font-bold">
+                {initial ?? '?'}
+              </div>
+            )}
           </div>
           <div>
             <p className="text-sm font-semibold text-warm-900">
-              {review.user?.full_name ?? 'Anonymous'}
+              {client?.full_name ?? t('common.anonymous')}
             </p>
             <Stars rating={review.rating} size={10} />
           </div>
         </div>
         <span className="text-[10px] text-warm-400 flex-shrink-0">
-          {formatRelativeTime(review.created_at)}
+          {formatRelativeTime(review.created_at, t)}
         </span>
       </div>
       {review.comment && (
@@ -213,10 +208,10 @@ function TabButton({ active, onClick, children }) {
   return (
     <button
       onClick={onClick}
-      className={`pb-3 px-1 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap
+      className={`py-1.5 px-4 text-xs font-semibold rounded-full border transition-all whitespace-nowrap
         ${active
-          ? 'border-sage-500 text-sage-600'
-          : 'border-transparent text-warm-400 hover:text-warm-700'
+          ? 'bg-sage-500 text-white border-sage-500'
+          : 'bg-white text-warm-500 border-beige-200 hover:border-sage-300 hover:text-warm-700'
         }`}
     >
       {children}
@@ -226,21 +221,22 @@ function TabButton({ active, onClick, children }) {
 
 // ─── Sticky CTA (mobile) ──────────────────────────────────────────────────────
 function StickyCTA({ product, onRequest }) {
+  const { t } = useTranslation();
   if (!product.is_active) return null;
   return (
     <div className="fixed bottom-20 left-3 right-3 md:hidden z-40">
       <div className="bg-white/95 backdrop-blur-sm border border-beige-200 rounded-2xl
         p-3.5 shadow-lg flex items-center gap-3">
         <div className="flex-1 min-w-0">
-          <p className="text-[10px] text-warm-400">Price</p>
-          <p className="text-sm font-bold text-warm-900">{formatProductPrice(product)}</p>
+          <p className="text-[10px] text-warm-400">{t('product.price')}</p>
+          <p className="text-sm font-bold text-warm-900">{formatProductPrice(product, t)}</p>
         </div>
         <button
           onClick={onRequest}
           className="flex-shrink-0 px-5 py-2.5 bg-sage-500 hover:bg-sage-600 text-white
             text-sm font-bold rounded-xl transition-colors"
         >
-          Request Order
+          {t('product.requestOrder')}
         </button>
       </div>
     </div>
@@ -267,6 +263,7 @@ function PageSkeleton() {
 
 // ─── Main ProductPage ─────────────────────────────────────────────────────────
 export default function ProductPage() {
+  const { t } = useTranslation();
   const { id }                     = useParams();
   const navigate                   = useNavigate();
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -278,13 +275,7 @@ export default function ProductPage() {
   const [wishlisted, setWishlisted] = useState(false);
   const [wishLoading, setWishLoading] = useState(false);
   const [error,      setError]      = useState(null);
-  const [reviewRating, setReviewRating] = useState(5);
-  const [reviewComment, setReviewComment] = useState('');
-  const [reviewSaving, setReviewSaving] = useState(false);
-  const [reviewError, setReviewError] = useState('');
-  const [reviewSuccess, setReviewSuccess] = useState('');
 
-  // ── Load product + reviews in parallel ──
   useEffect(() => {
     setLoading(true);
     Promise.all([
@@ -297,7 +288,6 @@ export default function ProductPage() {
 
         setReviews(extractApiItems(revRes, { itemKeys: ['reviews'] }));
 
-        // Check wishlist state if logged in
         if (isAuthenticated && p) {
           wishlistAPI.check(p.id)
             .then((r) => {
@@ -307,9 +297,9 @@ export default function ProductPage() {
             .catch(() => {});
         }
       })
-      .catch(() => setError('Could not load this product'))
+      .catch(() => setError(t('product.errorLoad')))
       .finally(() => setLoading(false));
-  }, [id, isAuthenticated]);
+  }, [id, isAuthenticated, t]);
 
   async function handleWishlist() {
     if (!isAuthenticated) { navigate('/login'); return; }
@@ -319,7 +309,7 @@ export default function ProductPage() {
     try {
       next ? await wishlistAPI.add(product.id) : await wishlistAPI.remove(product.id);
     } catch {
-      setWishlisted(!next); // revert
+      setWishlisted(!next);
     } finally {
       setWishLoading(false);
     }
@@ -330,46 +320,6 @@ export default function ProductPage() {
     window.dispatchEvent(new CustomEvent('open-order-form', { detail: { product } }));
   }
 
-  async function handleReviewSubmit(event) {
-    event.preventDefault();
-
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-
-    setReviewSaving(true);
-    setReviewError('');
-    setReviewSuccess('');
-
-    try {
-      const response = await reviewsAPI.createReview({
-        product_id: product.id,
-        rating: reviewRating,
-        comment: reviewComment.trim() || undefined,
-      });
-
-      const createdReview = extractApiEntity(response, 'review');
-
-      if (createdReview) {
-        setReviews((current) => [createdReview, ...current]);
-      }
-
-      setReviewComment('');
-      setReviewRating(5);
-      setReviewSuccess('Review submitted successfully.');
-    } catch (submitError) {
-      setReviewError(
-        submitError?.response?.data?.message ??
-        submitError?.message ??
-        'Failed to submit review.'
-      );
-    } finally {
-      setReviewSaving(false);
-    }
-  }
-
-  // ── Loading ──
   if (loading) {
     return (
       <div className="min-h-screen bg-cream-100">
@@ -378,14 +328,13 @@ export default function ProductPage() {
     );
   }
 
-  // ── Error / Not found ──
   if (error || !product) {
     return (
       <div className="min-h-screen bg-cream-100 flex flex-col items-center justify-center gap-4 px-4 text-center">
-        <span className="text-5xl">😕</span>
-        <p className="text-warm-800 font-semibold text-lg">{error ?? 'Product not found'}</p>
+        <Package size={48} className="text-warm-300" />
+        <p className="text-warm-800 font-semibold text-lg">{error ?? t('product.notFound')}</p>
         <Link to="/browse" className="text-sage-600 hover:underline text-sm">
-          ← Back to Browse
+          {t('product.backToBrowse')}
         </Link>
       </div>
     );
@@ -399,9 +348,9 @@ export default function ProductPage() {
 
         {/* ── Breadcrumb ── */}
         <nav className="flex items-center gap-2 text-xs text-warm-400 mb-6">
-          <Link to="/" className="hover:text-sage-600 transition-colors">Home</Link>
+          <Link to="/" className="hover:text-sage-600 transition-colors">{t('product.breadcrumb.home')}</Link>
           <ChevronRight size={12} />
-          <Link to="/browse" className="hover:text-sage-600 transition-colors">Products</Link>
+          <Link to="/browse" className="hover:text-sage-600 transition-colors">{t('product.breadcrumb.products')}</Link>
           <ChevronRight size={12} />
           <span className="text-warm-700 truncate max-w-[160px]">{product.name}</span>
         </nav>
@@ -417,8 +366,7 @@ export default function ProductPage() {
 
             {/* Title + Wishlist */}
             <div className="flex items-start gap-3">
-              <h1 className="text-2xl font-bold text-warm-900 leading-tight flex-1"
-                style={{ fontFamily: "'Amiri', serif" }}>
+              <h1 className="text-2xl font-bold text-warm-900 leading-tight flex-1">
                 {product.name}
               </h1>
               <button
@@ -428,11 +376,11 @@ export default function ProductPage() {
                 className={`flex-shrink-0 w-10 h-10 rounded-full border-2 flex items-center
                   justify-center transition-all disabled:opacity-50
                   ${wishlisted
-                    ? 'bg-danger border-danger text-white'
-                    : 'bg-white border-beige-200 text-warm-400 hover:border-danger hover:text-danger'
+                    ? 'bg-brick-50 border-brick-200 text-brick-500'
+                    : 'bg-white border-beige-200 text-warm-400 hover:border-brick-200 hover:text-brick-500'
                   }`}
               >
-                <Heart size={16} className={wishlisted ? 'fill-white' : ''} />
+                <Heart size={16} className={wishlisted ? 'fill-brick-500' : ''} />
               </button>
             </div>
 
@@ -449,13 +397,13 @@ export default function ProductPage() {
               {product.categories?.name && (
                 <span className="text-[10px] font-semibold bg-cream-200 text-warm-600
                   px-2.5 py-1 rounded-full border border-beige-200">
-                  {product.categories.name}
+                  {t(`categories.${product.categories.name}`, product.categories.name)}
                 </span>
               )}
               {!product.is_active && (
                 <span className="text-[10px] font-bold bg-red-50 text-danger
                   px-2.5 py-1 rounded-full border border-red-100">
-                  Unavailable
+                  {t('product.unavailable')}
                 </span>
               )}
             </div>
@@ -463,13 +411,13 @@ export default function ProductPage() {
             {/* Price box */}
             <div className="bg-cream-200 border border-beige-200 rounded-2xl p-4">
               <p className="text-[10px] text-warm-400 font-semibold uppercase tracking-wider mb-1">
-                Price Range
+                {t('product.priceRange')}
               </p>
-              <p className="text-3xl font-bold text-warm-900">{formatProductPrice(product)}</p>
+              <p className="text-3xl font-bold text-warm-800">{formatProductPrice(product, t)}</p>
               {product.completion_days && (
                 <p className="text-xs text-warm-400 mt-1.5 flex items-center gap-1">
                   <Clock size={11} />
-                  Estimated completion: {product.completion_days} days
+                  {t('product.completion', { days: product.completion_days })}
                 </p>
               )}
             </div>
@@ -485,10 +433,10 @@ export default function ProductPage() {
                   className="w-full py-4 bg-sage-500 hover:bg-sage-600 text-white font-bold
                     text-base rounded-2xl transition-colors shadow-sm"
                 >
-                  Request Custom Order
+                  {t('product.requestOrder')}
                 </button>
                 <p className="text-xs text-center text-warm-400">
-                  Your request goes directly to the artisan for review
+                  {t('product.requestOrderSub')}
                 </p>
               </div>
             )}
@@ -520,7 +468,7 @@ export default function ProductPage() {
                       <CheckCircle2 size={13} className="text-sage-500 flex-shrink-0" />
                     )}
                   </div>
-                  <p className="text-[10px] text-warm-400">View full profile →</p>
+                  <p className="text-[10px] text-warm-400">{t('product.seller.viewProfile')} →</p>
                 </div>
               </Link>
             )}
@@ -529,16 +477,16 @@ export default function ProductPage() {
 
         {/* ── Tabs ── */}
         <div className="bg-white rounded-3xl border border-beige-200 overflow-hidden">
-          <div className="flex gap-6 px-6 border-b border-beige-100 overflow-x-auto no-scrollbar">
+          <div className="flex gap-2 px-4 py-3 border-b border-beige-100 overflow-x-auto no-scrollbar">
             <TabButton active={activeTab === 'details'} onClick={() => setActiveTab('details')}>
-              Details
+              {t('product.tabs.details')}
             </TabButton>
             <TabButton active={activeTab === 'reviews'} onClick={() => setActiveTab('reviews')}>
-              Reviews ({reviews.length})
+              {t('product.tabs.reviews')} {t('product.reviews.count', { count: reviews.length })}
             </TabButton>
             {seller && (
               <TabButton active={activeTab === 'seller'} onClick={() => setActiveTab('seller')}>
-                About the Artisan
+                {t('product.tabs.seller')}
               </TabButton>
             )}
           </div>
@@ -548,13 +496,12 @@ export default function ProductPage() {
             {activeTab === 'details' && (
               <div className="space-y-4">
                 <p className="text-sm text-warm-700 leading-relaxed whitespace-pre-line">
-                  {product.description ?? 'No description available for this product.'}
+                  {product.description ?? t('product.noDescription')}
                 </p>
                 {product.completion_days && (
                   <div className="flex items-center gap-2 text-sm text-warm-500 pt-3 border-t border-beige-100">
                     <Clock size={14} />
-                    Estimated completion time:
-                    <strong className="text-warm-800">{product.completion_days} days</strong>
+                    {t('product.completion', { days: product.completion_days })}
                   </div>
                 )}
               </div>
@@ -565,55 +512,44 @@ export default function ProductPage() {
               <div className="space-y-6">
                 <div className="bg-cream-100 border border-beige-200 rounded-2xl p-4">
                   {authLoading ? (
-                    <p className="text-sm text-warm-400">Checking your session...</p>
+                    <p className="text-sm text-warm-400">{t('product.reviews.checkingSession')}</p>
                   ) : !isAuthenticated ? (
                     <div className="space-y-2">
-                      <p className="text-sm font-semibold text-warm-800">Leave a review after you sign in</p>
+                      <p className="text-sm font-semibold text-warm-800">{t('product.reviews.loginPrompt')}</p>
                       <button
                         type="button"
                         onClick={() => navigate('/login')}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-sage-500 text-white text-sm font-semibold rounded-xl hover:bg-sage-600 transition-colors"
                       >
-                        Sign In
+                        {t('product.reviews.signIn')}
                       </button>
                     </div>
                   ) : (
-                    <form onSubmit={handleReviewSubmit} className="space-y-3">
+                    <div className="flex items-start gap-3 px-4 py-3 bg-cream-100 border border-beige-200 rounded-2xl">
+                      <MessageSquare size={16} className="text-sage-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="text-sm font-semibold text-warm-800 mb-2">Share your experience</p>
-                        <RatingPicker value={reviewRating} onChange={setReviewRating} disabled={reviewSaving} />
+                        <p className="text-sm font-semibold text-warm-800">{t('product.reviews.orderPrompt')}</p>
+                        <p className="text-xs text-warm-500 mt-0.5">
+                          {t('product.reviews.orderSubBefore')}{' '}
+                          <button
+                            type="button"
+                            onClick={() => navigate('/orders')}
+                            className="text-sage-600 font-semibold hover:underline"
+                          >
+                            {t('product.reviews.orderSubLink')}
+                          </button>{' '}
+                          {t('product.reviews.orderSubAfter')}
+                        </p>
                       </div>
-                      <textarea
-                        value={reviewComment}
-                        onChange={(event) => setReviewComment(event.target.value)}
-                        placeholder="Add an optional comment about this product..."
-                        rows={3}
-                        className="w-full px-4 py-3 text-sm bg-white border border-beige-200 rounded-2xl outline-none focus:border-sage-400 resize-none"
-                      />
-                      {reviewError && (
-                        <p className="text-xs text-danger">{reviewError}</p>
-                      )}
-                      {reviewSuccess && (
-                        <p className="text-xs text-sage-600">{reviewSuccess}</p>
-                      )}
-                      <button
-                        type="submit"
-                        disabled={reviewSaving}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-sage-500 text-white text-sm font-semibold rounded-xl hover:bg-sage-600 transition-colors disabled:opacity-60"
-                      >
-                        {reviewSaving ? 'Submitting...' : 'Post Review'}
-                      </button>
-                    </form>
+                    </div>
                   )}
                 </div>
 
                 {reviews.length === 0 ? (
                   <div className="text-center py-10">
                     <MessageSquare size={28} className="text-warm-300 mx-auto mb-3" />
-                    <p className="text-warm-400 text-sm font-medium">No reviews yet</p>
-                    <p className="text-warm-300 text-xs mt-1">
-                      Be the first to order and review this product
-                    </p>
+                    <p className="text-warm-400 text-sm font-medium">{t('product.reviews.empty')}</p>
+                    <p className="text-warm-300 text-xs mt-1">{t('product.reviews.emptySub')}</p>
                   </div>
                 ) : (
                   reviews.map(r => <ReviewCard key={r.id} review={r} />)
@@ -638,8 +574,7 @@ export default function ProductPage() {
                   )}
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <h3 className="text-lg font-bold text-warm-900"
-                        style={{ fontFamily: "'Amiri', serif" }}>
+                      <h3 className="text-lg font-bold text-warm-900">
                         {seller.shop_name}
                       </h3>
                       {seller.is_verified && (
@@ -657,9 +592,8 @@ export default function ProductPage() {
                   </div>
                 </div>
 
-                  {(seller.story || seller.description) && (
-                  <p className="text-sm text-warm-700 leading-relaxed border-t border-beige-100 pt-4"
-                    style={{ fontFamily: "'Amiri', serif" }}>
+                {(seller.story || seller.description) && (
+                  <p className="text-sm text-warm-700 leading-relaxed border-t border-beige-100 pt-4">
                     {seller.story ?? seller.description}
                   </p>
                 )}
@@ -670,7 +604,7 @@ export default function ProductPage() {
                     text-sage-600 rounded-full text-sm font-semibold hover:bg-sage-500 hover:text-white
                     transition-all"
                 >
-                  View Full Profile <ChevronRight size={14} />
+                  {t('product.seller.viewProfile')} <ChevronRight size={14} />
                 </Link>
               </div>
             )}

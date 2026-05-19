@@ -1,12 +1,6 @@
 // shared/schemas/auth.schema.js
-// ─────────────────────────────────────────────────────────────
-// CONVERTED TO ES MODULE
-// Vite (frontend) requires ESM. Node.js (backend) also supports ESM
-// when package.json has "type": "module" OR when files use .mjs extension.
-//
-// If your backend package.json does NOT have "type": "module", the backend
-// must require() this file differently — see the backend note at the bottom.
-// ─────────────────────────────────────────────────────────────
+// ESM version — imported by the frontend (Vite).
+// Backend uses auth.schema.cjs (CommonJS require).
 
 function pickFirstDefined(...values) {
   return values.find((value) => value !== undefined);
@@ -189,10 +183,3 @@ export function normalizeVerifyOtpPayload(payload = {}) {
     otp: pickFirstDefined(payload.otp, payload.code, ''),
   };
 }
-
-// ─────────────────────────────────────────────────────────────
-// BACKEND COMPATIBILITY
-// If your backend uses CommonJS (require()), add this at the
-// bottom of the file OR rename the file to auth.schema.mjs
-// and update backend imports to use createRequire + import()
-// ─────────────────────────────────────────────────────────────

@@ -1,8 +1,9 @@
 'use strict';
 
-const { supabaseAdmin } = require('../config/supabase');
-const { AppError }      = require('../middlewares/error.middleware');
-const logger            = require('../utils/logger');
+const { supabaseAdmin }            = require('../config/supabase');
+const { AppError }                 = require('../middlewares/error.middleware');
+const logger                       = require('../utils/logger');
+const { updateVerificationStatus } = require('./verification.service');
 
 // ─────────────────────────────────────────────────────────────
 // CONSTANTS
@@ -35,8 +36,7 @@ const SELLER_DETAIL_COLUMNS = `
 // ─────────────────────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────────────────────
-const isNotFound = (error) =>
-  error?.code === 'PGRST116' || error?.code === '406';
+const isNotFound = (error) => error?.code === 'PGRST116';
 
 const getSortOrder = (sort) => {
   switch (sort) {
@@ -410,6 +410,9 @@ const updateSeller = async (userId, sellerId, updates) => {
 
   logger.info({ message: 'Seller profile updated', sellerId, userId });
 
+  // Fire-and-forget: profile completeness is a verification criterion
+  updateVerificationStatus(sellerId);
+
   return normalizeSeller(updatedSeller);
 };
 
@@ -444,8 +447,9 @@ const verifySeller = async (sellerId) => {
   const { data: updatedSeller, error } = await supabaseAdmin
     .from('sellers')
     .update({
-      is_verified: true,
-      updated_at:  new Date().toISOString(),
+      is_verified:    true,
+      admin_override: true,
+      updated_at:     new Date().toISOString(),
     })
     .eq('id', sellerId)
     .select('id, shop_name, is_verified')
