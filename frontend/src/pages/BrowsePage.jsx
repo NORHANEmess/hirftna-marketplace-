@@ -310,7 +310,7 @@ export default function BrowsePage() {
                   type="number"
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value)}
-                  placeholder="Min"
+                  placeholder={t('browse.pricePlaceholderMin')}
                   className="w-full px-3 py-2 text-sm bg-white border border-beige-200 rounded-xl outline-none focus:border-sage-400 transition-colors"
                 />
                 <span className="self-center text-warm-400 text-sm">–</span>
@@ -318,7 +318,7 @@ export default function BrowsePage() {
                   type="number"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
-                  placeholder="Max"
+                  placeholder={t('browse.pricePlaceholderMax')}
                   className="w-full px-3 py-2 text-sm bg-white border border-beige-200 rounded-xl outline-none focus:border-sage-400 transition-colors"
                 />
               </div>
@@ -366,7 +366,7 @@ export default function BrowsePage() {
           <div className="flex items-center gap-2 mb-3">
             <span className="w-1 h-4 rounded-full bg-sage-500" />
             <p className="text-[11px] font-bold tracking-[0.16em] text-sage-600 uppercase">
-              {t('browse.featuredProducts')}
+              {t('browse.promotedProducts')}
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">

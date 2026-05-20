@@ -191,7 +191,6 @@ function ProductFilterTabs({ active, onChange }) {
   const { t } = useTranslation();
   const tabs = [
     { value: 'all',    label: t('home.featured.tabs.all'),    sort: 'newest' },
-    { value: 'newest', label: t('home.featured.tabs.newest'), sort: 'newest' },
     { value: 'rating', label: t('home.featured.tabs.rating'), sort: 'rating' },
   ];
 
