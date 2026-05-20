@@ -649,8 +649,52 @@ Product: "Handmade Pottery Bowl"
 
 ---
 
-*Last updated: 2026-05-19*
-*Frontend Phases 1–14, 16, 17, and 18 complete. All backend endpoints wired. MVP feature-complete.*
+---
+
+## DEPLOYMENT
+
+```
+Status:     DEPLOYED (2026-05-20)
+Live URL:   https://hirftna.vercel.app   (Vercel)
+Backend:    https://hirftna-backend.onrender.com  (Render)
+```
+
+**Vercel env vars:**
+```
+VITE_API_URL=https://hirftna-backend.onrender.com/api/v1
+VITE_SUPABASE_URL=https://azjeomrahtmaeergfffh.supabase.co
+VITE_SUPABASE_ANON_KEY=...
+```
+
+---
+
+## CHANGELOG
+
+### 2026-05-20 — Production Deployment + RTL Fixes
+
+- Deployed to https://hirftna.vercel.app (Vercel) + https://hirftna-backend.onrender.com (Render)
+- **TopBar.jsx — MobileCategoriesSheet RTL fix:**
+  * Added `justify-between` to each category row
+  * Added `ChevronRight` with `rtl:rotate-180` class as trailing indicator
+  * Wrapped icon+label in `<div className="flex items-center gap-4 min-w-0">` to enable proper truncation
+  * Imported `ChevronRight` from lucide-react
+- **RegisterPage.jsx — RTL input icons fix:**
+  * All leading icon positions: `left-3.5` → `start-3.5`
+  * All trailing eye button positions: `right-3.5` → `end-3.5`
+  * Input padding-start: `pl-10` → `ps-10`
+  * Input padding-end: `pr-11` → `pe-11`
+  * Applies to: Full Name, Email, Password, Confirm Password inputs
+- **LoginPage.jsx — same RTL input icons fix:**
+  * Email input: `left-3.5` → `start-3.5`, `pl-10` → `ps-10`
+  * Password input: `left-3.5` → `start-3.5`, `right-3.5` → `end-3.5`, `pl-10 pr-11` → `ps-10 pe-11`
+
+### 2026-05-19 — Phase 19 Final Polish
+- PaymentModal + PaymentStep, ErrorBoundary, i18n payment keys, Amiri font
+
+---
+
+*Last updated: 2026-05-20*
+*Frontend Phases 1–14, 16, 17, and 18 complete. All backend endpoints wired. Deployed to production.*
 *Admin account: set role='admin' directly in Supabase DB. Chatbot: requires GEMINI_API_KEY in backend .env.*
 *Animation note: all animations respect prefers-reduced-motion. RTL swaps fadeInLeft ↔ fadeInRight automatically.*
 *Payment: PaymentModal (seller→platform) and PaymentStep (client→seller) are SEPARATE components — do NOT merge.*

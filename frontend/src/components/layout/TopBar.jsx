@@ -4,6 +4,7 @@ import {
   AlignJustify,
   Bell,
   ChevronDown,
+  ChevronRight,
   Heart,
   LayoutDashboard,
   Menu,
@@ -248,12 +249,15 @@ function MobileCategoriesSheet({ categories, open, onClose }) {
           <button
             type="button"
             onClick={() => selectCategory('')}
-            className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-cream-100 transition-colors border-b border-beige-50"
+            className="w-full flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-cream-100 transition-colors border-b border-beige-50"
           >
-            <div className="w-10 h-10 rounded-2xl bg-cream-200 flex items-center justify-center flex-shrink-0">
-              <Shapes size={18} className="text-sage-600" />
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-2xl bg-cream-200 flex items-center justify-center flex-shrink-0">
+                <Shapes size={18} className="text-sage-600" />
+              </div>
+              <span className="text-sm font-semibold text-warm-800">{t('topbar.allCategories')}</span>
             </div>
-            <span className="text-sm font-semibold text-warm-800">{t('topbar.allCategories')}</span>
+            <ChevronRight size={16} className="text-warm-400 flex-shrink-0 rtl:rotate-180" />
           </button>
           {categories.map((cat) => {
             const Icon = getCategoryIcon(cat.slug);
@@ -262,12 +266,15 @@ function MobileCategoriesSheet({ categories, open, onClose }) {
                 key={cat.id}
                 type="button"
                 onClick={() => selectCategory(cat.id)}
-                className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-cream-100 transition-colors border-b border-beige-50 last:border-0"
+                className="w-full flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-cream-100 transition-colors border-b border-beige-50 last:border-0"
               >
-                <div className="w-10 h-10 rounded-2xl bg-sage-50 flex items-center justify-center flex-shrink-0">
-                  <Icon size={18} className="text-sage-600" />
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="w-10 h-10 rounded-2xl bg-sage-50 flex items-center justify-center flex-shrink-0">
+                    <Icon size={18} className="text-sage-600" />
+                  </div>
+                  <p className="text-sm font-semibold text-warm-800 text-start truncate">{getCategoryLabel(cat, t)}</p>
                 </div>
-                <p className="text-sm font-semibold text-warm-800 text-start">{getCategoryLabel(cat, t)}</p>
+                <ChevronRight size={16} className="text-warm-400 flex-shrink-0 rtl:rotate-180" />
               </button>
             );
           })}
@@ -381,54 +388,57 @@ export default function TopBar({ unreadCount = 0 }) {
   const handleSearch = useCallback((q) => navigate(`/browse?search=${encodeURIComponent(q)}`), [navigate]);
 
   return (
-    <header
-      className={`sticky top-0 z-40 transition-all duration-300
-        ${isSolid
-          ? 'bg-cream-100/95 backdrop-blur-md border-b border-beige-200 shadow-[0_1px_0_rgba(53,50,42,0.06)]'
-          : 'bg-transparent border-b border-transparent'
-        }`}
-    >
-      <div className="relative flex items-center justify-between h-16 px-4 md:px-6 lg:px-10 gap-3">
-        <LogoMark size="md" light={!isSolid} />
+    <>
+      <header
+        className={`sticky top-0 z-40 transition-all duration-300
+          ${isSolid
+            ? 'bg-cream-100/95 backdrop-blur-md border-b border-beige-200 shadow-[0_1px_0_rgba(53,50,42,0.06)]'
+            : 'bg-transparent border-b border-transparent'
+          }`}
+      >
+        <div className="relative flex items-center justify-between h-16 px-4 md:px-6 lg:px-10 gap-3">
+          <LogoMark size="md" light={!isSolid} />
 
-        <div className="hidden md:flex flex-1 items-center gap-3 px-4 max-w-2xl">
-          <CategoriesDropdown categories={categories} lang={lang} light={!isSolid} />
-          <SearchBar onSearch={handleSearch} light={!isSolid} />
-        </div>
+          <div className="hidden md:flex flex-1 items-center gap-3 px-4 max-w-2xl">
+            <CategoriesDropdown categories={categories} lang={lang} light={!isSolid} />
+            <SearchBar onSearch={handleSearch} light={!isSolid} />
+          </div>
 
-        <div className="md:hidden flex items-center gap-2 ml-auto z-[65]">
-          {categories.length > 0 && (
+          <div className="md:hidden flex items-center gap-2 ml-auto z-[65]">
+            {categories.length > 0 && (
+              <button
+                type="button"
+                onClick={() => { setMobileMenuOpen(false); setMobileCategoriesOpen(true); }}
+                className={`flex items-center gap-1.5 px-3 h-10 rounded-full transition-colors text-sm font-semibold
+                  ${!isSolid ? 'bg-white/15 hover:bg-white/25 text-white' : 'bg-cream-200 hover:bg-beige-200 text-sage-700'}`}
+                aria-label={t('topbar.categories')}
+              >
+                <AlignJustify size={15} />
+                <span className="text-xs">{t('topbar.categories')}</span>
+              </button>
+            )}
+
+            <SearchBar onSearch={handleSearch} light={!isSolid} />
+
             <button
               type="button"
-              onClick={() => { setMobileMenuOpen(false); setMobileCategoriesOpen(true); }}
-              className={`flex items-center gap-1.5 px-3 h-10 rounded-full transition-colors text-sm font-semibold
+              onClick={() => { setMobileCategoriesOpen(false); setMobileMenuOpen((c) => !c); }}
+              className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors
                 ${!isSolid ? 'bg-white/15 hover:bg-white/25 text-white' : 'bg-cream-200 hover:bg-beige-200 text-sage-700'}`}
-              aria-label={t('topbar.categories')}
+              aria-label={mobileMenuOpen ? t('topbar.closeMenu') : t('topbar.menu')}
             >
-              <AlignJustify size={15} />
-              <span className="text-xs">{t('topbar.categories')}</span>
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
-          )}
+          </div>
 
-          <SearchBar onSearch={handleSearch} light={!isSolid} />
-
-          <button
-            type="button"
-            onClick={() => { setMobileCategoriesOpen(false); setMobileMenuOpen((c) => !c); }}
-            className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors
-              ${!isSolid ? 'bg-white/15 hover:bg-white/25 text-white' : 'bg-cream-200 hover:bg-beige-200 text-sage-700'}`}
-            aria-label={mobileMenuOpen ? t('topbar.closeMenu') : t('topbar.menu')}
-          >
-            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
+          <div className="hidden md:flex items-center gap-2">
+            <LanguageSwitcher variant="compact" />
+            <DesktopNav unreadCount={unreadCount} light={!isSolid} />
+          </div>
         </div>
+      </header>
 
-        <div className="hidden md:flex items-center gap-2">
-          <LanguageSwitcher variant="compact" />
-          <DesktopNav unreadCount={unreadCount} light={!isSolid} />
-        </div>
-      </div>
-
+      {/* Portaled outside <header> so backdrop-blur-md does not break fixed positioning */}
       <MobileCategoriesSheet
         categories={categories}
         lang={lang}
@@ -442,6 +452,6 @@ export default function TopBar({ unreadCount = 0 }) {
         lang={lang}
         unreadCount={unreadCount}
       />
-    </header>
+    </>
   );
 }

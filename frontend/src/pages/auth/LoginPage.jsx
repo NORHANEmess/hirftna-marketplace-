@@ -116,7 +116,7 @@ export default function LoginPage() {
                 {t('auth.login.email')}
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-400">
+                <span className="absolute start-3.5 top-1/2 -translate-y-1/2 text-warm-400">
                   <Mail size={16} />
                 </span>
                 <input
@@ -125,7 +125,7 @@ export default function LoginPage() {
                   value={credentials.email}
                   onChange={(e) => setCredentials((c) => ({ ...c, email: e.target.value }))}
                   placeholder={t('auth.login.emailPlaceholder')}
-                  className="input pl-10"
+                  className="input ps-10"
                   autoComplete="email"
                   required
                   disabled={loading}
@@ -148,7 +148,7 @@ export default function LoginPage() {
                 </Link>
               </div>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-400">
+                <span className="absolute start-3.5 top-1/2 -translate-y-1/2 text-warm-400">
                   <Lock size={16} />
                 </span>
                 <input
@@ -157,7 +157,7 @@ export default function LoginPage() {
                   value={credentials.password}
                   onChange={(e) => setCredentials((c) => ({ ...c, password: e.target.value }))}
                   placeholder={t('auth.login.passwordPlaceholder')}
-                  className="input pl-10 pr-11"
+                  className="input ps-10 pe-11"
                   autoComplete="current-password"
                   required
                   disabled={loading}
@@ -165,7 +165,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors"
+                  className="absolute end-3.5 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors"
                   aria-label={showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword')}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}

@@ -157,14 +157,15 @@ export default function RegisterPage() {
                 <div>
                   <label className="label">{t('auth.register.fullName')}</label>
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-400">
+                    <span className="absolute start-3.5 top-1/2 -translate-y-1/2 text-warm-400">
                       <User size={16} />
                     </span>
                     <input
                       type="text"
                       value={form.full_name}
                       onChange={update('full_name')}
-                      className="input pl-10"
+                      placeholder={t('auth.register.namePlaceholder')}
+                      className="input ps-10"
                       disabled={loading}
                     />
                   </div>
@@ -174,14 +175,15 @@ export default function RegisterPage() {
                 <div>
                   <label className="label">{t('auth.register.email')}</label>
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-400">
+                    <span className="absolute start-3.5 top-1/2 -translate-y-1/2 text-warm-400">
                       <Mail size={16} />
                     </span>
                     <input
                       type="email"
                       value={form.email}
                       onChange={update('email')}
-                      className="input pl-10"
+                      placeholder={t('auth.register.emailPlaceholder')}
+                      className="input ps-10"
                       disabled={loading}
                     />
                   </div>
@@ -191,20 +193,21 @@ export default function RegisterPage() {
                 <div>
                   <label className="label">{t('auth.register.password')}</label>
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-400">
+                    <span className="absolute start-3.5 top-1/2 -translate-y-1/2 text-warm-400">
                       <Lock size={16} />
                     </span>
                     <input
                       type={showPw ? 'text' : 'password'}
                       value={form.password}
                       onChange={update('password')}
-                      className="input pl-10 pr-11"
+                      placeholder={t('auth.register.passwordPlaceholder')}
+                      className="input ps-10 pe-11"
                       disabled={loading}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPw((v) => !v)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors"
+                      className="absolute end-3.5 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors"
                     >
                       {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -222,20 +225,21 @@ export default function RegisterPage() {
                 <div>
                   <label className="label">{t('auth.register.confirmPassword')}</label>
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-warm-400">
+                    <span className="absolute start-3.5 top-1/2 -translate-y-1/2 text-warm-400">
                       <ShieldCheck size={16} />
                     </span>
                     <input
                       type={showConf ? 'text' : 'password'}
                       value={form.confirm}
                       onChange={update('confirm')}
-                      className="input pl-10 pr-11"
+                      placeholder={t('auth.register.confirmPlaceholder')}
+                      className="input ps-10 pe-11"
                       disabled={loading}
                     />
                     <button
                       type="button"
                       onClick={() => setShowConf((v) => !v)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors"
+                      className="absolute end-3.5 top-1/2 -translate-y-1/2 text-warm-400 hover:text-warm-700 transition-colors"
                     >
                       {showConf ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
