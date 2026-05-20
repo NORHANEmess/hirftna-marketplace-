@@ -8,6 +8,9 @@ import { useTranslation } from '../../i18n/index.jsx';
 import DashboardSidebar from '../../components/layout/DashboardSidebar';
 import PaymentModal from '../../components/payment/PaymentModal';
 
+const DURATION_OPTIONS = [7, 14, 30];
+const PRICE_PER_DAY = 500;
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function formatDate(dateString) {
   if (!dateString) return '—';
@@ -21,6 +24,14 @@ function daysLeft(endsAt) {
   const diff = new Date(endsAt) - Date.now();
   if (diff <= 0) return 0;
   return Math.ceil(diff / 86400000);
+}
+
+function elapsedPercent(startsAt, endsAt) {
+  if (!startsAt || !endsAt) return 0;
+  const total = new Date(endsAt) - new Date(startsAt);
+  if (total <= 0) return 100;
+  const elapsed = Date.now() - new Date(startsAt);
+  return Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
 }
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
@@ -55,23 +66,125 @@ function Benefit({ icon: Icon, text }) {
   );
 }
 
+// ─── Duration Selector ────────────────────────────────────────────────────────
+function DurationSelector({ selected, onChange }) {
+  const { t } = useTranslation();
+  return (
+    <div>
+      <p className="text-xs font-semibold text-warm-600 mb-2">{t('promotions.chooseDuration')}</p>
+      <div className="grid grid-cols-3 gap-2">
+        {DURATION_OPTIONS.map((days) => {
+          const price = days * PRICE_PER_DAY;
+          const isSelected = selected === days;
+          return (
+            <button
+              key={days}
+              type="button"
+              onClick={() => onChange(days)}
+              className={`flex flex-col items-center py-3 px-2 rounded-2xl border-2 transition-all ${
+                isSelected
+                  ? 'border-sage-500 bg-sage-50'
+                  : 'border-beige-200 bg-white hover:border-sage-300'
+              }`}
+            >
+              <span className={`text-base font-bold ${isSelected ? 'text-sage-700' : 'text-warm-800'}`}>
+                {days}
+              </span>
+              <span className={`text-[10px] font-medium mb-1 ${isSelected ? 'text-sage-600' : 'text-warm-500'}`}>
+                {t('common.days')}
+              </span>
+              <span className={`text-xs font-bold ${isSelected ? 'text-sage-700' : 'text-warm-700'}`}>
+                {Number(price).toLocaleString()} DA
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-warm-400 text-center mt-1.5">{t('promotions.pricePerDay')}</p>
+    </div>
+  );
+}
+
+// ─── Active Promotion Countdown ───────────────────────────────────────────────
+function ActivePromotionCard({ promotion }) {
+  const { t } = useTranslation();
+  const remaining = daysLeft(promotion.ends_at);
+  const percent   = elapsedPercent(promotion.starts_at, promotion.ends_at);
+  const isEndingSoon = remaining !== null && remaining <= 2 && remaining > 0;
+  const isExpiredNow = remaining === 0;
+
+  const countdownColor = isEndingSoon
+    ? 'text-amber-600'
+    : isExpiredNow
+      ? 'text-warm-400'
+      : 'text-sage-600';
+
+  let countdownText;
+  if (isExpiredNow) {
+    countdownText = t('promotions.expiredOn', { date: formatDate(promotion.ends_at) });
+  } else if (remaining === 1) {
+    countdownText = t('promotions.expiresToday');
+  } else {
+    countdownText = t('promotions.daysRemaining', { days: remaining });
+  }
+
+  return (
+    <div className="bg-white border border-beige-200 rounded-2xl p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="font-bold text-warm-900 text-sm">{t('promotions.currentPromotion')}</p>
+        <StatusBadge status="active" />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-cream-100 rounded-xl p-3">
+          <p className="text-[10px] text-warm-400 uppercase tracking-wide mb-0.5">{t('promotions.starts')}</p>
+          <p className="text-sm font-semibold text-warm-800">{formatDate(promotion.starts_at)}</p>
+        </div>
+        <div className="bg-cream-100 rounded-xl p-3">
+          <p className="text-[10px] text-warm-400 uppercase tracking-wide mb-0.5">{t('promotions.expires')}</p>
+          <p className="text-sm font-semibold text-warm-800">{formatDate(promotion.ends_at)}</p>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="space-y-1.5">
+        <div className="w-full h-2 bg-beige-100 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${isEndingSoon ? 'bg-amber-400' : 'bg-sage-500'}`}
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+        <div className="flex items-center justify-between text-[10px] text-warm-400">
+          <span>{t('promotions.elapsedPercent', { percent })}</span>
+          {remaining !== null && (
+            <span className={`font-semibold flex items-center gap-1 ${countdownColor}`}>
+              <CalendarCheck size={11} />
+              {isEndingSoon && !isExpiredNow && `⚠ `}{countdownText}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function SellerPromotions() {
   const { t } = useTranslation();
 
   // Hero/browse promotion state
-  const [promotion, setPromotion]   = useState(undefined); // undefined = loading
+  const [promotion, setPromotion]   = useState(undefined);
+  const [selectedDays, setSelectedDays] = useState(30);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState(null);
   const [success, setSuccess]       = useState(false);
-  const [showPromoPayment, setShowPromoPayment]       = useState(false);
-  const [promoPaymentDays, setPromoPaymentDays]       = useState(30);
+  const [showPromoPayment, setShowPromoPayment] = useState(false);
 
   // Product promotion state
   const [myProducts, setMyProducts]               = useState([]);
-  const [productPromotions, setProductPromotions] = useState(undefined); // undefined = loading
+  const [productPromotions, setProductPromotions] = useState(undefined);
   const [selectedProductId, setSelectedProductId] = useState('');
   const [selectedPlacement, setSelectedPlacement] = useState('featured');
+  const [selectedProductDays, setSelectedProductDays] = useState(30);
   const [productSubmitting, setProductSubmitting] = useState(false);
   const [productError, setProductError]           = useState(null);
   const [showProductPayment, setShowProductPayment] = useState(false);
@@ -101,10 +214,9 @@ export default function SellerPromotions() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await promotionsAPI.request({ placement: 'hero', requested_days: 30 });
+      const res = await promotionsAPI.request({ placement: 'hero', requested_days: selectedDays });
       setPromotion(res.data?.data?.promotion ?? null);
       setSuccess(true);
-      setPromoPaymentDays(30);
       setShowPromoPayment(true);
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -124,7 +236,7 @@ export default function SellerPromotions() {
       await promotionsAPI.request({
         placement: selectedPlacement,
         product_id: selectedProductId,
-        requested_days: 30,
+        requested_days: selectedProductDays,
       });
       setSelectedProductId('');
       const res = await promotionsAPI.getMyProductPromotions();
@@ -157,28 +269,7 @@ export default function SellerPromotions() {
         {promotion === undefined ? (
           <div className="h-40 bg-beige-200 rounded-2xl animate-pulse" />
         ) : promotion?.status === 'active' ? (
-          <div className="bg-white border border-beige-200 rounded-2xl p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <p className="font-bold text-warm-900 text-sm">{t('promotions.currentPromotion')}</p>
-              <StatusBadge status="active" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-cream-100 rounded-xl p-3">
-                <p className="text-[10px] text-warm-400 uppercase tracking-wide mb-0.5">{t('promotions.starts')}</p>
-                <p className="text-sm font-semibold text-warm-800">{formatDate(promotion.starts_at)}</p>
-              </div>
-              <div className="bg-cream-100 rounded-xl p-3">
-                <p className="text-[10px] text-warm-400 uppercase tracking-wide mb-0.5">{t('promotions.expires')}</p>
-                <p className="text-sm font-semibold text-warm-800">{formatDate(promotion.ends_at)}</p>
-              </div>
-            </div>
-            {daysLeft(promotion.ends_at) !== null && (
-              <p className="text-xs text-sage-600 font-medium flex items-center gap-1.5">
-                <CalendarCheck size={13} />
-                {t('promotions.daysLeft', { count: daysLeft(promotion.ends_at) })}
-              </p>
-            )}
-          </div>
+          <ActivePromotionCard promotion={promotion} />
         ) : promotion?.status === 'pending' ? (
           <div className="bg-warning/10 border border-warning/30 rounded-2xl p-5 flex items-start gap-3">
             <Clock size={18} className="text-warning flex-shrink-0 mt-0.5" />
@@ -187,7 +278,7 @@ export default function SellerPromotions() {
               <p className="text-xs text-warm-500 mt-0.5 leading-relaxed">{t('promotions.pendingBody')}</p>
               <button
                 type="button"
-                onClick={() => { setPromoPaymentDays(30); setShowPromoPayment(true); }}
+                onClick={() => setShowPromoPayment(true)}
                 className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-warning hover:bg-amber-600 px-3 py-1.5 rounded-xl transition-colors"
               >
                 {t('payment.declare_payment')}
@@ -230,10 +321,15 @@ export default function SellerPromotions() {
                 <Benefit icon={CalendarCheck} text={t('promotions.benefit3')} />
               </div>
 
-              {/* Price */}
+              {/* Duration selector */}
+              <DurationSelector selected={selectedDays} onChange={setSelectedDays} />
+
+              {/* Price summary */}
               <div className="bg-cream-100 rounded-xl px-4 py-3 flex items-center justify-between">
                 <p className="text-xs text-warm-500">{t('promotions.priceLabel')}</p>
-                <p className="font-bold text-warm-900 text-sm">{t('promotions.price')}</p>
+                <p className="font-bold text-warm-900 text-sm">
+                  {Number(selectedDays * PRICE_PER_DAY).toLocaleString()} DA
+                </p>
               </div>
 
               {error && (
@@ -334,6 +430,17 @@ export default function SellerPromotions() {
                   </div>
                 </div>
 
+                {/* Duration selector for product boost */}
+                <DurationSelector selected={selectedProductDays} onChange={setSelectedProductDays} />
+
+                {/* Price summary */}
+                <div className="bg-cream-100 rounded-xl px-4 py-3 flex items-center justify-between">
+                  <p className="text-xs text-warm-500">{t('promotions.priceLabel')}</p>
+                  <p className="font-bold text-warm-900 text-sm">
+                    {Number(selectedProductDays * PRICE_PER_DAY).toLocaleString()} DA
+                  </p>
+                </div>
+
                 {productError && (
                   <div className="flex items-center gap-2 text-xs text-danger bg-red-50 rounded-xl px-3 py-2">
                     <AlertCircle size={13} /> {productError}
@@ -359,15 +466,25 @@ export default function SellerPromotions() {
           <div className="h-16 bg-beige-200 rounded-2xl animate-pulse" />
         ) : productPromotions.length > 0 ? (
           <div className="bg-white border border-beige-200 rounded-2xl divide-y divide-beige-100">
-            {productPromotions.map((pp) => (
-              <div key={pp.id} className="px-4 py-3 flex items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-warm-800 truncate">{pp.product?.name ?? '—'}</p>
-                  <p className="text-[10px] text-warm-400 uppercase tracking-wide mt-0.5">{pp.placement}</p>
+            {productPromotions.map((pp) => {
+              const remaining = daysLeft(pp.ends_at);
+              return (
+                <div key={pp.id} className="px-4 py-3 flex items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-warm-800 truncate">{pp.product?.name ?? '—'}</p>
+                    <p className="text-[10px] text-warm-400 uppercase tracking-wide mt-0.5">{pp.placement}</p>
+                    {pp.status === 'active' && remaining !== null && (
+                      <p className={`text-[10px] font-semibold mt-0.5 ${remaining <= 2 ? 'text-amber-600' : 'text-sage-600'}`}>
+                        {remaining <= 0
+                          ? t('promotions.expiredOn', { date: formatDate(pp.ends_at) })
+                          : t('promotions.daysRemaining', { days: remaining })}
+                      </p>
+                    )}
+                  </div>
+                  <StatusBadge status={pp.status} />
                 </div>
-                <StatusBadge status={pp.status} />
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : null}
       </div>
@@ -375,8 +492,8 @@ export default function SellerPromotions() {
 
       {showPromoPayment && (
         <PaymentModal
-          amount={500 * promoPaymentDays}
-          description={`${t('payment.promotion_fee')} — ${promoPaymentDays} ${t('common.days')}`}
+          amount={selectedDays * PRICE_PER_DAY}
+          description={`${t('payment.promotion_fee')} — ${selectedDays} ${t('common.days')}`}
           onPaymentDeclared={() => { setShowPromoPayment(false); refreshPromotions(); }}
           onClose={() => setShowPromoPayment(false)}
         />
@@ -384,8 +501,8 @@ export default function SellerPromotions() {
 
       {showProductPayment && (
         <PaymentModal
-          amount={500 * 30}
-          description={`${t('payment.promotion_fee')} — 30 ${t('common.days')}`}
+          amount={selectedProductDays * PRICE_PER_DAY}
+          description={`${t('payment.promotion_fee')} — ${selectedProductDays} ${t('common.days')}`}
           onPaymentDeclared={() => { setShowProductPayment(false); refreshPromotions(); }}
           onClose={() => setShowProductPayment(false)}
         />
