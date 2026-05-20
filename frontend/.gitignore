@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 .env
+.env.*
+!.env.example
 
 
 # Project documentation (optional if you don't want to track them)

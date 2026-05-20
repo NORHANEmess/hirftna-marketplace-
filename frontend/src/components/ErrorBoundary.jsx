@@ -8,7 +8,9 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    console.error('ErrorBoundary:', error, info);
+    if (import.meta.env.DEV) {
+      console.error('ErrorBoundary:', error, info);
+    }
   }
 
   render() {

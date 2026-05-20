@@ -4,6 +4,7 @@ node_modules/
 # Environment variables — NEVER upload this
 .env
 .env.*
+!.env.example
 
 # Log files
 logs/
