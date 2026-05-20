@@ -84,21 +84,23 @@ function RolePill({ role }) {
 }
 
 function VerifiedPill() {
+  const { t } = useTranslation();
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-sage-50 border border-sage-200 text-sage-700 rounded-full text-[10px] font-semibold">
       <BadgeCheck size={10} className="text-sage-600" />
-      Verified
+      {t('adminUsers.verifiedLabel')}
     </span>
   );
 }
 
 function UnverifiedPill({ score }) {
+  const { t } = useTranslation();
   const pct = Math.round((score.met / score.total) * 100);
   return (
     <div className="flex flex-col gap-0.5">
       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-full text-[10px] font-semibold w-fit">
         <Clock size={9} />
-        Unverified
+        {t('adminUsers.unverifiedLabel')}
       </span>
       <div className="flex items-center gap-1.5 pl-0.5">
         <div className="h-1 w-14 bg-beige-200 rounded-full overflow-hidden">
@@ -151,6 +153,7 @@ function SkeletonCard() {
 }
 
 function ConfirmModal({ title, body, confirmLabel, danger, onConfirm, onCancel, loading }) {
+  const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 pb-6 sm:pb-0">
       <div
@@ -166,7 +169,7 @@ function ConfirmModal({ title, body, confirmLabel, danger, onConfirm, onCancel, 
             disabled={loading}
             className="flex-1 py-3 text-sm font-medium text-warm-600 bg-cream-100 rounded-2xl border border-beige-200 hover:bg-beige-100 transition-colors disabled:opacity-50"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={onConfirm}

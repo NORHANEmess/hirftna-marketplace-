@@ -1,17 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
-  Users,
-  Package,
-  ShoppingBag,
-  TrendingUp,
-  UserCheck,
-  Store,
-  Star,
-  CalendarDays,
-  Loader2,
+  Users, Package, ShoppingBag, TrendingUp,
+  Store, Star, Loader2,
 } from 'lucide-react';
 import { adminAPI } from '../../services/api';
+import { useTranslation } from '../../i18n/index.jsx';
 import DashboardSidebar from '../../components/layout/DashboardSidebar';
 
 function formatCurrency(value) {
@@ -67,6 +60,7 @@ function StatusBar({ label, count, total, color }) {
 }
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -74,9 +68,9 @@ export default function AdminDashboard() {
   useEffect(() => {
     adminAPI.getStats()
       .then((res) => setStats(res.data?.data?.stats))
-      .catch(() => setError('Failed to load stats. Please try again.'))
+      .catch(() => setError(t('admin.failedStats')))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   const totalOrders = stats?.orders?.total || 0;
 
@@ -87,8 +81,8 @@ export default function AdminDashboard() {
       <div className="flex-1 pb-24">
       {/* Header */}
       <div className="bg-white border-b border-beige-200 px-4 pt-6 pb-4">
-        <p className="text-xs font-medium text-sage-600 uppercase tracking-widest mb-1">Admin Panel</p>
-        <h1 className="text-2xl font-bold text-warm-900">Dashboard</h1>
+        <p className="text-xs font-medium text-sage-600 uppercase tracking-widest mb-1">{t('admin.adminPanel')}</p>
+        <h1 className="text-2xl font-bold text-warm-900">{t('admin.dashboard')}</h1>
       </div>
 
       <div className="px-4 py-4 space-y-4">
@@ -100,26 +94,26 @@ export default function AdminDashboard() {
 
         {/* Top stats row */}
         <div className="grid grid-cols-2 gap-3">
-          <StatCard icon={Users} label="Total Users" value={stats?.users?.total ?? '—'} loading={loading} />
-          <StatCard icon={Package} label="Total Products" value={stats?.products?.total ?? '—'} sub={`${stats?.products?.active ?? 0} active`} loading={loading} />
-          <StatCard icon={ShoppingBag} label="Total Orders" value={stats?.orders?.total ?? '—'} loading={loading} />
-          <StatCard icon={TrendingUp} label="Total Revenue" value={stats ? formatCurrency(stats.revenue?.total) : '—'} accent loading={loading} />
+          <StatCard icon={Users}       label={t('admin.totalUsers')}   value={stats?.users?.total ?? '—'}                                  loading={loading} />
+          <StatCard icon={Package}     label={t('admin.totalProducts')} value={stats?.products?.total ?? '—'} sub={`${stats?.products?.active ?? 0} active`} loading={loading} />
+          <StatCard icon={ShoppingBag} label={t('admin.totalOrders')}   value={stats?.orders?.total ?? '—'}                                 loading={loading} />
+          <StatCard icon={TrendingUp}  label={t('admin.totalRevenue')}  value={stats ? formatCurrency(stats.revenue?.total) : '—'} accent   loading={loading} />
         </div>
 
         {/* Orders by status */}
         <div className="bg-white rounded-2xl border border-beige-200 p-4">
-          <h2 className="text-sm font-semibold text-warm-900 mb-3">Orders by Status</h2>
+          <h2 className="text-sm font-semibold text-warm-900 mb-3">{t('admin.ordersByStatus')}</h2>
           {loading ? (
             <div className="space-y-2">
               {[1, 2, 3].map((i) => <div key={i} className="h-4 bg-beige-100 rounded animate-pulse" />)}
             </div>
           ) : (
             <div className="space-y-2">
-              <StatusBar label="Pending" count={stats?.orders?.byStatus?.pending ?? 0} total={totalOrders} color="bg-amber-400" />
-              <StatusBar label="Accepted" count={stats?.orders?.byStatus?.accepted ?? 0} total={totalOrders} color="bg-blue-400" />
-              <StatusBar label="Ready" count={stats?.orders?.byStatus?.ready ?? 0} total={totalOrders} color="bg-indigo-400" />
-              <StatusBar label="Completed" count={stats?.orders?.byStatus?.completed ?? 0} total={totalOrders} color="bg-sage-500" />
-              <StatusBar label="Rejected" count={stats?.orders?.byStatus?.rejected ?? 0} total={totalOrders} color="bg-red-400" />
+              <StatusBar label={t('orders.statuses.pending')}   count={stats?.orders?.byStatus?.pending   ?? 0} total={totalOrders} color="bg-amber-400" />
+              <StatusBar label={t('orders.statuses.accepted')}  count={stats?.orders?.byStatus?.accepted  ?? 0} total={totalOrders} color="bg-blue-400" />
+              <StatusBar label={t('orders.statuses.ready')}     count={stats?.orders?.byStatus?.ready     ?? 0} total={totalOrders} color="bg-indigo-400" />
+              <StatusBar label={t('orders.statuses.completed')} count={stats?.orders?.byStatus?.completed ?? 0} total={totalOrders} color="bg-sage-500" />
+              <StatusBar label={t('orders.statuses.rejected')}  count={stats?.orders?.byStatus?.rejected  ?? 0} total={totalOrders} color="bg-red-400" />
             </div>
           )}
         </div>
@@ -127,31 +121,31 @@ export default function AdminDashboard() {
         {/* Users by role + this month */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white rounded-2xl border border-beige-200 p-4">
-            <h2 className="text-xs font-semibold text-warm-500 uppercase tracking-wide mb-3">Users by Role</h2>
+            <h2 className="text-xs font-semibold text-warm-500 uppercase tracking-wide mb-3">{t('admin.usersByRole')}</h2>
             {loading ? (
               <div className="space-y-2">
                 {[1, 2].map((i) => <div key={i} className="h-4 bg-beige-100 rounded animate-pulse" />)}
               </div>
             ) : (
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-warm-500">Clients</span><span className="font-semibold text-warm-900">{stats?.users?.byRole?.client ?? 0}</span></div>
-                <div className="flex justify-between"><span className="text-warm-500">Sellers</span><span className="font-semibold text-warm-900">{stats?.users?.byRole?.seller ?? 0}</span></div>
-                <div className="flex justify-between"><span className="text-warm-500">Admins</span><span className="font-semibold text-warm-900">{stats?.users?.byRole?.admin ?? 0}</span></div>
+                <div className="flex justify-between"><span className="text-warm-500">{t('admin.clientsLabel')}</span><span className="font-semibold text-warm-900">{stats?.users?.byRole?.client ?? 0}</span></div>
+                <div className="flex justify-between"><span className="text-warm-500">{t('admin.sellersLabel')}</span><span className="font-semibold text-warm-900">{stats?.users?.byRole?.seller ?? 0}</span></div>
+                <div className="flex justify-between"><span className="text-warm-500">{t('admin.adminsLabel')}</span><span className="font-semibold text-warm-900">{stats?.users?.byRole?.admin  ?? 0}</span></div>
               </div>
             )}
           </div>
 
           <div className="bg-white rounded-2xl border border-beige-200 p-4">
-            <h2 className="text-xs font-semibold text-warm-500 uppercase tracking-wide mb-3">This Month</h2>
+            <h2 className="text-xs font-semibold text-warm-500 uppercase tracking-wide mb-3">{t('admin.thisMonth')}</h2>
             {loading ? (
               <div className="space-y-2">
                 {[1, 2].map((i) => <div key={i} className="h-4 bg-beige-100 rounded animate-pulse" />)}
               </div>
             ) : (
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-warm-500">New Users</span><span className="font-semibold text-sage-600">{stats?.thisMonth?.newUsers ?? 0}</span></div>
-                <div className="flex justify-between"><span className="text-warm-500">New Orders</span><span className="font-semibold text-sage-600">{stats?.thisMonth?.newOrders ?? 0}</span></div>
-                <div className="flex justify-between"><span className="text-warm-500">Reviews</span><span className="font-semibold text-warm-900">{stats?.reviews?.total ?? 0}</span></div>
+                <div className="flex justify-between"><span className="text-warm-500">{t('admin.newUsers')}</span><span className="font-semibold text-sage-600">{stats?.thisMonth?.newUsers  ?? 0}</span></div>
+                <div className="flex justify-between"><span className="text-warm-500">{t('admin.newOrders')}</span><span className="font-semibold text-sage-600">{stats?.thisMonth?.newOrders ?? 0}</span></div>
+                <div className="flex justify-between"><span className="text-warm-500">{t('admin.reviewsLabel')}</span><span className="font-semibold text-warm-900">{stats?.reviews?.total       ?? 0}</span></div>
               </div>
             )}
           </div>
@@ -161,14 +155,14 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-2xl border border-beige-200 p-4">
           <div className="flex items-center gap-2 mb-3">
             <Store size={16} className="text-sage-600" />
-            <h2 className="text-sm font-semibold text-warm-900">Top Sellers</h2>
+            <h2 className="text-sm font-semibold text-warm-900">{t('admin.topSellers')}</h2>
           </div>
           {loading ? (
             <div className="space-y-2">
               {[1, 2, 3].map((i) => <div key={i} className="h-8 bg-beige-100 rounded-lg animate-pulse" />)}
             </div>
           ) : !stats?.topSellers?.length ? (
-            <p className="text-sm text-warm-400 text-center py-2">No data yet</p>
+            <p className="text-sm text-warm-400 text-center py-2">{t('admin.noData')}</p>
           ) : (
             <div className="space-y-2">
               {stats.topSellers.map((s, i) => (
@@ -179,7 +173,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="flex items-center gap-3 text-xs text-warm-400">
                     <span><Star size={11} className="inline text-amber-400 mr-0.5" />{Number(s.avg_rating || 0).toFixed(1)}</span>
-                    <span className="font-semibold text-sage-600">{s.completed_orders} orders</span>
+                    <span className="font-semibold text-sage-600">{t('admin.ordersCount', { count: s.completed_orders })}</span>
                   </div>
                 </div>
               ))}
@@ -191,14 +185,14 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-2xl border border-beige-200 p-4">
           <div className="flex items-center gap-2 mb-3">
             <Star size={16} className="text-amber-500" />
-            <h2 className="text-sm font-semibold text-warm-900">Top Products by Rating</h2>
+            <h2 className="text-sm font-semibold text-warm-900">{t('admin.topProductsByRating')}</h2>
           </div>
           {loading ? (
             <div className="space-y-2">
               {[1, 2, 3].map((i) => <div key={i} className="h-8 bg-beige-100 rounded-lg animate-pulse" />)}
             </div>
           ) : !stats?.topProducts?.length ? (
-            <p className="text-sm text-warm-400 text-center py-2">No data yet</p>
+            <p className="text-sm text-warm-400 text-center py-2">{t('admin.noData')}</p>
           ) : (
             <div className="space-y-2">
               {stats.topProducts.map((p, i) => (

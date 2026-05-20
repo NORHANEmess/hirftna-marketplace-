@@ -2,9 +2,11 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Trash2, ExternalLink, ChevronLeft, ChevronRight, Loader2, AlertTriangle } from 'lucide-react';
 import { adminAPI, categoriesAPI, resolveApiError } from '../../services/api';
+import { useTranslation } from '../../i18n/index.jsx';
 import DashboardSidebar from '../../components/layout/DashboardSidebar';
 
 export default function AdminProducts() {
+  const { t } = useTranslation();
   const [products, setProducts] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -18,7 +20,6 @@ export default function AdminProducts() {
   const [deleteError, setDeleteError] = useState(null);
   const debounceRef = useRef(null);
 
-  // Load categories once
   useEffect(() => {
     categoriesAPI.getAll()
       .then((res) => setCategories(res.data?.data?.categories || []))
@@ -85,12 +86,17 @@ export default function AdminProducts() {
     <div className="min-h-screen bg-cream-100 md:flex">
       <DashboardSidebar role="admin" />
       <div className="flex-1 pb-28 md:pb-10">
+
       {/* Header */}
       <div className="bg-white border-b border-beige-200 px-4 pt-6 pb-4">
-        <Link to="/admin" className="text-xs text-sage-600 hover:text-sage-700 mb-2 inline-block">← Dashboard</Link>
-        <h1 className="text-2xl font-bold text-warm-900">Products</h1>
+        <Link to="/admin" className="text-xs text-sage-600 hover:text-sage-700 mb-2 inline-block">
+          {t('adminProducts.backToDashboard')}
+        </Link>
+        <h1 className="text-2xl font-bold text-warm-900">{t('adminProducts.title')}</h1>
         {pagination && (
-          <p className="text-xs text-warm-400 mt-1">{pagination.total} total products</p>
+          <p className="text-xs text-warm-400 mt-1">
+            {t('adminProducts.totalCount', { count: pagination.total })}
+          </p>
         )}
       </div>
 
@@ -101,7 +107,7 @@ export default function AdminProducts() {
           <input
             value={search}
             onChange={handleSearch}
-            placeholder="Search products..."
+            placeholder={t('adminProducts.searchPlaceholder')}
             className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-beige-200 bg-cream-50 focus:outline-none focus:ring-2 focus:ring-sage-300"
           />
         </div>
@@ -111,7 +117,7 @@ export default function AdminProducts() {
             onChange={handleCategoryFilter}
             className="w-full px-3 py-2 text-sm rounded-xl border border-beige-200 bg-cream-50 text-warm-700 focus:outline-none focus:ring-2 focus:ring-sage-300"
           >
-            <option value="">All Categories</option>
+            <option value="">{t('adminProducts.allCategories')}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
@@ -142,8 +148,8 @@ export default function AdminProducts() {
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12 text-warm-400">
-            <p className="text-base font-medium">No products found</p>
-            <p className="text-sm mt-1">Try a different search or category</p>
+            <p className="text-base font-medium">{t('adminProducts.noFound')}</p>
+            <p className="text-sm mt-1">{t('adminProducts.noFoundSub')}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -153,8 +159,8 @@ export default function AdminProducts() {
               const priceLabel = product.price
                 ? `${Number(product.price).toLocaleString()} DA`
                 : product.price_min
-                  ? `From ${Number(product.price_min).toLocaleString()} DA`
-                  : 'Price on request';
+                  ? t('adminProducts.fromPrice', { price: Number(product.price_min).toLocaleString() })
+                  : t('adminProducts.priceOnRequest');
 
               return (
                 <div key={product.id} className="bg-white rounded-2xl border border-beige-200 p-4 flex gap-3">
@@ -170,11 +176,13 @@ export default function AdminProducts() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-warm-900 truncate">{product.name}</p>
-                    <p className="text-xs text-warm-400 truncate">{product.seller?.shop_name || 'Unknown seller'}</p>
+                    <p className="text-xs text-warm-400 truncate">
+                      {product.seller?.shop_name || t('adminProducts.unknownSeller')}
+                    </p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-warm-600">{priceLabel}</span>
                       <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${product.is_active ? 'bg-sage-50 text-sage-700' : 'bg-beige-100 text-warm-500'}`}>
-                        {product.is_active ? 'Active' : 'Hidden'}
+                        {product.is_active ? t('adminProducts.active') : t('adminProducts.hidden')}
                       </span>
                     </div>
                   </div>
@@ -185,14 +193,14 @@ export default function AdminProducts() {
                       to={`/products/${product.id}`}
                       target="_blank"
                       className="p-1.5 rounded-lg text-warm-400 hover:text-sage-600 hover:bg-sage-50 transition-colors"
-                      title="View product"
+                      aria-label={t('adminUsers.viewProfile')}
                     >
                       <ExternalLink size={14} />
                     </Link>
                     <button
                       onClick={() => setDeleteTarget(product)}
                       className="p-1.5 rounded-lg text-warm-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                      title="Delete product"
+                      aria-label={t('admin.deleteProduct')}
                     >
                       <Trash2 size={14} />
                     </button>
@@ -213,7 +221,9 @@ export default function AdminProducts() {
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="text-sm text-warm-600">Page {page} of {totalPages}</span>
+            <span className="text-sm text-warm-600">
+              {t('adminProducts.page', { page, total: totalPages })}
+            </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
@@ -233,10 +243,10 @@ export default function AdminProducts() {
               <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle size={20} className="text-red-600" />
               </div>
-              <h3 className="text-base font-semibold text-warm-900">Delete Product?</h3>
+              <h3 className="text-base font-semibold text-warm-900">{t('adminProducts.deleteTitle')}</h3>
             </div>
             <p className="text-sm text-warm-600 mb-5">
-              "<span className="font-medium">{deleteTarget.name}</span>" will be permanently removed. This action cannot be undone.
+              {t('adminProducts.deleteBody', { name: deleteTarget.name })}
             </p>
             {deleteError && (
               <p className="text-xs text-red-600 bg-red-50 rounded-xl px-3 py-2 mb-3">{deleteError}</p>
@@ -247,7 +257,7 @@ export default function AdminProducts() {
                 disabled={deleting}
                 className="flex-1 py-2.5 rounded-xl border border-beige-200 text-sm text-warm-700 hover:bg-beige-50 transition-colors disabled:opacity-50"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={confirmDelete}
@@ -255,7 +265,7 @@ export default function AdminProducts() {
                 className="flex-1 py-2.5 rounded-xl bg-red-600 text-sm text-white font-medium hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                {deleting ? 'Deleting...' : 'Delete'}
+                {deleting ? t('adminProducts.deleting') : t('adminProducts.delete')}
               </button>
             </div>
           </div>
