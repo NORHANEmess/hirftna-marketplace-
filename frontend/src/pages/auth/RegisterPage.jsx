@@ -122,8 +122,9 @@ export default function RegisterPage() {
 
           {/* Loading overlay: visible while awaiting OTP response, before the OTP form appears */}
           {loading && !inOtpStep && (
-            <div className="absolute inset-0 bg-white/75 rounded-3xl flex items-center justify-center z-10">
+            <div className="absolute inset-0 bg-white/75 rounded-3xl flex flex-col items-center justify-center gap-3 z-10">
               <Loader size={28} className="animate-spin text-sage-500" />
+              <p className="text-sm text-warm-500">{t('auth.sendingCode')}</p>
             </div>
           )}
 

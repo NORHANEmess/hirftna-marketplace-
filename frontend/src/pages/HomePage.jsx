@@ -8,6 +8,7 @@ import { extractApiItems, productsAPI, promotionsAPI, sellersAPI } from '../serv
 import { formatProductPrice } from '../components/product/ProductCard';
 import { useTranslation } from '../i18n/index.jsx';
 import { useInView } from '../hooks/useInView';
+import HeroCarousel from '../components/hero/HeroCarousel';
 
 // ─── Section Header ───────────────────────────────────────────────────────────
 function SectionHeader({ eyebrow, title, subtitle, onSeeAll, seeAllLabel }) {
@@ -727,8 +728,11 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-cream-100 pb-28 md:pb-10">
 
-      {/* ── Hero ── */}
-      <HeroSection heroAds={heroAds} />
+      {/* ── Hero: carousel when promotions exist, original split-hero as fallback ── */}
+      {(heroAds === null || heroAds.length > 0)
+        ? <HeroCarousel ads={heroAds} />
+        : <HeroSection heroAds={heroAds} />
+      }
 
       {/* ── Padded content ── */}
       <div className="px-2 lg:px-8">

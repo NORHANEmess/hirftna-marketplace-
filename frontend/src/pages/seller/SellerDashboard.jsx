@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Eye,
   Heart,
+  Info,
   LayoutDashboard,
   Loader2,
   LogOut,
@@ -23,7 +24,6 @@ import { extractApiItems, ordersAPI, sellersAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../i18n/index.jsx';
 import DashboardSidebar from '../../components/layout/DashboardSidebar';
-import PaymentModal from '../../components/payment/PaymentModal';
 
 function formatCurrency(value) {
   if (!value && value !== 0) {
@@ -192,7 +192,6 @@ export default function SellerDashboard() {
   const [error, setError] = useState('');
   const [noProfile, setNoProfile] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [showActivationPayment, setShowActivationPayment] = useState(false);
 
   useEffect(() => {
     sellersAPI.getAnalytics()
@@ -292,22 +291,15 @@ export default function SellerDashboard() {
           </div>
         )}
 
-        {/* Activation banner: shop not yet verified — products hidden from public */}
+        {/* Earn-badge info card: shop visible immediately, badge is earned */}
         {verificationStatus && !verificationStatus.isVerified && (
-          <div className="bg-warning/10 border border-warning/30 rounded-2xl p-4 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-warning/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <AlertCircle size={16} className="text-warning" />
+          <div className="bg-sage-50 border border-sage-200 rounded-2xl p-4 flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-sage-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Info size={16} className="text-sage-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-warm-800">{t('sellerDashboard.activationBanner.title')}</p>
-              <p className="text-xs text-warm-600 mt-0.5 leading-relaxed">{t('sellerDashboard.activationBanner.subtitle')}</p>
-              <button
-                type="button"
-                onClick={() => setShowActivationPayment(true)}
-                className="inline-flex items-center gap-1.5 mt-2.5 text-xs font-semibold text-white bg-warning hover:bg-amber-600 px-3 py-1.5 rounded-xl transition-colors"
-              >
-                {t('payment.activation_fee')}
-              </button>
+              <p className="text-sm font-bold text-warm-800">{t('seller.earnBadge')}</p>
+              <p className="text-xs text-warm-500 mt-0.5 leading-relaxed">{t('seller.earnBadgeDesc')}</p>
             </div>
           </div>
         )}
@@ -406,19 +398,6 @@ export default function SellerDashboard() {
       </div>
       </div>
 
-      {showActivationPayment && (
-        <PaymentModal
-          amount={5000}
-          description={t('payment.activation_fee')}
-          onPaymentDeclared={() => {
-            setShowActivationPayment(false);
-            sellersAPI.getVerificationStatus()
-              .then((response) => setVerificationStatus(response.data?.data ?? null))
-              .catch(() => {});
-          }}
-          onClose={() => setShowActivationPayment(false)}
-        />
-      )}
     </div>
   );
 }

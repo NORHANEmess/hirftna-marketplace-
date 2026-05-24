@@ -80,8 +80,7 @@ const getAllSellers = async (query) => {
 
   let dbQuery = supabaseAdmin
     .from('sellers')
-    .select(SELLER_PUBLIC_COLUMNS, { count: 'exact' })
-    .eq('is_verified', true);
+    .select(SELLER_PUBLIC_COLUMNS, { count: 'exact' });
 
   if (category_id) dbQuery = dbQuery.eq('category_id', category_id);
   if (search)      dbQuery = dbQuery.ilike('shop_name', `%${search}%`);
@@ -134,9 +133,9 @@ const getSellerById = async (id) => {
   const { data: products, error: productsError } = await supabaseAdmin
     .from('products')
     .select(`
-      id, name, price, avg_rating,
+      id, name, price, price_min, price_max, avg_rating,
       view_count, created_at,
-      images:product_images (
+      product_images (
         id, image_url, position
       )
     `)

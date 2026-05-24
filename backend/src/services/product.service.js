@@ -402,12 +402,9 @@ const getAllProducts = async (query) => {
     resolvedCategoryId = matchedCategory.id;
   }
 
-  // Filter products to verified sellers only using an inner join — avoids loading
-  // all seller IDs into memory first.
   let dbQuery = supabaseAdmin
     .from('products')
-    .select(`${PRODUCT_BASE_COLUMNS}, sellers!inner(id)`, { count: 'exact' })
-    .eq('sellers.is_verified', true)
+    .select(PRODUCT_BASE_COLUMNS, { count: 'exact' })
     .eq('is_active', true);
 
   if (resolvedCategoryId) dbQuery = dbQuery.eq('category_id', resolvedCategoryId);
@@ -448,11 +445,6 @@ const getProductById = async (id, user = null) => {
   if (!id) throw new AppError('Product ID is required', 400);
 
   const product = await fetchSingleProduct(id, { includeInactive: false });
-
-  // Hide products from unverified sellers except for admins
-  if (!product.seller?.is_verified && user?.role !== 'admin') {
-    throw new AppError('Product not found', 404);
-  }
 
   incrementViewCount(id);
   if (user?.id) trackBrowsingEvent(user.id, id, 'view');

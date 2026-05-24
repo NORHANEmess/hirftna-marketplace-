@@ -326,7 +326,7 @@ GET    /categories                    → all (public)
 GET    /categories/slug/:slug         → by slug (public)
 
 // SELLERS
-GET    /sellers                            → browse verified (public)
+GET    /sellers                            → browse all sellers (public)
 GET    /sellers/:id                        → public profile (public)
 GET    /sellers/me                         → own full profile (seller)
 GET    /sellers/me/verification-status     → own verification status (seller)
@@ -582,8 +582,8 @@ Phase 14 — UI Polish ✅ COMPLETE
 └── F56 ✅ SellerProfileEdit — AvatarUploader onError prop shows toast
 
 Phase 16 — Seller Activation + Promotions ✅ COMPLETE
-├── F57 ✅ SellerDashboard.jsx — activation banner (is_verified=false), "Boost My Shop" quick action
-├── F58 ✅ SellerProducts.jsx — unverified warning banner
+├── F57 ✅ SellerDashboard.jsx — earn-badge info card (informational only; all sellers can sell without verification)
+├── F58 ✅ SellerProducts.jsx — all products visible; no unverified warning banner
 ├── F59 ✅ SellerPromotions.jsx at /seller/promotions (RequireSeller) — submit/view promotion status
 ├── F60 ✅ HeroCarousel.jsx — auto-advancing carousel with touch swipe + reduced-motion support
 ├── F61 ✅ HomePage.jsx — hero carousel when promotions active, static hero fallback
@@ -719,7 +719,7 @@ VITE_SUPABASE_ANON_KEY=...
 
 ---
 
-*Last updated: 2026-05-20*
+*Last updated: 2026-05-24*
 *Frontend Phases 1–14, 16, 17, and 18 complete. All backend endpoints wired. Deployed to production.*
 *Admin account: set role='admin' directly in Supabase DB. Chatbot: requires GEMINI_API_KEY in backend .env.*
 *Animation note: all animations respect prefers-reduced-motion. RTL swaps fadeInLeft ↔ fadeInRight automatically.*

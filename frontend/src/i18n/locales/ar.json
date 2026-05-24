@@ -198,7 +198,10 @@
     "responseTime": "يرد عادةً في غضون ساعتين",
     "clientFallback": "عميل",
     "editShop": "تعديل ملف المتجر",
-    "editShopSubtitle": "تحديث القصة والصورة والمعلومات"
+    "editShopSubtitle": "تحديث القصة والصورة والمعلومات",
+    "earnBadge": "احصل على شارة التوثيق",
+    "earnBadgeDesc": "أكمل ملفك الشخصي، أضف منتجات، وابنِ سمعتك للحصول على شارة ✓ التوثيق.",
+    "verifiedSeller": "بائع موثّق"
   },
   "customOrder": {
     "title": "طلب مخصص",
@@ -341,8 +344,12 @@
   "auth": {
     "logout": "تسجيل الخروج",
     "logoutSubtitle": "إنهاء جلستك",
+    "sendingCode": "جاري إرسال رمز التحقق...",
+    "welcomeMessage": "مرحباً بك في حرفتنا!",
     "otp": {
       "sentTo": "أرسلنا رمز التحقق إلى",
+      "sending": "الرمز في الطريق...",
+      "checkingInbox": "نتحقق من صندوق الوارد",
       "noCode": "لم تستلم الرمز؟",
       "tryAgain": "إعادة إرسال الرمز"
     },
@@ -749,9 +756,9 @@
     "endingSoon": "تنتهي قريباً",
     "successTitle": "تم إرسال الطلب!",
     "successBody": "سنراجع طلب الترقية ونفعّله قريباً.",
-    "heroBadge": "✦ حرفي مميز",
+    "heroBadge": "✦ بائع مُروَّج",
     "visitShop": "زيارة المتجر",
-    "heroCarouselLabel": "الحرفيون المميزون",
+    "heroCarouselLabel": "بائعون مُروّجون",
     "slideN": "الشريحة {{n}}",
     "featuredSellers": "البائعون المميزون",
     "boostProduct": {

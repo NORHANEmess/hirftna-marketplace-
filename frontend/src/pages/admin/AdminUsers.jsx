@@ -576,7 +576,7 @@ export default function AdminUsers() {
       <div className="flex-1 pb-28 md:pb-10">
 
       {/* ── Header (sticky) ─────────────────────────────────── */}
-      <div className="bg-white border-b border-beige-200 px-4 pt-5 pb-0 sticky top-0 z-20">
+      <div className="bg-white border-b border-beige-200 px-4 pt-5 pb-0 sticky top-14 z-30">
         <Link
           to="/admin"
           className="text-xs text-sage-600 hover:text-sage-700 mb-3 inline-flex items-center gap-1 transition-colors"

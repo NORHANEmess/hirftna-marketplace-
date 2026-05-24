@@ -198,7 +198,10 @@
     "responseTime": "Usually responds within 2 hours",
     "clientFallback": "Client",
     "editShop": "Edit Shop Profile",
-    "editShopSubtitle": "Update your story, photo and info"
+    "editShopSubtitle": "Update your story, photo and info",
+    "earnBadge": "Earn your verified badge",
+    "earnBadgeDesc": "Complete your profile, add products, and build your reputation to earn the ✓ verified badge.",
+    "verifiedSeller": "Verified Seller"
   },
   "customOrder": {
     "title": "Custom Order Request",
@@ -341,8 +344,12 @@
   "auth": {
     "logout": "Sign Out",
     "logoutSubtitle": "End your session",
+    "sendingCode": "Sending verification code...",
+    "welcomeMessage": "Welcome to Hirftna!",
     "otp": {
       "sentTo": "We sent a verification code to",
+      "sending": "Code on its way...",
+      "checkingInbox": "Checking your inbox",
       "noCode": "Didn't receive the code?",
       "tryAgain": "Resend code"
     },
@@ -751,9 +758,9 @@
     "endingSoon": "Ending soon",
     "successTitle": "Request Submitted!",
     "successBody": "We'll review your promotion request and activate it shortly.",
-    "heroBadge": "✦ Featured Artisan",
+    "heroBadge": "✦ Promoted Seller",
     "visitShop": "Visit Shop",
-    "heroCarouselLabel": "Featured Artisans",
+    "heroCarouselLabel": "Promoted Sellers",
     "slideN": "Slide {{n}}",
     "featuredSellers": "Featured Sellers",
     "boostProduct": {

@@ -175,6 +175,11 @@ export default function SellerPage() {
             )}
           </div>
 
+          {/* Bio */}
+          {seller.bio && (
+            <p className="text-sm text-warm-600 leading-relaxed mb-3">{seller.bio}</p>
+          )}
+
           {/* Response time */}
           <div className="flex items-center gap-1.5 text-xs text-warm-400 mb-5">
             <Clock size={12} className="text-brick-400" />
