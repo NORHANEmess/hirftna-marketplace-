@@ -100,7 +100,12 @@ export default function LoginPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-3xl border border-beige-200 shadow-soft p-7">
+        <div className="relative bg-white rounded-3xl border border-beige-200 shadow-soft p-7">
+          {loading && !inOtpStep && (
+            <div className="absolute inset-0 bg-white/75 rounded-3xl flex items-center justify-center z-10">
+              <Loader size={28} className="animate-spin text-sage-500" />
+            </div>
+          )}
           {inOtpStep ? (
             <OtpStep
               email={pendingEmail}
@@ -195,18 +200,22 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 border-t border-beige-200" />
-            <span className="text-xs text-warm-400 font-medium">{t('common.or')}</span>
-            <div className="flex-1 border-t border-beige-200" />
-          </div>
+          {!inOtpStep && (
+            <>
+              <div className="flex items-center gap-3 my-5">
+                <div className="flex-1 border-t border-beige-200" />
+                <span className="text-xs text-warm-400 font-medium">{t('common.or')}</span>
+                <div className="flex-1 border-t border-beige-200" />
+              </div>
 
-          <p className="text-center text-sm text-warm-500">
-            {t('auth.login.registerPrompt')}{' '}
-            <Link to="/register" className="text-sage-600 font-semibold hover:text-sage-700 hover:underline transition-colors">
-              {t('auth.login.registerLink')}
-            </Link>
-          </p>
+              <p className="text-center text-sm text-warm-500">
+                {t('auth.login.registerPrompt')}{' '}
+                <Link to="/register" className="text-sage-600 font-semibold hover:text-sage-700 hover:underline transition-colors">
+                  {t('auth.login.registerLink')}
+                </Link>
+              </p>
+            </>
+          )}
         </div>
 
         <p className="text-center text-xs text-warm-400 mt-5 leading-relaxed">

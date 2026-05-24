@@ -630,6 +630,8 @@ const deleteProduct = async (userId, productId) => {
     supabaseAdmin.from('reviews').delete().eq('product_id', productId),
     supabaseAdmin.from('wishlist').delete().eq('product_id', productId),
     supabaseAdmin.from('product_images').delete().eq('product_id', productId),
+    supabaseAdmin.from('promotions').delete().eq('product_id', productId),
+    supabaseAdmin.from('order_items').delete().eq('product_id', productId),
   ]);
 
   const { error } = await supabaseAdmin

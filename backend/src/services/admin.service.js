@@ -342,7 +342,7 @@ const verifySeller = async (sellerId, isVerified) => {
 // ─────────────────────────────────────────────────────────────
 // DELETE PRODUCT (admin force-delete)
 // Must remove related records first to avoid FK constraint violations:
-// product_images, wishlist, reviews, browsing_events all reference product_id
+// product_images, wishlist, reviews, browsing_events, promotions, order_items all reference product_id
 // ─────────────────────────────────────────────────────────────
 const deleteProduct = async (productId) => {
   const { data: product, error: findError } = await supabaseAdmin
@@ -359,6 +359,8 @@ const deleteProduct = async (productId) => {
     supabaseAdmin.from('reviews').delete().eq('product_id', productId),
     supabaseAdmin.from('wishlist').delete().eq('product_id', productId),
     supabaseAdmin.from('product_images').delete().eq('product_id', productId),
+    supabaseAdmin.from('promotions').delete().eq('product_id', productId),
+    supabaseAdmin.from('order_items').delete().eq('product_id', productId),
   ]);
 
   for (const { error: cleanupErr } of cleanups) {
