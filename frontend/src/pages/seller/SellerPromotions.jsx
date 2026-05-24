@@ -12,9 +12,10 @@ const DURATION_OPTIONS = [7, 14, 30];
 const PRICE_PER_DAY = 500;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-function formatDate(dateString) {
+function formatDate(dateString, lang) {
   if (!dateString) return '—';
-  return new Date(dateString).toLocaleDateString('en-GB', {
+  const locale = lang === 'ar' ? 'ar-DZ' : 'en-GB';
+  return new Date(dateString).toLocaleDateString(locale, {
     day: 'numeric', month: 'short', year: 'numeric',
   });
 }
@@ -107,7 +108,7 @@ function DurationSelector({ selected, onChange }) {
 
 // ─── Active Promotion Countdown ───────────────────────────────────────────────
 function ActivePromotionCard({ promotion }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const remaining = daysLeft(promotion.ends_at);
   const percent   = elapsedPercent(promotion.starts_at, promotion.ends_at);
   const isEndingSoon = remaining !== null && remaining <= 2 && remaining > 0;
@@ -121,7 +122,7 @@ function ActivePromotionCard({ promotion }) {
 
   let countdownText;
   if (isExpiredNow) {
-    countdownText = t('promotions.expiredOn', { date: formatDate(promotion.ends_at) });
+    countdownText = t('promotions.expiredOn', { date: formatDate(promotion.ends_at, lang) });
   } else if (remaining === 1) {
     countdownText = t('promotions.expiresToday');
   } else {
@@ -137,11 +138,11 @@ function ActivePromotionCard({ promotion }) {
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-cream-100 rounded-xl p-3">
           <p className="text-[10px] text-warm-400 uppercase tracking-wide mb-0.5">{t('promotions.starts')}</p>
-          <p className="text-sm font-semibold text-warm-800">{formatDate(promotion.starts_at)}</p>
+          <p className="text-sm font-semibold text-warm-800">{formatDate(promotion.starts_at, lang)}</p>
         </div>
         <div className="bg-cream-100 rounded-xl p-3">
           <p className="text-[10px] text-warm-400 uppercase tracking-wide mb-0.5">{t('promotions.expires')}</p>
-          <p className="text-sm font-semibold text-warm-800">{formatDate(promotion.ends_at)}</p>
+          <p className="text-sm font-semibold text-warm-800">{formatDate(promotion.ends_at, lang)}</p>
         </div>
       </div>
 
@@ -169,7 +170,7 @@ function ActivePromotionCard({ promotion }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function SellerPromotions() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   // Hero/browse promotion state
   const [promotion, setPromotion]   = useState(undefined);
@@ -249,7 +250,9 @@ export default function SellerPromotions() {
     }
   }
 
-  const canRequest = promotion === null || promotion?.status === 'expired' || promotion?.status === 'rejected';
+  const isRejected = promotion?.status === 'rejected';
+  const isExpired  = promotion?.status === 'expired';
+  const canRequest = promotion === null || isExpired || isRejected;
 
   return (
     <div className="min-h-screen bg-cream-100 md:flex">
@@ -292,7 +295,7 @@ export default function SellerPromotions() {
               <p className="text-sm font-bold text-danger">{t('promotions.rejectedTitle')}</p>
             </div>
             {promotion.rejection_reason && (
-              <p className="text-xs text-warm-600 leading-relaxed">{t('promotions.rejectedReason')}: {promotion.rejection_reason}</p>
+              <p className="text-xs text-warm-600 leading-relaxed">{t('promotions.rejectedReason', { reason: promotion.rejection_reason })}</p>
             )}
           </div>
         ) : null}
@@ -344,7 +347,7 @@ export default function SellerPromotions() {
                 className="w-full flex items-center justify-center gap-2 py-3 bg-sage-500 hover:bg-sage-600 disabled:opacity-60 text-white text-sm font-semibold rounded-2xl transition-colors"
               >
                 {submitting ? <Loader2 size={16} className="animate-spin" /> : <ChevronRight size={16} />}
-                {submitting ? t('common.loading') : t('promotions.requestCta')}
+                {submitting ? t('common.loading') : (isRejected || isExpired) ? t('promotions.requestAgain') : t('promotions.requestCta')}
               </button>
 
               <p className="text-[10px] text-warm-400 text-center">{t('promotions.adminNote')}</p>
@@ -476,7 +479,7 @@ export default function SellerPromotions() {
                     {pp.status === 'active' && remaining !== null && (
                       <p className={`text-[10px] font-semibold mt-0.5 ${remaining <= 2 ? 'text-amber-600' : 'text-sage-600'}`}>
                         {remaining <= 0
-                          ? t('promotions.expiredOn', { date: formatDate(pp.ends_at) })
+                          ? t('promotions.expiredOn', { date: formatDate(pp.ends_at, lang) })
                           : t('promotions.daysRemaining', { days: remaining })}
                       </p>
                     )}

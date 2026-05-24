@@ -5,26 +5,7 @@ import Toast from '../components/ui/Toast';
 import { formatRelativeTime } from '../utils/formatPrice';
 import { Spinner } from '../components/ui/Spinner';
 import { useTranslation } from '../i18n/index.jsx';
-
-// ─── i18n content map — keeps DB body out of the UI ──────────────────────────
-function getNotificationContent(notification, t) {
-  const bodyKeyMap = {
-    new_order:       'notifications.new_order_body',
-    order_received:  'notifications.new_order_body',
-    order_accepted:  'notifications.order_accepted_body',
-    order_rejected:  'notifications.order_rejected_body',
-    order_ready:     'notifications.order_ready_body',
-    order_completed: 'notifications.order_completed_body',
-  };
-
-  const title = t(`notifications.types.${notification.type}`) || t('notifications.types.system');
-  const bodyKey = bodyKeyMap[notification.type];
-  const body = bodyKey
-    ? t(bodyKey)
-    : (notification.body || notification.message || '');
-
-  return { title, body };
-}
+import { getNotificationText } from '../utils/notificationText';
 
 // ─── Type config ──────────────────────────────────────────────────────────────
 const TYPE_CONFIG = {
@@ -39,12 +20,12 @@ const TYPE_CONFIG = {
 
 // ─── Single Notification Item ─────────────────────────────────────────────────
 function NotifItem({ notif, onMarkRead }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const config  = TYPE_CONFIG[notif.type] ?? TYPE_CONFIG.system;
   const { Icon } = config;
   const isUnread = !notif.is_read;
 
-  const { title, body } = getNotificationContent(notif, t);
+  const { title, body } = getNotificationText(notif, t);
 
   return (
     <div
@@ -68,7 +49,7 @@ function NotifItem({ notif, onMarkRead }) {
         {body && (
           <p className="text-xs text-warm-500 leading-relaxed mb-1">{body}</p>
         )}
-        <p className="text-[10px] text-warm-400">{formatRelativeTime(notif.created_at, t)}</p>
+        <p className="text-[10px] text-warm-400">{formatRelativeTime(notif.created_at, t, lang)}</p>
       </div>
 
       {/* Unread indicator dot */}

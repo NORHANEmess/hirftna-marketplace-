@@ -95,7 +95,7 @@ export default function AdminDashboard() {
         {/* Top stats row */}
         <div className="grid grid-cols-2 gap-3">
           <StatCard icon={Users}       label={t('admin.totalUsers')}   value={stats?.users?.total ?? '—'}                                  loading={loading} />
-          <StatCard icon={Package}     label={t('admin.totalProducts')} value={stats?.products?.total ?? '—'} sub={`${stats?.products?.active ?? 0} active`} loading={loading} />
+          <StatCard icon={Package}     label={t('admin.totalProducts')} value={stats?.products?.total ?? '—'} sub={t('admin.activeCount', { count: stats?.products?.active ?? 0 })} loading={loading} />
           <StatCard icon={ShoppingBag} label={t('admin.totalOrders')}   value={stats?.orders?.total ?? '—'}                                 loading={loading} />
           <StatCard icon={TrendingUp}  label={t('admin.totalRevenue')}  value={stats ? formatCurrency(stats.revenue?.total) : '—'} accent   loading={loading} />
         </div>

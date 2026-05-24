@@ -6,15 +6,16 @@ import { extractApiEntity, notificationsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
 export default function MainLayout() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading: authLoading, clearSession } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (authLoading || !isAuthenticated) {
       return undefined;
     }
 
     let cancelled = false;
+    let interval = null;
 
     const fetchCount = () => {
       notificationsAPI.getUnreadCount()
@@ -24,17 +25,38 @@ export default function MainLayout() {
           const count = payload.unreadCount ?? payload.count ?? 0;
           setUnreadCount(Number(count));
         })
-        .catch(() => {});
+        .catch((err) => {
+          if (cancelled) return;
+          if (err?.response?.status === 401) {
+            clearSession();
+          }
+        });
     };
 
-    fetchCount();
-    const interval = setInterval(fetchCount, 60_000);
+    const startPolling = () => {
+      fetchCount();
+      interval = setInterval(fetchCount, 120_000); // 2 minutes — notifications aren't instant-critical
+    };
+
+    const stopPolling = () => {
+      clearInterval(interval);
+      interval = null;
+    };
+
+    const handleVisibility = () => {
+      if (document.hidden) stopPolling();
+      else startPolling();
+    };
+
+    startPolling();
+    document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
       cancelled = true;
-      clearInterval(interval);
+      stopPolling();
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, authLoading, clearSession]);
 
   const visibleUnreadCount = isAuthenticated ? unreadCount : 0;
 

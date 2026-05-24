@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Heart,
   LayoutDashboard,
+  LogOut,
   Menu,
   Package,
   Search,
@@ -286,7 +287,7 @@ function MobileCategoriesSheet({ categories, open, onClose }) {
 
 function MobileMenu({ open, onClose, categories, unreadCount }) {
   const { t } = useTranslation();
-  const { isAuthenticated, isAdmin, isSeller } = useAuth();
+  const { isAuthenticated, isAdmin, isSeller, logout } = useAuth();
   const navigate = useNavigate();
 
   const accountLinks = useMemo(() => {
@@ -362,6 +363,17 @@ function MobileMenu({ open, onClose, categories, unreadCount }) {
               })}
             </div>
           </div>
+
+          {isAuthenticated && (
+            <button
+              type="button"
+              onClick={async () => { onClose(); await logout(); navigate('/'); }}
+              className="w-full flex items-center gap-3 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-danger text-start hover:bg-red-100 transition-colors"
+            >
+              <LogOut size={16} className="flex-shrink-0" />
+              <span>{t('auth.logout')}</span>
+            </button>
+          )}
 
           <LanguageSwitcher variant="full" />
         </div>

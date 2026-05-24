@@ -9,6 +9,7 @@ import {
   Search,
   ShoppingBag,
   Tag,
+  TrendingUp,
   User,
   Users,
 } from 'lucide-react';
@@ -87,15 +88,15 @@ export default function BottomNav({ unreadCount = 0 }) {
     { icon: Search, label: t('bottomNav.browse'), path: '/browse', auth: false },
     { icon: ClipboardList, label: t('bottomNav.orders'), path: '/seller/orders', auth: true },
     { icon: Bell, label: t('bottomNav.notifications'), path: '/notifications', auth: true },
-    { icon: User, label: t('bottomNav.profile'), path: '/seller/dashboard', auth: true },
+    { icon: LayoutDashboard, label: t('bottomNav.dashboard'), path: '/seller/dashboard', auth: true },
   ];
 
   const adminNav = [
-    { icon: LayoutDashboard, label: t('bottomNav.dashboard'), path: '/admin', auth: true },
-    { icon: Users, label: t('bottomNav.users'), path: '/admin/users', auth: true },
-    { icon: Package, label: t('bottomNav.products'), path: '/admin/products', auth: true },
-    { icon: Tag, label: t('bottomNav.categories'), path: '/admin/categories', auth: true },
-    { icon: User, label: t('bottomNav.profile'), path: '/profile', auth: true },
+    { icon: LayoutDashboard, label: t('bottomNav.dashboard'),   path: '/admin',             auth: true },
+    { icon: Users,           label: t('bottomNav.users'),        path: '/admin/users',       auth: true },
+    { icon: Package,         label: t('bottomNav.products'),     path: '/admin/products',    auth: true },
+    { icon: TrendingUp,      label: t('bottomNav.promotions'),   path: '/admin/promotions',  auth: true },
+    { icon: Tag,             label: t('bottomNav.categories'),   path: '/admin/categories',  auth: true },
   ];
 
   const navItems = isAdmin

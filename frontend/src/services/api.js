@@ -367,8 +367,24 @@ export const clientRatingsAPI = {
 };
 
 // ================== CATEGORIES ==================
+// getAll is cached in memory — categories rarely change.
+// All pages share the same result; at most one network call per 10 minutes.
+let _categoriesCache = null;
+let _categoriesCacheTime = 0;
+const _CATEGORIES_TTL = 10 * 60 * 1000; // 10 minutes
+
 export const categoriesAPI = {
-  getAll:    ()          => api.get('/categories'),
+  getAll: async () => {
+    const now = Date.now();
+    if (_categoriesCache && (now - _categoriesCacheTime) < _CATEGORIES_TTL) {
+      return _categoriesCache;
+    }
+    const res = await api.get('/categories');
+    _categoriesCache = res;
+    _categoriesCacheTime = Date.now();
+    return res;
+  },
+  invalidateCache: () => { _categoriesCache = null; },
   getById:   (id)        => api.get(`/categories/${id}`),
   getBySlug: (slug)      => api.get(`/categories/slug/${slug}`),
   create:    (data)      => api.post('/categories', data),

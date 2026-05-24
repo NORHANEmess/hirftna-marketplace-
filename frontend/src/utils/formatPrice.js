@@ -79,7 +79,10 @@ export function formatDate(dateStr, options = {}) {
     const {
         style = 'medium', // 'short' | 'medium' | 'long'
         locale = 'en-GB',
+        lang = null,
     } = options;
+
+    const resolvedLocale = lang ? (lang === 'ar' ? 'ar-DZ' : 'en-GB') : locale;
 
     const formats = {
         short: { month: 'short', day: 'numeric' },
@@ -87,7 +90,7 @@ export function formatDate(dateStr, options = {}) {
         long: { year: 'numeric', month: 'long', day: 'numeric' },
     };
 
-    return date.toLocaleDateString(locale, formats[style] || formats.medium);
+    return date.toLocaleDateString(resolvedLocale, formats[style] || formats.medium);
 }
 
 /**
@@ -95,7 +98,7 @@ export function formatDate(dateStr, options = {}) {
  * @param {string} dateStr - ISO date string
  * @returns {string}
  */
-export function formatRelativeTime(dateStr, t = null) {
+export function formatRelativeTime(dateStr, t = null, lang = null) {
     if (!dateStr) return '—';
 
     const date = new Date(dateStr);
@@ -125,7 +128,7 @@ export function formatRelativeTime(dateStr, t = null) {
         if (months < 12) return `${months}mo ago`;
     }
 
-    return formatDate(dateStr, { style: 'short' });
+    return formatDate(dateStr, { style: 'short', lang });
 }
 
 /**

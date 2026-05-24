@@ -220,6 +220,7 @@ export function AuthProvider({ children }) {
       clearPendingOtp,
       register,
       logout,
+      clearSession: clearAuthState,
       updateUser,
       changePassword,
       isAuthenticated,
@@ -236,6 +237,7 @@ export function AuthProvider({ children }) {
     clearPendingOtp,
     register,
     logout,
+    clearAuthState,
     updateUser,
     changePassword,
   ]);

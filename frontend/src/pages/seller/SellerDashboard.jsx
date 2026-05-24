@@ -32,7 +32,7 @@ function formatCurrency(value) {
   return `${Number(value).toLocaleString()} DA`;
 }
 
-function formatRelativeTime(dateString, t) {
+function formatRelativeTime(dateString, t, lang = 'en') {
   if (!dateString) {
     return '';
   }
@@ -44,7 +44,7 @@ function formatRelativeTime(dateString, t) {
   if (minutes < 60) return t('common.minutesAgo', { count: minutes });
   if (hours < 24) return t('common.hoursAgo', { count: hours });
   if (days < 7) return t('common.daysAgo', { count: days });
-  return new Date(dateString).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return new Date(dateString).toLocaleDateString(lang === 'ar' ? 'ar-DZ' : 'en-GB', { day: 'numeric', month: 'short' });
 }
 
 const STATUS_STYLES = {
@@ -107,7 +107,7 @@ function QuickAction({ to, icon, label, desc, primary = false }) {
 }
 
 function OrderRow({ order }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const navigate = useNavigate();
   const styles = STATUS_STYLES[order.status] ?? STATUS_STYLES.pending;
   const statusLabel = t(`orders.statuses.${order.status}`) || order.status;
@@ -137,7 +137,7 @@ function OrderRow({ order }) {
         <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${styles.bg} ${styles.color}`}>
           {statusLabel}
         </span>
-        <span className="text-[9px] text-warm-400">{formatRelativeTime(order.created_at, t)}</span>
+        <span className="text-[9px] text-warm-400">{formatRelativeTime(order.created_at, t, lang)}</span>
       </div>
     </div>
   );
@@ -346,8 +346,8 @@ export default function SellerDashboard() {
             <QuickAction to="/seller/products" icon={Plus} label={t('sellerDashboard.addProduct')} desc={t('sellerDashboard.addProductSub')} primary />
             <QuickAction to="/seller/orders" icon={ShoppingBag} label={t('sellerDashboard.viewOrders')} desc={t('sellerDashboard.viewOrdersSub')} />
             <QuickAction to="/seller/promotions" icon={TrendingUp} label={t('sellerDashboard.boostShop')} desc={t('sellerDashboard.boostShopSub')} />
-            <QuickAction to="/wishlist" icon={Heart} label={t('sellerDashboard.wishlist')} desc={t('sellerDashboard.wishlistSub')} />
-            <QuickAction to="/seller/profile" icon={LayoutDashboard} label={t('sellerDashboard.editProfile')} desc={t('sellerDashboard.editProfileSub')} />
+            <QuickAction to="/wishlist" icon={Heart} label={t('nav.wishlist')} desc={t('profile.menu.savedItems')} />
+            <QuickAction to="/seller/profile" icon={LayoutDashboard} label={t('seller.editShop')} desc={t('seller.editShopSubtitle')} />
             <button
               type="button"
               onClick={handleLogout}
@@ -358,8 +358,8 @@ export default function SellerDashboard() {
                 {loggingOut ? <Loader2 size={17} className="text-danger animate-spin" /> : <LogOut size={17} className="text-danger" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-warm-800">{t('desktopNav.signOut')}</p>
-                <p className="text-[10px] text-warm-400">{t('sellerDashboard.signOutSub')}</p>
+                <p className="text-sm font-semibold text-warm-800">{t('auth.logout')}</p>
+                <p className="text-[10px] text-warm-400">{t('auth.logoutSubtitle')}</p>
               </div>
               <ChevronRight size={14} className="text-warm-400" />
             </button>

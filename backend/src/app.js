@@ -86,14 +86,36 @@ app.use(morgan('combined', {
 }));
 
 // ─────────────────────────────────────────────────────────────
-// 3. RATE LIMITING
+// 3. PROXY TRUST
+// Must be set before rate limiters so express-rate-limit reads
+// the real client IP from X-Forwarded-For (not Render's proxy IP).
+// Without this, every user shares ONE rate limit bucket.
+// ─────────────────────────────────────────────────────────────
+app.set('trust proxy', 1);
+
+// ─────────────────────────────────────────────────────────────
+// 4. RATE LIMITING
 // Applied after body parsing so the body is available if needed
 // ─────────────────────────────────────────────────────────────
+
+// Public read limiter — generous limit for browsing endpoints
+// Categories and products are hit constantly during normal browsing
+const publicReadLimiter = rateLimit({
+  windowMs:        15 * 60 * 1000,
+  max:             2000,
+  standardHeaders: true,
+  legacyHeaders:   false,
+  message: {
+    success: false,
+    message: 'Too many requests. Please slow down.',
+    errors:  null,
+  },
+});
 
 // Global rate limit — all API routes
 const globalLimiter = rateLimit({
   windowMs:        15 * 60 * 1000, // 15 minutes
-  max:             100,             // max 100 requests per window
+  max:             500,             // 500 req/window — SPA sessions make many legitimate calls
   standardHeaders: true,
   legacyHeaders:   false,
   message: {
@@ -102,18 +124,18 @@ const globalLimiter = rateLimit({
     errors:  null,
   },
   skip: (req) => {
-    // Skip rate limiting for health check
     return req.path === '/health';
   },
 });
 app.use('/api', globalLimiter);
 
-// Strict rate limit — auth routes only
+// Strict rate limit — auth routes only (brute force protection)
 const authLimiter = rateLimit({
-  windowMs:        15 * 60 * 1000, // 15 minutes
-  max:             10,              // max 10 auth attempts
-  standardHeaders: true,
-  legacyHeaders:   false,
+  windowMs:               15 * 60 * 1000, // 15 minutes
+  max:                    30,              // 30 failed attempts per window
+  skipSuccessfulRequests: true,            // successful logins don't count
+  standardHeaders:        true,
+  legacyHeaders:          false,
   skip: (req) => req.path === '/me' && req.method === 'GET',
   message: {
     success: false,
@@ -152,10 +174,10 @@ app.get('/favicon.ico', (req, res) => res.status(204).end());
 app.use('/api/v1/auth', require('./routes/auth.routes'));
 
 // Phase 3 — Categories (STEP 21)
- app.use('/api/v1/categories', require('./routes/category.routes'));
+app.use('/api/v1/categories', publicReadLimiter, require('./routes/category.routes'));
 
 // Phase 4 — Products (STEP 25)
-  app.use('/api/v1/products', require('./routes/product.routes'));
+app.use('/api/v1/products', publicReadLimiter, require('./routes/product.routes'));
 
 // Phase 5 — File Uploads (STEP 28)
  app.use('/api/v1/uploads', require('./routes/upload.routes'));

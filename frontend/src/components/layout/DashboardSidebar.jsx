@@ -28,7 +28,7 @@ export default function DashboardSidebar({ role = 'seller' }) {
     <aside className="hidden md:flex flex-col w-52 flex-shrink-0 border-r border-beige-200 bg-white sticky top-14 self-start h-[calc(100dvh-3.5rem)] overflow-y-auto">
       <div className="px-3 pt-5 pb-2">
         <p className="text-[9px] font-bold tracking-[0.18em] text-warm-400 uppercase px-3 mb-2">
-          {role === 'admin' ? 'Admin Panel' : t('sellerDashboard.nav.overview')}
+          {role === 'admin' ? t('admin.adminPanel') : t('sellerDashboard.nav.overview')}
         </p>
       </div>
       <nav className="flex flex-col gap-0.5 px-3 pb-6">

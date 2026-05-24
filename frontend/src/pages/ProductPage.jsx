@@ -16,7 +16,7 @@ import { formatProductPrice } from '../components/product/ProductCard';
 import { useTranslation } from '../i18n/index.jsx';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function formatRelativeTime(dateStr, t) {
+function formatRelativeTime(dateStr, t, lang = 'en') {
   if (!dateStr) return '';
   const diff  = Date.now() - new Date(dateStr).getTime();
   const mins  = Math.floor(diff / 60000);
@@ -26,7 +26,7 @@ function formatRelativeTime(dateStr, t) {
   if (mins  < 60) return t('common.minutesAgo', { count: mins });
   if (hours < 24) return t('common.hoursAgo', { count: hours });
   if (days  < 7)  return t('common.daysAgo', { count: days });
-  return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return new Date(dateStr).toLocaleDateString(lang === 'ar' ? 'ar-DZ' : 'en-GB', { day: 'numeric', month: 'short' });
 }
 
 // ─── Image Gallery ────────────────────────────────────────────────────────────
@@ -164,7 +164,7 @@ function Stars({ rating, size = 12 }) {
 
 // ─── Review Card ──────────────────────────────────────────────────────────────
 function ReviewCard({ review }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const client = review.client;
   const initial = client?.full_name?.[0]?.toUpperCase();
   return (
@@ -193,7 +193,7 @@ function ReviewCard({ review }) {
           </div>
         </div>
         <span className="text-[10px] text-warm-400 flex-shrink-0">
-          {formatRelativeTime(review.created_at, t)}
+          {formatRelativeTime(review.created_at, t, lang)}
         </span>
       </div>
       {review.comment && (

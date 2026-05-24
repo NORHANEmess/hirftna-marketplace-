@@ -8,9 +8,10 @@ import { useTranslation } from '../../i18n/index.jsx';
 import DashboardSidebar from '../../components/layout/DashboardSidebar';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function formatDate(dateStr) {
+function formatDate(dateStr, lang) {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('en-GB', {
+  const locale = lang === 'ar' ? 'ar-DZ' : 'en-GB';
+  return new Date(dateStr).toLocaleDateString(locale, {
     day: 'numeric', month: 'short', year: 'numeric',
   });
 }
@@ -104,7 +105,7 @@ function RejectModal({ promotion, onConfirm, onClose, loading }) {
 
 // ─── Promotion Card ───────────────────────────────────────────────────────────
 function PromotionCard({ promotion, onActivate, onReject, activating, rejecting }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const seller = promotion.seller;
   const user   = seller?.user;
 
@@ -132,15 +133,15 @@ function PromotionCard({ promotion, onActivate, onReject, activating, rejecting 
           <p className="text-[9px] text-warm-400">{t('adminPromotions.duration')}</p>
         </div>
         <div className="bg-cream-100 rounded-xl py-2 px-1">
-          <p className="text-xs font-bold text-warm-800">{formatDate(promotion.created_at)}</p>
+          <p className="text-xs font-bold text-warm-800">{formatDate(promotion.created_at, lang)}</p>
           <p className="text-[9px] text-warm-400">{t('adminPromotions.requested')}</p>
         </div>
       </div>
 
       {promotion.status === 'active' && promotion.ends_at && (
         <p className="text-xs text-sage-600 font-medium">
-          {t('adminPromotions.expiresOn', { date: formatDate(promotion.ends_at) })}
-          {daysLeft(promotion.ends_at) !== null && ` (${daysLeft(promotion.ends_at)}d left)`}
+          {t('adminPromotions.expiresOn', { date: formatDate(promotion.ends_at, lang) })}
+          {daysLeft(promotion.ends_at) !== null && ` ${t('adminPromotions.daysLeft', { days: daysLeft(promotion.ends_at) })}`}
         </p>
       )}
 

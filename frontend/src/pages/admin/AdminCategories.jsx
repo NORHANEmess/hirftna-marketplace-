@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Pencil, Trash2, AlertTriangle, Loader2, Tag } from 'lucide-react';
 import { categoriesAPI, resolveApiError } from '../../services/api';
 import { useTranslation } from '../../i18n/index.jsx';
+import { getCategoryName } from '../../utils/categoryHelpers';
 import DashboardSidebar from '../../components/layout/DashboardSidebar';
 
 function slugify(str) {
@@ -16,7 +17,7 @@ function slugify(str) {
 const EMPTY_FORM = { name: '', slug: '', icon_url: '' };
 
 export default function AdminCategories() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -131,6 +132,7 @@ export default function AdminCategories() {
         await categoriesAPI.update(editTarget.id, payload);
         showToast('success', t('admin.categories.updateSuccess'));
       }
+      categoriesAPI.invalidateCache();
       closeModal();
       fetchCategories();
     } catch (err) {
@@ -147,6 +149,7 @@ export default function AdminCategories() {
     setDeleteError(null);
     try {
       await categoriesAPI.delete(deleteTarget.id);
+      categoriesAPI.invalidateCache();
       showToast('success', t('admin.categories.deleteSuccess'));
       closeModal();
       fetchCategories();
@@ -178,13 +181,13 @@ export default function AdminCategories() {
       {/* Header */}
       <div className="bg-white border-b border-beige-200 px-4 pt-6 pb-4">
         <Link to="/admin" className="text-xs text-sage-600 hover:text-sage-700 mb-2 inline-block">
-          ← Dashboard
+          {t('common.backToDashboard')}
         </Link>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-warm-900">{t('admin.categories.title')}</h1>
             {!loading && (
-              <p className="text-xs text-warm-400 mt-1">{categories.length} total</p>
+              <p className="text-xs text-warm-400 mt-1">{t('common.total', { count: categories.length })}</p>
             )}
           </div>
           <button
@@ -256,7 +259,7 @@ export default function AdminCategories() {
                       key={cat.id}
                       className="border-b border-beige-50 last:border-0 hover:bg-cream-50 transition-colors"
                     >
-                      <td className="px-4 py-3 font-medium text-warm-900">{cat.name}</td>
+                      <td className="px-4 py-3 font-medium text-warm-900">{getCategoryName(cat.slug, cat.name, t)}</td>
                       <td className="px-4 py-3 hidden sm:table-cell">
                         <span className="text-xs text-warm-400 font-mono bg-beige-50 px-2 py-0.5 rounded-lg">
                           {cat.slug}
@@ -273,7 +276,7 @@ export default function AdminCategories() {
                       </td>
                       <td className="px-4 py-3 text-xs text-warm-400 hidden md:table-cell">
                         {cat.created_at
-                          ? new Date(cat.created_at).toLocaleDateString()
+                          ? new Date(cat.created_at).toLocaleDateString(lang === 'ar' ? 'ar-DZ' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
                           : '—'}
                       </td>
                       <td className="px-4 py-3">
@@ -404,7 +407,7 @@ export default function AdminCategories() {
               </h3>
             </div>
             <p className="text-sm text-warm-600 mb-2">
-              "<span className="font-medium">{deleteTarget.name}</span>"
+              "<span className="font-medium">{getCategoryName(deleteTarget.slug, deleteTarget.name, t)}</span>"
             </p>
             <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 mb-4">
               {t('admin.categories.deleteWarning')}

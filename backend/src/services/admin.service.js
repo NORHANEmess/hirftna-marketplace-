@@ -322,14 +322,15 @@ const verifySeller = async (sellerId, isVerified) => {
 
   // Notify the seller of the admin decision
   if (data.user_id) {
+    const notifType = isVerified === true ? 'seller_verified' : 'system';
     await supabaseAdmin.from('notifications').insert({
       user_id: data.user_id,
-      type:    'system',
-      title:   isVerified ? '🎉 تم التحقق من متجرك من قبل الإدارة!' : '⚠️ تم إلغاء تحقق متجرك',
-      body:    isVerified
-        ? 'قامت الإدارة بمنحك شارة التحقق. متجرك الآن موثق رسمياً.'
-        : 'قامت الإدارة بإلغاء تحقق متجرك. تواصل مع الدعم لمعرفة السبب.',
-      meta:    { sellerId, isVerified, adminAction: true },
+      type:    notifType,
+      title:   notifType,
+      body:    null,
+      meta:    isVerified === true
+        ? { shopName: data.shop_name }
+        : { sellerId, isVerified, adminAction: true },
     }).catch((notifErr) => {
       logger.error({ message: 'Failed to send verification notification', sellerId, error: notifErr.message });
     });
@@ -476,7 +477,7 @@ const listPromotions = async ({ page = 1, limit = 20, status } = {}) => {
 const activatePromotion = async (promotionId) => {
   const { data: existing, error: findError } = await supabaseAdmin
     .from('promotions')
-    .select('id, status, requested_days, seller_id, seller:sellers!seller_id ( user_id, shop_name )')
+    .select('id, status, placement, requested_days, seller_id, seller:sellers!seller_id ( user_id, shop_name )')
     .eq('id', promotionId)
     .single();
 
@@ -508,10 +509,10 @@ const activatePromotion = async (promotionId) => {
   if (userId) {
     supabaseAdmin.from('notifications').insert({
       user_id: userId,
-      type:    'system',
-      title:   '🌟 تمت الموافقة على ترقية متجرك!',
-      body:    `متجرك "${existing.seller.shop_name}" سيظهر الآن في الصفحة الرئيسية للزوار. مدة الترقية ${existing.requested_days} يوم.`,
-      meta:    { promotionId, action: 'activated' },
+      type:    'promotion_activated',
+      title:   'promotion_activated',
+      body:    null,
+      meta:    { shopName: existing.seller?.shop_name, days: existing.requested_days, placement: existing.placement },
     }).then(({ error: notifError }) => {
       if (notifError) logger.error({ message: 'Admin: promotion activation notification failed', error: notifError.message });
     });
@@ -528,7 +529,7 @@ const activatePromotion = async (promotionId) => {
 const rejectPromotion = async (promotionId, rejection_reason) => {
   const { data: existing, error: findError } = await supabaseAdmin
     .from('promotions')
-    .select('id, status, seller_id, seller:sellers!seller_id ( user_id, shop_name )')
+    .select('id, status, placement, seller_id, seller:sellers!seller_id ( user_id, shop_name )')
     .eq('id', promotionId)
     .single();
 
@@ -555,10 +556,10 @@ const rejectPromotion = async (promotionId, rejection_reason) => {
   if (userId) {
     supabaseAdmin.from('notifications').insert({
       user_id: userId,
-      type:    'system',
-      title:   '❌ طلب ترقية المتجر مرفوض',
-      body:    `طلب ترقية متجرك "${existing.seller.shop_name}" تم رفضه. السبب: ${rejection_reason}`,
-      meta:    { promotionId, action: 'rejected', rejection_reason },
+      type:    'promotion_rejected',
+      title:   'promotion_rejected',
+      body:    null,
+      meta:    { shopName: existing.seller?.shop_name, rejectionReason: rejection_reason, placement: existing.placement },
     }).then(({ error: notifError }) => {
       if (notifError) logger.error({ message: 'Admin: promotion rejection notification failed', error: notifError.message });
     });

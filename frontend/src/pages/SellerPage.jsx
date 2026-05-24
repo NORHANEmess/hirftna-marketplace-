@@ -12,8 +12,16 @@ import clsx from 'clsx';
 // ─────────────────────────────────────────────────────────────
 // REVIEW ITEM (seller reviews)
 // ─────────────────────────────────────────────────────────────
+function normalizeWilayaKey(location) {
+  if (!location) return '';
+  return location.toLowerCase().trim()
+    .replace(/\s+/g, '_')
+    .replace(/[éèê]/g, 'e').replace(/[àâ]/g, 'a')
+    .replace(/[ïî]/g, 'i').replace(/[ûùü]/g, 'u').replace(/[ôö]/g, 'o');
+}
+
 function ReviewItem({ review }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   return (
     <div className="py-4 border-b border-beige-100 last:border-0">
       <div className="flex items-start gap-3">
@@ -38,7 +46,7 @@ function ReviewItem({ review }) {
             <StarRating rating={review.rating} size="xs" showValue={false} />
           </div>
           <p className="text-[10px] text-warm-400 mb-1.5">
-            {formatRelativeTime(review.created_at, t)}
+            {formatRelativeTime(review.created_at, t, lang)}
           </p>
           {review.comment && (
             <p className="text-sm text-warm-600 leading-relaxed">{review.comment}</p>
@@ -53,7 +61,7 @@ function ReviewItem({ review }) {
 // SELLER PAGE — public profile
 // ─────────────────────────────────────────────────────────────
 export default function SellerPage() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const { id }              = useParams();
   const navigate            = useNavigate();
 
@@ -152,7 +160,7 @@ export default function SellerPage() {
           {/* Info row: location · category · since */}
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-warm-400 mb-2">
             {seller.location && (
-              <span className="flex items-center gap-1"><MapPin size={12} /> {seller.location}</span>
+              <span className="flex items-center gap-1"><MapPin size={12} /> {t('wilayas.' + normalizeWilayaKey(seller.location), seller.location)}</span>
             )}
             {seller.category?.name && (
               <span className="flex items-center gap-1.5">
@@ -162,7 +170,7 @@ export default function SellerPage() {
             )}
             {seller.created_at && (
               <span className="flex items-center gap-1">
-                <Calendar size={12} /> {t('seller.since', { date: formatDate(seller.created_at, { style: 'short' }) })}
+                <Calendar size={12} /> {t('seller.since', { date: formatDate(seller.created_at, { style: 'short', lang }) })}
               </span>
             )}
           </div>

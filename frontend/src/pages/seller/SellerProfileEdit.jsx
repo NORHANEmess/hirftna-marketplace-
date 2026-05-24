@@ -14,6 +14,25 @@ function parseApiError(error) {
   return error?.response?.data?.message ?? error?.message ?? 'Something went wrong';
 }
 
+const WILAYA_SLUGS = [
+  'adrar','chlef','laghouat','oum_el_bouaghi','batna','bejaia','biskra','bechar',
+  'blida','bouira','tamanrasset','tebessa','tlemcen','tiaret','tizi_ouzou','alger',
+  'djelfa','jijel','setif','saida','skikda','sidi_bel_abbes','annaba','guelma',
+  'constantine','medea','mostaganem','msila','mascara','ouargla','oran','el_bayadh',
+  'illizi','bordj_bou_arreridj','boumerdes','el_tarf','tindouf','tissemsilt','el_oued',
+  'khenchela','souk_ahras','tipaza','mila','ain_defla','naama','ain_temouchent',
+  'ghardaia','relizane','timimoun','bordj_badji_mokhtar','ouled_djellal','beni_abbes',
+  'in_salah','in_guezzam','touggourt','djanet','el_mghair','el_meniaa',
+];
+
+function normalizeWilayaSlug(location) {
+  if (!location) return '';
+  return location.toLowerCase().trim()
+    .replace(/\s+/g, '_')
+    .replace(/[éèê]/g, 'e').replace(/[àâ]/g, 'a')
+    .replace(/[ïî]/g, 'i').replace(/[ûùü]/g, 'u').replace(/[ôö]/g, 'o');
+}
+
 function Toast({ message, type = 'success', onClose }) {
   useEffect(() => {
     const timeout = setTimeout(onClose, 3500);
@@ -74,6 +93,7 @@ function PasswordInput({ value, onChange, placeholder, show, onToggle, error }) 
 }
 
 function AvatarUploader({ currentUrl, shopName, onUpload, onError }) {
+  const { t } = useTranslation();
   const inputRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
@@ -117,8 +137,8 @@ function AvatarUploader({ currentUrl, shopName, onUpload, onError }) {
         <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
       </div>
       <div>
-        <p className="text-sm font-semibold text-warm-800">Shop Avatar</p>
-        <p className="text-[10px] text-warm-400 mt-0.5">Tap the camera icon to change your photo</p>
+        <p className="text-sm font-semibold text-warm-800">{t('sellerProfile.avatar')}</p>
+        <p className="text-[10px] text-warm-400 mt-0.5">{t('sellerProfile.avatarSub')}</p>
       </div>
     </div>
   );
@@ -141,7 +161,7 @@ function TabBtn({ active, onClick, icon, label }) {
 }
 
 export default function SellerProfileEdit() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const { user, updateUser } = useAuth();
   const [tab, setTab] = useState('shop');
   const [categories, setCategories] = useState([]);
@@ -203,7 +223,7 @@ export default function SellerProfileEdit() {
               story:       seller.story       ?? '',
               category_id: seller.category_id ?? '',
               avatar_url:  seller.avatar_url  ?? '',
-              location:    seller.location    ?? '',
+              location:    normalizeWilayaSlug(seller.location) ?? '',
             });
           }
         } else if (sellerResult.reason?.response?.status !== 404) {
@@ -338,8 +358,8 @@ export default function SellerProfileEdit() {
       <div className="sticky top-14 z-30 bg-cream-100/95 backdrop-blur-sm border-b border-beige-100">
         <div className="max-w-xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-warm-900">Shop Settings</h1>
-            <p className="text-xs text-warm-400">Manage your artisan profile</p>
+            <h1 className="text-lg font-bold text-warm-900">{t('sellerProfile.title')}</h1>
+            <p className="text-xs text-warm-400">{t('sellerProfile.subtitle')}</p>
           </div>
           <button
             type="button"
@@ -347,16 +367,16 @@ export default function SellerProfileEdit() {
             disabled={saving}
             className="flex items-center gap-2 px-5 py-2.5 bg-sage-500 hover:bg-sage-600 text-white text-sm font-semibold rounded-2xl transition-colors disabled:opacity-60 shadow-sm"
           >
-            {saving ? <><Loader2 size={14} className="animate-spin" /> Saving...</> : <><Save size={14} /> Save</>}
+            {saving ? <><Loader2 size={14} className="animate-spin" /> {t('sellerProfile.saving')}</> : <><Save size={14} /> {t('sellerProfile.save')}</>}
           </button>
         </div>
       </div>
 
       <div className="max-w-xl mx-auto px-4 py-5 space-y-5">
         <div className="flex gap-1.5 bg-cream-200 p-1 rounded-2xl border border-beige-200">
-          <TabBtn active={tab === 'shop'}    onClick={() => setTab('shop')}    icon={Store}    label="Shop"    />
-          <TabBtn active={tab === 'story'}   onClick={() => setTab('story')}   icon={BookOpen} label="Story"   />
-          <TabBtn active={tab === 'account'} onClick={() => setTab('account')} icon={User}     label="Account" />
+          <TabBtn active={tab === 'shop'}    onClick={() => setTab('shop')}    icon={Store}    label={t('sellerProfile.tabs.shop')}    />
+          <TabBtn active={tab === 'story'}   onClick={() => setTab('story')}   icon={BookOpen} label={t('sellerProfile.tabs.story')}   />
+          <TabBtn active={tab === 'account'} onClick={() => setTab('account')} icon={User}     label={t('sellerProfile.tabs.account')} />
         </div>
 
         {/* ── Shop Tab ── */}
@@ -370,7 +390,7 @@ export default function SellerProfileEdit() {
             />
             <div className="h-px bg-beige-100" />
 
-            <Field label="Shop Name" error={errors.shop_name}>
+            <Field label={t('sellerProfile.shopName')} error={errors.shop_name}>
               <input
                 value={form.shop_name}
                 onChange={(event) => setField('shop_name', event.target.value)}
@@ -381,7 +401,7 @@ export default function SellerProfileEdit() {
               />
             </Field>
 
-            <Field label="Short Bio" hint="Shown under your shop name">
+            <Field label={t('sellerProfile.bio')} hint={t('sellerProfile.bioHint')}>
               <textarea
                 value={form.description}
                 onChange={(event) => setField('description', event.target.value)}
@@ -392,26 +412,31 @@ export default function SellerProfileEdit() {
             </Field>
 
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Main Category">
+              <Field label={t('sellerProfile.category')}>
                 <select
                   value={form.category_id}
                   onChange={(event) => setField('category_id', event.target.value)}
                   className="w-full px-3 py-2.5 text-sm bg-cream-100 border border-beige-200 rounded-2xl outline-none focus:border-sage-400 transition-colors"
                 >
-                  <option value="">Select...</option>
+                  <option value="">{t('sellerProducts.form.selectCategory')}</option>
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>{category.name}</option>
                   ))}
                 </select>
               </Field>
 
-              <Field label="City / Wilaya">
-                <input
+              <Field label={t('sellerProfile.city')}>
+                <select
                   value={form.location}
                   onChange={(event) => setField('location', event.target.value)}
-                  placeholder="e.g. Tizi Ouzou"
                   className="w-full px-3 py-2.5 text-sm bg-cream-100 border border-beige-200 rounded-2xl outline-none focus:border-sage-400 transition-colors"
-                />
+                  dir={lang === 'ar' ? 'rtl' : 'ltr'}
+                >
+                  <option value="">{t('sellerProfile.cityPlaceholder')}</option>
+                  {WILAYA_SLUGS.map((slug) => (
+                    <option key={slug} value={slug}>{t('wilayas.' + slug)}</option>
+                  ))}
+                </select>
               </Field>
             </div>
           </div>
@@ -421,13 +446,12 @@ export default function SellerProfileEdit() {
         {tab === 'story' && (
           <div className="bg-white rounded-3xl border border-beige-200 p-5 space-y-4">
             <div className="bg-sage-50 border border-sage-100 rounded-2xl p-4">
-              <p className="text-xs font-semibold text-sage-700 mb-1">✦ Your Artisan Story</p>
-              <p className="text-[11px] text-sage-600 leading-relaxed">
-                This appears on your public profile. Tell buyers who you are, how you started, and what makes your craft unique.
+              <p className="text-xs font-semibold text-sage-600 leading-relaxed">
+                {t('sellerProfile.storyExplain')}
               </p>
             </div>
 
-            <Field label="Your Story" hint={`${form.story.length} characters`}>
+            <Field label={t('sellerProfile.storyTitle')} hint={t('sellerProfile.storyHint', { count: form.story.length })}>
               <textarea
                 value={form.story}
                 onChange={(event) => setField('story', event.target.value)}
@@ -439,7 +463,7 @@ export default function SellerProfileEdit() {
 
             {form.story.trim() && (
               <div className="bg-cream-100 border border-beige-200 rounded-2xl p-4">
-                <p className="text-[10px] font-bold text-warm-400 uppercase tracking-widest mb-2">Preview</p>
+                <p className="text-[10px] font-bold text-warm-400 uppercase tracking-widest mb-2">{t('sellerProfile.storyPreview')}</p>
                 <p className="text-sm text-warm-700 leading-relaxed whitespace-pre-line">
                   {form.story}
                 </p>
@@ -453,9 +477,9 @@ export default function SellerProfileEdit() {
           <>
             {/* Account Information */}
             <div className="bg-white rounded-3xl border border-beige-200 p-5 space-y-4">
-              <p className="text-xs font-bold text-warm-400 uppercase tracking-widest">Account Information</p>
+              <p className="text-xs font-bold text-warm-400 uppercase tracking-widest">{t('sellerProfile.accountInfo')}</p>
 
-              <Field label="Full Name" error={accountErrors.full_name}>
+              <Field label={t('profile.nameLabel')} error={accountErrors.full_name}>
                 <input
                   value={accountForm.full_name}
                   onChange={(event) => {
@@ -470,13 +494,13 @@ export default function SellerProfileEdit() {
               </Field>
 
               <div className="flex items-center justify-between py-2.5 border-t border-beige-100">
-                <span className="text-sm text-warm-500">Email</span>
+                <span className="text-sm text-warm-500">{t('profile.email')}</span>
                 <span className="text-sm font-semibold text-warm-900 truncate max-w-[200px]">{user?.email ?? '—'}</span>
               </div>
 
               <div className="flex items-center justify-between py-2.5 border-t border-beige-100">
-                <span className="text-sm text-warm-500">Role</span>
-                <span className="text-xs font-bold bg-sage-100 text-sage-700 px-2.5 py-1 rounded-full">Artisan / Seller</span>
+                <span className="text-sm text-warm-500">{t('sellerProfile.role')}</span>
+                <span className="text-xs font-bold bg-sage-100 text-sage-700 px-2.5 py-1 rounded-full">{t('sellerProfile.roleSeller')}</span>
               </div>
             </div>
 
@@ -484,10 +508,10 @@ export default function SellerProfileEdit() {
             <div className="bg-white rounded-3xl border border-beige-200 p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <Lock size={14} className="text-warm-400" />
-                <p className="text-xs font-bold text-warm-400 uppercase tracking-widest">Change Password</p>
+                <p className="text-xs font-bold text-warm-400 uppercase tracking-widest">{t('auth.changePassword.title')}</p>
               </div>
 
-              <Field label="Current Password" error={pwErrors.current_password}>
+              <Field label={t('auth.changePassword.oldPassword')} error={pwErrors.current_password}>
                 <PasswordInput
                   value={pwForm.current_password}
                   onChange={(e) => setPwField('current_password', e.target.value)}
@@ -498,7 +522,7 @@ export default function SellerProfileEdit() {
                 />
               </Field>
 
-              <Field label="New Password" error={pwErrors.new_password}>
+              <Field label={t('auth.changePassword.newPassword')} error={pwErrors.new_password}>
                 <PasswordInput
                   value={pwForm.new_password}
                   onChange={(e) => setPwField('new_password', e.target.value)}
@@ -509,7 +533,7 @@ export default function SellerProfileEdit() {
                 />
               </Field>
 
-              <Field label="Confirm New Password" error={pwErrors.confirm_password}>
+              <Field label={t('auth.changePassword.confirmPassword')} error={pwErrors.confirm_password}>
                 <PasswordInput
                   value={pwForm.confirm_password}
                   onChange={(e) => setPwField('confirm_password', e.target.value)}
@@ -527,8 +551,8 @@ export default function SellerProfileEdit() {
                 className="flex items-center gap-2 px-5 py-2.5 bg-sage-500 hover:bg-sage-600 text-white text-sm font-semibold rounded-2xl transition-colors disabled:opacity-60 shadow-sm"
               >
                 {savingPassword
-                  ? <><Loader2 size={14} className="animate-spin" /> Updating...</>
-                  : 'Update Password'}
+                  ? <><Loader2 size={14} className="animate-spin" /> {t('auth.changePassword.submitting')}</>
+                  : t('auth.changePassword.submit')}
               </button>
             </div>
           </>

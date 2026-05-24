@@ -251,9 +251,9 @@ const createOrder = async (clientUser, orderData) => {
     createNotification({
       userId: seller.user_id,
       type:   'new_order',
-      title:  'طلب جديد! 🛍️',
-      body:   'لديك طلب مخصص جديد بانتظار مراجعتك',
-      meta:   { orderId: order.id, clientId },
+      title:  'new_order',
+      body:   null,
+      meta:   { orderId: order.id, clientName: resolvedClientName },
     });
   }
 
@@ -372,7 +372,7 @@ const updateOrderStatus = async (userId, orderId, { status, rejection_reason }) 
   // Get seller profile
   const { data: seller, error: sellerError } = await supabaseAdmin
     .from('sellers')
-    .select('id')
+    .select('id, shop_name')
     .eq('user_id', userId)
     .single();
 
@@ -426,33 +426,21 @@ const updateOrderStatus = async (userId, orderId, { status, rejection_reason }) 
   }
 
   // Notify client (accepted / rejected only — ready/completed have their own functions)
-  const notificationMap = {
-    accepted: {
-      type:  'order_accepted',
-      title: 'تم قبول طلبك! ✅',
-      body:  'قبل الحرفي طلبك وسيبدأ العمل قريباً',
-    },
-    rejected: {
-      type:  'order_rejected',
-      title: 'تم رفض طلبك ❌',
-      body:  rejection_reason
-        ? `تم رفض طلبك: ${rejection_reason}`
-        : 'تم رفض طلبك من قِبل الحرفي',
-    },
-  };
-
-  const notification = notificationMap[status];
-  if (notification) {
+  if (status === 'accepted') {
     createNotification({
       userId: order.client_id,
-      type:   notification.type,
-      title:  notification.title,
-      body:   notification.body,
-      meta: {
-        orderId,
-        status,
-        ...(status === 'rejected' && rejection_reason && { rejection_reason }),
-      },
+      type:   'order_accepted',
+      title:  'order_accepted',
+      body:   null,
+      meta:   { orderId, shopName: seller.shop_name },
+    });
+  } else if (status === 'rejected') {
+    createNotification({
+      userId: order.client_id,
+      type:   'order_rejected',
+      title:  'order_rejected',
+      body:   null,
+      meta:   { orderId, shopName: seller.shop_name, rejectionReason: rejection_reason },
     });
   }
 
@@ -477,7 +465,7 @@ const markReady = async (userId, orderId, { final_price, delivery_type }) => {
   // Resolve seller profile
   const { data: seller, error: sellerError } = await supabaseAdmin
     .from('sellers')
-    .select('id')
+    .select('id, shop_name')
     .eq('user_id', userId)
     .single();
 
@@ -531,9 +519,9 @@ const markReady = async (userId, orderId, { final_price, delivery_type }) => {
   createNotification({
     userId: order.client_id,
     type:   'order_ready',
-    title:  'طلبك جاهز للتأكيد! 🎉',
-    body:   `السعر النهائي: ${final_price} DA — قم بتأكيد الاستلام`,
-    meta:   { orderId, final_price },
+    title:  'order_ready',
+    body:   null,
+    meta:   { orderId, shopName: seller.shop_name, finalPrice: final_price },
   });
 
   logger.info({ message: 'Order marked ready', orderId, sellerId: seller.id, final_price });
@@ -597,9 +585,9 @@ const confirmComplete = async (userId, orderId) => {
     createNotification({
       userId: seller.user_id,
       type:   'order_completed',
-      title:  'اكتمل الطلب! ✅',
-      body:   'قام العميل بتأكيد استلام الطلب — يمكنك الآن تقييم العميل',
-      meta:   { orderId },
+      title:  'order_completed',
+      body:   null,
+      meta:   { orderId, clientName: updatedOrder?.client?.full_name ?? 'Client' },
     });
   }
 

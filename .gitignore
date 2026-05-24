@@ -21,6 +21,7 @@ PRE_DEPLOYMENT_FIXES.md
 FIXES_APPLIED.md
 CONTEXT.md
 BUG_REPORT.md
+MISMATCHES.md
 
 # Claude workspace
 .claude/

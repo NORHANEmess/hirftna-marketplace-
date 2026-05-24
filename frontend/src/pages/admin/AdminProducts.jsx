@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, Trash2, ExternalLink, ChevronLeft, ChevronRight, Loader2, AlertTriangle } from 'lucide-react';
 import { adminAPI, categoriesAPI, resolveApiError } from '../../services/api';
 import { useTranslation } from '../../i18n/index.jsx';
+import { getCategoryName } from '../../utils/categoryHelpers';
 import DashboardSidebar from '../../components/layout/DashboardSidebar';
 
 export default function AdminProducts() {
@@ -119,7 +120,7 @@ export default function AdminProducts() {
           >
             <option value="">{t('adminProducts.allCategories')}</option>
             {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+              <option key={c.id} value={c.id}>{getCategoryName(c.slug, c.name, t)}</option>
             ))}
           </select>
         )}

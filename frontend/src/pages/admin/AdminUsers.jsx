@@ -23,6 +23,14 @@ import { adminAPI, resolveApiError } from '../../services/api';
 import { useTranslation } from '../../i18n/index.jsx';
 import DashboardSidebar from '../../components/layout/DashboardSidebar';
 
+function normalizeWilayaKey(location) {
+  if (!location) return '';
+  return location.toLowerCase().trim()
+    .replace(/\s+/g, '_')
+    .replace(/[éèê]/g, 'e').replace(/[àâ]/g, 'a')
+    .replace(/[ïî]/g, 'i').replace(/[ûùü]/g, 'u').replace(/[ôö]/g, 'o');
+}
+
 // ─── Tab config ───────────────────────────────────────────────────────────────
 const TABS = [
   { id: 'all',               labelKey: 'adminUsers.tabs.all',               role: '',       verified: undefined },
@@ -32,9 +40,9 @@ const TABS = [
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function formatJoinDate(dateStr) {
+function formatJoinDate(dateStr, lang = 'en') {
   if (!dateStr) return '';
-  return new Date(dateStr).toLocaleDateString('en-GB', {
+  return new Date(dateStr).toLocaleDateString(lang === 'ar' ? 'ar-DZ' : 'en-GB', {
     day: 'numeric', month: 'short', year: 'numeric',
   });
 }
@@ -191,7 +199,7 @@ function ConfirmModal({ title, body, confirmLabel, danger, onConfirm, onCancel, 
 
 // ─── Seller Card ──────────────────────────────────────────────────────────────
 function SellerCard({ user, onVerify, onRevoke, verifyingId }) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const { seller } = user;
   const isVerified = seller?.is_verified;
   const isActing   = verifyingId === seller?.id;
@@ -212,7 +220,7 @@ function SellerCard({ user, onVerify, onRevoke, verifyingId }) {
           </div>
           <p className="text-xs text-warm-400 truncate">{user.email}</p>
           <p className="text-[10px] text-warm-300 mt-0.5">
-            {t('adminUsers.joined')} {formatJoinDate(user.created_at)}
+            {t('adminUsers.joined')} {formatJoinDate(user.created_at, lang)}
           </p>
         </div>
       </div>
@@ -236,7 +244,7 @@ function SellerCard({ user, onVerify, onRevoke, verifyingId }) {
             {(seller.location || seller.city) && (
               <span className="flex items-center gap-1 text-[10px] text-warm-500">
                 <MapPin size={9} className="text-warm-300" />
-                {seller.location || seller.city}
+                {t('wilayas.' + normalizeWilayaKey(seller.location || seller.city), seller.location || seller.city)}
               </span>
             )}
           </div>
@@ -323,7 +331,7 @@ function SellerCard({ user, onVerify, onRevoke, verifyingId }) {
 
 // ─── Client Card ──────────────────────────────────────────────────────────────
 function ClientCard({ user, onChangeRole, roleChangingId }) {
-  const { t }    = useTranslation();
+  const { t, lang } = useTranslation();
   const stats    = user.client_stats || {};
   const isActing = roleChangingId === user.id;
 
@@ -341,7 +349,7 @@ function ClientCard({ user, onChangeRole, roleChangingId }) {
           </div>
           <p className="text-xs text-warm-400 truncate">{user.email}</p>
           <p className="text-[10px] text-warm-300 mt-0.5">
-            {t('adminUsers.joined')} {formatJoinDate(user.created_at)}
+            {t('adminUsers.joined')} {formatJoinDate(user.created_at, lang)}
           </p>
         </div>
       </div>

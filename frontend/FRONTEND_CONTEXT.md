@@ -10,7 +10,7 @@
 - **Name:** Hirftna Marketplace (حرفتنا)
 - **Type:** Custom-order artisan marketplace — NOT traditional e-commerce
 - **Key Concept:** Products are custom, prices are ranges, orders are requests
-- **Frontend Stack:** React 18 + Vite + TailwindCSS + React Router v6 + i18next
+- **Frontend Stack:** React 19.2.4 + Vite + TailwindCSS + React Router v7 + i18next
 - **Backend:** Node.js/Express on port 4000 — all 60+ endpoints complete (Phases 1–14)
 - **Design:** Warm cream/beige palette, sage green accent, rounded corners, soft shadows, mobile-first, RTL-ready
 
@@ -67,9 +67,13 @@ RTL:        [dir="rtl"] swaps fadeInLeft ↔ fadeInRight automatically
 
 ### Typography
 ```
-font-sans:    Inter (body text, UI)
-font-display: Playfair Display (hero headlines, section headings, seller names)
-             → serif, editorial feel, added to index.html Google Fonts link
+font-sans:  "Plus Jakarta Sans", "Readex Pro", system-ui, sans-serif
+            → [dir="rtl"] activates Readex Pro as primary (Arabic-optimized)
+            → Defined in tailwind.config.js as the font-sans stack (NOT Inter)
+font-logo:  Inter (500–700) — loaded in index.html for LogoMark "MARKETPLACE" wordmark only
+font-ar:    Amiri (400, 700) — loaded in index.html for Arabic logo text "حرفتنا"
+NOTE: Playfair Display is NOT in tailwind.config.js — all headings use Plus Jakarta Sans.
+      Inter is NOT a body font; it only appears in the logo Latin wordmark.
 ```
 
 ---
@@ -157,10 +161,12 @@ const isAdmin   = user?.role === 'admin'    // admin role set directly in DB onl
 
 ### Route Guards (router/index.jsx)
 ```
-RequireAuth   → any authenticated user (client OR seller) — wishlist, orders, profile, notifications
-RequireSeller → authenticated + role=seller — /seller/* routes
-GuestOnly     → not authenticated — /login, /register, /forgot-password, /reset-password
-RequireAdmin  → authenticated + role=admin — /admin, /admin/users, /admin/products
+RequireAuth      → any authenticated user (client OR seller OR admin)
+RequireNotAdmin  → authenticated + role≠admin — /wishlist, /orders (blocks admins; redirects to /admin)
+RequireSeller    → authenticated + role=seller — /seller/* routes
+GuestOnly        → not authenticated — /login, /register, /forgot-password, /reset-password
+RequireAdmin     → authenticated + role=admin — /admin, /admin/users, /admin/products
+NOTE: /wishlist and /orders use RequireNotAdmin (NOT RequireAuth) — admins are redirected away.
 ```
 
 ### Bottom Nav (Mobile Floating Pill) — role-aware
@@ -188,7 +194,7 @@ frontend/src/
 │   ├── chatbot/
 │   │   └── ChatbotWidget.jsx   ✅ floating widget (authenticated users only), Gemini backend
 │   ├── layout/
-│   │   ├── MainLayout.jsx      ✅ wraps all pages, polls unread count every 60s
+│   │   ├── MainLayout.jsx      ✅ wraps all pages, polls unread count every 120s (pauses when tab hidden)
 │   │   ├── TopBar.jsx          ✅ logo + search + categories dropdown + desktop nav
 │   │   ├── DesktopNav.jsx      ✅ desktop icons (wishlist, orders, notifications, profile)
 │   │   └── BottomNav.jsx       ✅ mobile floating pill, role-aware
@@ -275,14 +281,15 @@ productsAPI:      getAll, getById, getMyProducts, create, update, delete
 ordersAPI:        getAll, getById, create, updateStatus, markReady, confirmComplete
 categoriesAPI:    getAll, getById, getBySlug
 sellersAPI:       getAll, getById, getMe, getAnalytics, getVerificationStatus, create, update
-reviewsAPI:       getProductReviews, getSellerRatings, getSellerReviews,
+reviewsAPI:       getProductReviews, getSellerRatings,
                   createReview, createRating, deleteReview
 wishlistAPI:      getAll, add, remove, check
 notificationsAPI: getAll, getUnreadCount, markRead, markAllRead, delete
 uploadsAPI:       uploadImage, uploadImages
 clientRatingsAPI: create({ order_id, client_id, rating, comment }), getByClient(clientId)
 chatbotAPI:       sendMessage(message, conversationHistory)
-promotionsAPI:    getHeroAds(), getBrowseAds(), request(data), getMe()
+promotionsAPI:    getHeroAds(), getBrowseAds(), getFeaturedProducts(params),
+                  request(data), getMe(), getMyProductPromotions()
 adminAPI:         getUsers(params), getProducts(params), getStats(),
                   verifySeller(sellerId, isVerified), deleteProduct(productId),
                   updateUserRole(userId, role),
@@ -319,12 +326,13 @@ GET    /categories                    → all (public)
 GET    /categories/slug/:slug         → by slug (public)
 
 // SELLERS
-GET    /sellers                       → browse verified (public)
-GET    /sellers/:id                   → public profile (public)
-GET    /sellers/me                    → own full profile (seller)
-GET    /sellers/analytics             → shop stats (seller)
-POST   /sellers                       → create shop (seller)
-PUT    /sellers/:id                   → update (seller)
+GET    /sellers                            → browse verified (public)
+GET    /sellers/:id                        → public profile (public)
+GET    /sellers/me                         → own full profile (seller)
+GET    /sellers/me/verification-status     → own verification status (seller)
+GET    /sellers/analytics                  → shop stats (seller)
+POST   /sellers                            → create shop (seller)
+PUT    /sellers/:id                        → update (seller)
 
 // ORDERS
 POST   /orders                        → create custom order (any auth)
@@ -368,10 +376,12 @@ POST   /chatbot                       → send message (auth, 20/hr per user)
                                         Body: { message, conversation_history[] }
 
 // PROMOTIONS
-GET    /promotions/hero               → active hero placement ads (public)
-GET    /promotions/browse             → active browse placement ads (public)
-POST   /promotions/request            → submit promotion request (seller)
-GET    /promotions/me                 → own promotion status (seller)
+GET    /promotions/hero                     → active hero placement ads (public)
+GET    /promotions/browse                   → active browse placement ads (public)
+GET    /promotions/featured-products        → promoted featured products (public, filterable)
+POST   /promotions/request                  → submit promotion request (seller)
+GET    /promotions/me                       → own promotion status (seller)
+GET    /promotions/my-product-promotions    → own per-product promotions (seller)
 
 // ADMIN (all require role=admin)
 GET    /admin/users                        → list users paginated (role + search filter)
@@ -404,6 +414,21 @@ PATCH  /admin/promotions/:id/reject        → reject promotion with rejection_r
   client_phone: string,
   client_address: string,
 }
+```
+
+---
+
+## i18n CONFIGURATION
+
+```
+Library:         react-i18next
+Namespace:       Single 'translation' namespace (NOT multi-namespace)
+                 All keys are nested paths within one JSON: orders.statuses.ready, customOrder.title, etc.
+Languages:       ['ar', 'en'] only — French is COMPLETELY ABSENT (not disabled, not partial)
+Storage key:     hirftna_lang (localStorage)
+Default:         'ar' (Arabic)
+RTL:             AR sets dir="rtl" on document.documentElement
+useTranslation() returns { ...translation, lang, setLang, isRTL }
 ```
 
 ---
@@ -482,7 +507,7 @@ Phase 2 — Layout & Navigation ✅ COMPLETE
 ├── F8  ✅ BottomNav.jsx (floating pill, role-aware)
 ├── F9  ✅ TopBar.jsx (logo + search + categories + mobile menu)
 ├── F10 ✅ DesktopNav.jsx (icons + profile dropdown)
-└── F11 ✅ MainLayout.jsx (polls unread count every 60s)
+└── F11 ✅ MainLayout.jsx (polls unread count every 120s; pauses when document.hidden)
 
 Phase 3 — UI Components ✅ COMPLETE
 ├── F12 ✅ Spinner.jsx (xs/sm/md/lg/xl)
@@ -593,8 +618,9 @@ Phase 17 — Final Polish ✅ COMPLETE (2026-05-19)
 └── F70 ✅ payment.* i18n keys added to en.json + ar.json (27 keys total)
 
 Phase 18 — Homepage Redesign + Animation System ✅ COMPLETE (2026-05-17)
-├── F69 ✅ index.html — Playfair Display (Google Fonts) added alongside Amiri
-├── F70 ✅ tailwind.config.js — font-display: Playfair Display (editorial serif)
+├── F69 ✅ index.html — Plus Jakarta Sans + Readex Pro + Amiri + Inter Google Fonts loaded
+├── F70 ✅ tailwind.config.js — font-sans: ["Plus Jakarta Sans", "Readex Pro", system-ui, sans-serif]
+│          NOTE: No font-display key in config; no Playfair Display in Tailwind config.
 ├── F71 ✅ src/index.css — full animation system:
 │          Keyframes: fadeInUp, fadeInDown, fadeInLeft, fadeInRight, heartBeat
 │          Classes: .animate-fade-in-up/down/left/right, .animate-heart-beat
@@ -606,7 +632,7 @@ Phase 18 — Homepage Redesign + Animation System ✅ COMPLETE (2026-05-17)
 ├── F72 ✅ src/hooks/useInView.js — IntersectionObserver fire-once hook → [ref, isInView]
 ├── F73 ✅ src/pages/HomePage.jsx — complete redesign:
 │          Split-screen hero (50/50 desktop, stacked mobile)
-│          HeroLeft: Playfair Display headline + search bar → /browse?search= + CTA
+│          HeroLeft: headline (Plus Jakarta Sans) + search bar → /browse?search= + CTA
 │          HeroRight: featured artisan card from heroAds (random) with fallback
 │          HeroSkeleton during loading; entrance animations staggered
 │          HowItWorksSection: 4-step scroll-triggered (useInView), SVG icons, step circles
@@ -697,5 +723,7 @@ VITE_SUPABASE_ANON_KEY=...
 *Frontend Phases 1–14, 16, 17, and 18 complete. All backend endpoints wired. Deployed to production.*
 *Admin account: set role='admin' directly in Supabase DB. Chatbot: requires GEMINI_API_KEY in backend .env.*
 *Animation note: all animations respect prefers-reduced-motion. RTL swaps fadeInLeft ↔ fadeInRight automatically.*
+*Font note: body font is Plus Jakarta Sans (LTR) / Readex Pro (RTL). Playfair Display is NOT used. Inter is logo Latin wordmark only. Amiri is logo Arabic text only.*
+*i18n note: single 'translation' namespace; AR + EN only; French is completely absent.*
 *Payment: PaymentModal (seller→platform) and PaymentStep (client→seller) are SEPARATE components — do NOT merge.*
 *Chargily card payment is SIMULATED (setTimeout 2s) — replace with real Chargily API redirect for production.*
