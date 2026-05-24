@@ -30,7 +30,7 @@ app.use(cors({
 
     // Allow localhost only in non-production environments
     if (process.env.NODE_ENV !== 'production') {
-      allowedOrigins.push('http://localhost:5173', 'http://localhost:3000');
+      allowedOrigins.push('http://localhost:5173', 'http://localhost:3000','https://hirftna.vercel.app',);
     }
 
     // Allow requests with no origin (Postman, mobile apps)
