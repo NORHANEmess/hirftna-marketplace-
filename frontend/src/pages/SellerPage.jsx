@@ -113,7 +113,7 @@ export default function SellerPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-cream-100">
+    <div className="min-h-screen bg-cream-100 pb-28 md:pb-10">
 
       {/* ── BACK ──────────────────────────────────────────────── */}
       <div className="px-4 pt-4">

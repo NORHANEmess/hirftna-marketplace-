@@ -11,7 +11,9 @@ export default function OtpStep({ email, onVerify, onBack, loading, error }) {
   const isComplete = digits.every((d) => d !== '');
 
   useEffect(() => {
-    refs.current[0]?.focus();
+    // Delay focus so the card is fully visible before the mobile keyboard appears
+    const id = setTimeout(() => refs.current[0]?.focus(), 300);
+    return () => clearTimeout(id);
   }, []);
 
   const handleChange = (i, e) => {
@@ -82,6 +84,8 @@ export default function OtpStep({ email, onVerify, onBack, loading, error }) {
               ref={(el) => { refs.current[i] = el; }}
               type="text"
               inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="one-time-code"
               maxLength={1}
               value={digit}
               onChange={(e) => handleChange(i, e)}

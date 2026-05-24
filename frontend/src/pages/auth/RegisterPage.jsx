@@ -108,7 +108,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-10 bg-cream-100">
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 pt-10 pb-28 md:py-10 bg-cream-100">
       <div className="w-full max-w-sm">
 
         <div className="text-center mb-7">
@@ -118,7 +118,14 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl border border-beige-200 shadow-soft p-7">
+        <div className="relative bg-white rounded-3xl border border-beige-200 shadow-soft p-7">
+
+          {/* Loading overlay: visible while awaiting OTP response, before the OTP form appears */}
+          {loading && !inOtpStep && (
+            <div className="absolute inset-0 bg-white/75 rounded-3xl flex items-center justify-center z-10">
+              <Loader size={28} className="animate-spin text-sage-500" />
+            </div>
+          )}
 
           {!inOtpStep ? (
             <>

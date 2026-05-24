@@ -78,7 +78,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-cream-100 md:flex">
       <DashboardSidebar role="admin" />
 
-      <div className="flex-1 pb-24">
+      <div className="flex-1 pb-28 md:pb-10">
       {/* Header */}
       <div className="bg-white border-b border-beige-200 px-4 pt-6 pb-4">
         <p className="text-xs font-medium text-sage-600 uppercase tracking-widest mb-1">{t('admin.adminPanel')}</p>

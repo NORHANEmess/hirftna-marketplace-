@@ -86,7 +86,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12 bg-cream-100">
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 pt-12 pb-28 md:py-12 bg-cream-100">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4"><LogoMark size="lg" /></div>

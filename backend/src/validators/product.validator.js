@@ -151,6 +151,11 @@ const updateProductSchema = z
     is_active: z
       .boolean({ error: 'is_active must be true or false' })
       .optional(),
+
+    images: z
+      .array(imageUrlField)
+      .max(5, { error: 'Cannot upload more than 5 images' })
+      .optional(),
   })
   .refine(
     (data) => Object.keys(data).filter(k => data[k] !== undefined).length > 0,

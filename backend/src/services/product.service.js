@@ -590,6 +590,32 @@ const updateProduct = async (userId, productId, updates) => {
     throw new AppError('Failed to update product', 500);
   }
 
+  // Replace product images when the caller provides a new images array
+  if (updates.images !== undefined) {
+    const { error: deleteErr } = await supabaseAdmin
+      .from('product_images')
+      .delete()
+      .eq('product_id', productId);
+
+    if (deleteErr) {
+      logger.error({ message: 'Failed to clear product images during update', productId, error: deleteErr.message });
+    } else if (updates.images.length > 0) {
+      const imageRows = updates.images
+        .filter((url) => typeof url === 'string' && url.trim())
+        .map((url, idx) => ({ product_id: productId, image_url: url, position: idx }));
+
+      if (imageRows.length > 0) {
+        const { error: insertErr } = await supabaseAdmin
+          .from('product_images')
+          .insert(imageRows);
+
+        if (insertErr) {
+          logger.error({ message: 'Failed to insert product images during update', productId, error: insertErr.message });
+        }
+      }
+    }
+  }
+
   logger.info({ message: 'Product updated', productId, sellerId: seller.id });
   return getProductByIdForSeller(productId);
 };
@@ -598,9 +624,17 @@ const deleteProduct = async (userId, productId) => {
   const seller = await getSellerByUserId(userId);
   await verifyProductOwnership(productId, seller.id);
 
+  // Remove child records first to satisfy FK constraints
+  await Promise.all([
+    supabaseAdmin.from('browsing_events').delete().eq('product_id', productId),
+    supabaseAdmin.from('reviews').delete().eq('product_id', productId),
+    supabaseAdmin.from('wishlist').delete().eq('product_id', productId),
+    supabaseAdmin.from('product_images').delete().eq('product_id', productId),
+  ]);
+
   const { error } = await supabaseAdmin
     .from('products')
-    .update({ is_active: false, updated_at: new Date().toISOString() })
+    .delete()
     .eq('id', productId);
 
   if (error) {
@@ -608,7 +642,7 @@ const deleteProduct = async (userId, productId) => {
     throw new AppError('Failed to delete product', 500);
   }
 
-  logger.info({ message: 'Product soft deleted', productId, sellerId: seller.id });
+  logger.info({ message: 'Product deleted', productId, sellerId: seller.id });
 
   // Fire-and-forget: removing a product may drop below the active-products threshold
   updateVerificationStatus(seller.id);

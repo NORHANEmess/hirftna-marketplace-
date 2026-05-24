@@ -94,22 +94,24 @@ const updateProduct = asyncHandler(async (req, res) => {
     name,
     description,
     price,
-    price_min,        // FIX
-    price_max,        // FIX
-    completion_days,  // FIX
+    price_min,
+    price_max,
+    completion_days,
     category_id,
     is_active,
+    images,
   } = req.validated.body;
 
   const updates = {};
-  if (name        !== undefined) updates.name        = name;
-  if (description !== undefined) updates.description = description;
-  if (price       !== undefined) updates.price       = price;
-  if (price_min   !== undefined) updates.price_min   = price_min;    // FIX
-  if (price_max   !== undefined) updates.price_max   = price_max;    // FIX
-  if (completion_days !== undefined) updates.completion_days = completion_days; // FIX
-  if (category_id !== undefined) updates.category_id = category_id;
-  if (is_active   !== undefined) updates.is_active   = is_active;
+  if (name            !== undefined) updates.name            = name;
+  if (description     !== undefined) updates.description     = description;
+  if (price           !== undefined) updates.price           = price;
+  if (price_min       !== undefined) updates.price_min       = price_min;
+  if (price_max       !== undefined) updates.price_max       = price_max;
+  if (completion_days !== undefined) updates.completion_days = completion_days;
+  if (category_id     !== undefined) updates.category_id     = category_id;
+  if (is_active       !== undefined) updates.is_active       = is_active;
+  if (images          !== undefined) updates.images          = images;
 
   const product = await productService.updateProduct(
     req.user.id,

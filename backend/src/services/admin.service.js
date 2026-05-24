@@ -341,6 +341,8 @@ const verifySeller = async (sellerId, isVerified) => {
 
 // ─────────────────────────────────────────────────────────────
 // DELETE PRODUCT (admin force-delete)
+// Must remove related records first to avoid FK constraint violations:
+// product_images, wishlist, reviews, browsing_events all reference product_id
 // ─────────────────────────────────────────────────────────────
 const deleteProduct = async (productId) => {
   const { data: product, error: findError } = await supabaseAdmin
@@ -350,6 +352,20 @@ const deleteProduct = async (productId) => {
     .single();
 
   if (findError || !product) throw new AppError('Product not found', 404);
+
+  // Delete all child records in parallel — each has a FK on product_id
+  const cleanups = await Promise.all([
+    supabaseAdmin.from('browsing_events').delete().eq('product_id', productId),
+    supabaseAdmin.from('reviews').delete().eq('product_id', productId),
+    supabaseAdmin.from('wishlist').delete().eq('product_id', productId),
+    supabaseAdmin.from('product_images').delete().eq('product_id', productId),
+  ]);
+
+  for (const { error: cleanupErr } of cleanups) {
+    if (cleanupErr) {
+      logger.warn({ message: 'Admin: cleanup step failed during product delete', productId, error: cleanupErr.message });
+    }
+  }
 
   const { error } = await supabaseAdmin
     .from('products')

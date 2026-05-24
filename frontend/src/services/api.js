@@ -319,6 +319,20 @@ api.interceptors.response.use(
       }
     }
 
+    // Token is expired and there is no refresh token — session is fully dead.
+    // Redirect to login instead of surfacing a raw 401 to the component.
+    if (
+      error.response?.status === 401 &&
+      original &&
+      !original._retry &&
+      !original.url?.includes('/auth/refresh') &&
+      localStorage.getItem(AUTH_STORAGE_KEYS.token) &&
+      !localStorage.getItem(AUTH_STORAGE_KEYS.refreshToken)
+    ) {
+      clearStoredSession();
+      window.location.href = '/login';
+    }
+
     return Promise.reject(error);
   }
 );
