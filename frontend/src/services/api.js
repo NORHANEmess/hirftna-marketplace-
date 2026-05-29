@@ -1,4 +1,6 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
+import { i18n } from '../i18n/index.jsx';
 import {
   parseChangePasswordPayload,
   parseLoginPayload,
@@ -294,9 +296,36 @@ const refreshAccessToken = async () => {
   return refreshPromise;
 };
 
+// Show a global toast for errors that no single component can handle
+// (network outage, 503 cold start). All other HTTP errors are handled
+// per-component so they don't trigger a second toast here.
+function handleGlobalErrorToast(error) {
+  if (!error?.response) {
+    const msg = String(error?.message || '').toLowerCase();
+    const isTimeout = error?.code === 'ECONNABORTED' || msg.includes('timeout');
+    const key = isTimeout ? 'apiErrors.timeout' : 'apiErrors.network';
+    const fallback = isTimeout
+      ? 'Request timed out. Please try again.'
+      : 'No internet connection. Please check your network.';
+    toast.error(i18n.t(key, fallback), { id: 'network-error' });
+    return;
+  }
+  if (error.response.status === 503) {
+    toast.error(
+      i18n.t('apiErrors.serverDown', 'Our servers are starting up. Please wait a moment and try again.'),
+      { id: 'server-down', duration: 6000 }
+    );
+  }
+}
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Skip global toast when the caller opts out (e.g. silent polling)
+    if (!error?.config?.skipGlobalErrorToast) {
+      handleGlobalErrorToast(error);
+    }
+
     const original = error.config;
 
     if (

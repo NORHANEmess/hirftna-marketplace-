@@ -288,9 +288,19 @@ const resolveStoredPrice = ({ price, price_min, price_max, existingPrice }) => {
 };
 
 const incrementViewCount = async (productId) => {
-  const { error } = await supabaseAdmin.rpc('increment_product_view', {
-    product_id: productId,
-  });
+  // PostgREST does not support expression-based updates (view_count + 1),
+  // so we read the current value and write back. A tiny race condition on
+  // concurrent views is acceptable for a view counter.
+  const { data: row } = await supabaseAdmin
+    .from('products')
+    .select('view_count')
+    .eq('id', productId)
+    .single();
+
+  const { error } = await supabaseAdmin
+    .from('products')
+    .update({ view_count: (Number(row?.view_count) || 0) + 1 })
+    .eq('id', productId);
 
   if (error) {
     logger.warn({
@@ -494,7 +504,7 @@ const createProduct = async (userId, productData) => {
 
   if (error) {
     logger.error({ message: 'Failed to create product', userId, error: error.message });
-    throw new AppError('Failed to create product', 500);
+    throw new AppError('Could not create your product. Please try again.', 500);
   }
 
   const imageRows = (images || [])
@@ -518,7 +528,7 @@ const createProduct = async (userId, productData) => {
       });
 
       await supabaseAdmin.from('products').delete().eq('id', product.id);
-      throw new AppError('Failed to save product images. Please try again.', 500);
+      throw new AppError('Could not save the product images. Please try again.', 500);
     }
   }
 
@@ -579,7 +589,7 @@ const updateProduct = async (userId, productId, updates) => {
       error: error.message,
       code: error.code,
     });
-    throw new AppError('Failed to update product', 500);
+    throw new AppError('Could not update your product. Please try again.', 500);
   }
 
   // Replace product images when the caller provides a new images array
@@ -633,7 +643,7 @@ const deleteProduct = async (userId, productId) => {
 
   if (error) {
     logger.error({ message: 'Failed to delete product', productId, error: error.message });
-    throw new AppError('Failed to delete product', 500);
+    throw new AppError('Could not delete this product. Please try again.', 500);
   }
 
   logger.info({ message: 'Product deleted', productId, sellerId: seller.id });

@@ -225,7 +225,7 @@ export default function SellerDashboard() {
 
   const totalSales = analytics?.seller?.total_sales ?? 0;
   const totalRevenue = analytics?.total_revenue ?? 0;
-  const totalViews = analytics?.products?.total ?? 0;
+  const totalViews = analytics?.total_views ?? 0;
   const avgRating = analytics?.seller?.avg_rating ?? 0;
   const pendingCount = analytics?.orders?.pending ?? recentOrders.filter((order) => order.status === 'pending').length;
 

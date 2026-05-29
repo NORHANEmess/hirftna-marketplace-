@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Star, Package, CheckCircle2, Clock, ArrowRight } from 'lucide-react';
-import { wishlistAPI } from '../../services/api';
+import toast from 'react-hot-toast';
+import { getApiErrorMessage, wishlistAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from '../../i18n/index.jsx';
 
@@ -98,8 +99,15 @@ export default function ProductCard({
       if (next) await wishlistAPI.add(product.id);
       else      await wishlistAPI.remove(product.id);
       onWishlistToggle?.(product, next);
-    } catch {
+    } catch (err) {
       setWishlisted(!next);
+      const key = next ? 'wishlistErrors.addFailed' : 'wishlistErrors.removeFailed';
+      toast.error(
+        t(key, getApiErrorMessage(err, next
+          ? 'Could not save this product. Please try again.'
+          : 'Could not remove this product. Please try again.'
+        ))
+      );
     } finally {
       setWishLoading(false);
     }

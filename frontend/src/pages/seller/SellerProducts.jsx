@@ -3,7 +3,8 @@ import {
   Plus, Pencil, Trash2, Eye, EyeOff, Package,
   CheckCircle2, AlertCircle, X, Upload, Loader2,
 } from 'lucide-react';
-import { categoriesAPI, extractApiItems, productsAPI, sellersAPI, uploadsAPI } from '../../services/api';
+import toast from 'react-hot-toast';
+import { categoriesAPI, extractApiItems, getApiErrorMessage, productsAPI, sellersAPI, uploadsAPI } from '../../services/api';
 import { useTranslation } from '../../i18n/index.jsx';
 import DashboardSidebar from '../../components/layout/DashboardSidebar';
 
@@ -61,8 +62,8 @@ function ImageUploader({ images, onChange, maxImages = 3 }) {
         })
       );
       onChange([...images, ...uploads.filter(Boolean)]);
-    } catch {
-      /* handled by parent */
+    } catch (err) {
+      toast.error(t('productErrors.uploadFailed', getApiErrorMessage(err, 'Could not upload the image. Please try again.')));
     } finally {
       setUploading(false);
     }

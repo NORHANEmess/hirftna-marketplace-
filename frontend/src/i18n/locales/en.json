@@ -1244,5 +1244,90 @@
     "djanet": "Djanet",
     "el_mghair": "El M'Ghair",
     "el_meniaa": "El Meniaa"
+  },
+  "apiErrors": {
+    "network": "No internet connection. Please check your network and try again.",
+    "timeout": "The request timed out. Please check your connection and try again.",
+    "serverDown": "Our servers are starting up. Please wait a moment and try again.",
+    "serverError": "Something went wrong on our end. Please try again later.",
+    "rateLimit": "Too many requests. Please slow down and try again in a few minutes.",
+    "forbidden": "You don't have permission to perform this action.",
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "generic": "Something went wrong. Please try again."
+  },
+  "authErrors": {
+    "emailRequired": "Please enter your email address.",
+    "passwordRequired": "Please enter your password.",
+    "invalidEmail": "Please enter a valid email address.",
+    "passwordTooWeak": "Password must be at least 8 characters with one uppercase letter and one number.",
+    "passwordsMismatch": "Passwords do not match.",
+    "nameRequired": "Please enter your full name.",
+    "emailExists": "An account with this email already exists. Please sign in or use a different email.",
+    "invalidCredentials": "Incorrect email or password. Please try again.",
+    "wrongPassword": "Incorrect password. Please try again.",
+    "emailNotFound": "No account found with this email address.",
+    "accountLocked": "Too many login attempts. Please try again in 15 minutes.",
+    "invalidOtp": "Invalid verification code. Please check your email and try again.",
+    "otpExpired": "Verification code has expired. Please register again to get a new code.",
+    "otpMaxAttempts": "Too many incorrect attempts. Please register again to get a new code.",
+    "resetLinkExpired": "This reset link has expired. Please request a new password reset.",
+    "loginFailed": "Login failed. Please try again.",
+    "registrationFailed": "Registration failed. Please try again."
+  },
+  "orderErrors": {
+    "createFailed": "Could not submit your order. Please try again.",
+    "requirementsRequired": "Please describe what you'd like to order.",
+    "budgetRequired": "Please enter your budget.",
+    "acceptFailed": "Could not accept this order. Please try again.",
+    "rejectReasonRequired": "Please provide a reason for rejecting this order.",
+    "finalPriceRequired": "Please enter the final price before marking as ready.",
+    "invalidPrice": "Please enter a valid price.",
+    "completeFailed": "Could not complete this order. Please try again."
+  },
+  "productErrors": {
+    "nameRequired": "Product name is required.",
+    "priceRequired": "Please set a price range.",
+    "categoryRequired": "Please select a category.",
+    "imageRequired": "Please upload at least one product image.",
+    "imageTooLarge": "Image is too large. Maximum size is 5 MB.",
+    "imageFormat": "Only JPEG, PNG, and WebP images are supported.",
+    "uploadFailed": "Could not upload the image. Please check your connection and try again.",
+    "uploadRateLimit": "Too many uploads. Please wait a few minutes before uploading again.",
+    "createFailed": "Could not create your product. Please try again.",
+    "updateFailed": "Could not update your product. Please try again.",
+    "deleteFailed": "Could not delete this product. Please try again."
+  },
+  "sellerErrors": {
+    "shopNameRequired": "Shop name is required.",
+    "categoryRequired": "Please select a category.",
+    "updateFailed": "Could not save your changes. Please try again.",
+    "avatarFailed": "Could not upload your photo. Please try again."
+  },
+  "promotionErrors": {
+    "alreadyPending": "You already have a pending promotion request for this placement.",
+    "alreadyActive": "You already have an active promotion for this placement.",
+    "requestFailed": "Could not submit your promotion request. Please try again."
+  },
+  "reviewErrors": {
+    "alreadyReviewed": "You have already reviewed this order.",
+    "submitFailed": "Could not submit your review. Please try again.",
+    "ratingRequired": "Please select a rating."
+  },
+  "wishlistErrors": {
+    "loginRequired": "Please sign in to save products to your wishlist.",
+    "addFailed": "Could not save this product. Please try again.",
+    "removeFailed": "Could not remove this product. Please try again."
+  },
+  "chatbotErrors": {
+    "rateLimit": "You've reached the message limit. Please try again in an hour.",
+    "sendFailed": "Could not send your message. Please try again.",
+    "emptyMessage": "Please type a message first."
+  },
+  "adminErrors": {
+    "verifyFailed": "Could not verify this seller. Please try again.",
+    "deleteFailed": "Could not delete this product. Please try again.",
+    "approveFailed": "Could not approve this promotion. Please try again.",
+    "rejectReasonRequired": "Please provide a reason for rejecting this promotion.",
+    "rejectFailed": "Could not reject this promotion. Please try again."
   }
 }

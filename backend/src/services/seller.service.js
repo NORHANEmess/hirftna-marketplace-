@@ -309,7 +309,7 @@ const createSeller = async (userId, sellerData) => {
       throw new AppError('You already have a seller profile.', 409);
     }
 
-    throw new AppError('Failed to create seller profile', 500);
+    throw new AppError('Could not create your shop profile. Please try again.', 500);
   }
 
   // FIX 2 — Handle user role update failure
@@ -404,7 +404,7 @@ const updateSeller = async (userId, sellerId, updates) => {
       error:    error.message,
       code:     error.code,
     });
-    throw new AppError('Failed to update seller profile', 500);
+    throw new AppError('Could not save your shop changes. Please try again.', 500);
   }
 
   logger.info({ message: 'Seller profile updated', sellerId, userId });
@@ -480,12 +480,12 @@ const verifySeller = async (sellerId) => {
 const getSellerAnalytics = async (userId) => {
   const seller = await getMySellerProfile(userId);
 
-  // FIX — Handle each count query error
   const [
     { count: totalProducts,  error: e1 },
     { count: activeProducts, error: e2 },
     { count: totalOrders,    error: e3 },
     { count: pendingOrders,  error: e4 },
+    { count: completedSales, error: e5 },
   ] = await Promise.all([
     supabaseAdmin
       .from('products')
@@ -508,10 +508,15 @@ const getSellerAnalytics = async (userId) => {
       .select('*', { count: 'exact', head: true })
       .eq('seller_id', seller.id)
       .eq('status', 'pending'),
+
+    supabaseAdmin
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+      .eq('seller_id', seller.id)
+      .eq('status', 'completed'),
   ]);
 
-  // Log any count errors but don't throw
-  [e1, e2, e3, e4].forEach((err, i) => {
+  [e1, e2, e3, e4, e5].forEach((err, i) => {
     if (err) {
       logger.error({
         message:  `Analytics count query ${i + 1} failed`,
@@ -521,7 +526,39 @@ const getSellerAnalytics = async (userId) => {
     }
   });
 
-  // FIX — Handle top products query error
+  // Revenue: SUM(final_price) from completed orders only
+  const { data: revenueRows, error: revenueError } = await supabaseAdmin
+    .from('orders')
+    .select('final_price')
+    .eq('seller_id', seller.id)
+    .eq('status', 'completed')
+    .not('final_price', 'is', null);
+
+  if (revenueError) {
+    logger.error({ message: 'Analytics revenue query failed', sellerId: seller.id, error: revenueError.message });
+  }
+
+  const totalRevenue = (revenueRows || []).reduce(
+    (sum, order) => sum + (parseFloat(order.final_price) || 0),
+    0
+  );
+
+  // Views: SUM(view_count) across all this seller's products
+  // view_count may be NULL on older rows — coerce to 0
+  const { data: viewsData, error: viewsError } = await supabaseAdmin
+    .from('products')
+    .select('view_count')
+    .eq('seller_id', seller.id);
+
+  if (viewsError) {
+    logger.error({ message: 'Analytics views query failed', sellerId: seller.id, error: viewsError.message });
+  }
+
+  const totalViews = (viewsData || []).reduce(
+    (sum, p) => sum + (Number(p.view_count) || 0),
+    0
+  );
+
   const { data: topProducts, error: topError } = await supabaseAdmin
     .from('products')
     .select('id, name, view_count, avg_rating, price')
@@ -544,7 +581,7 @@ const getSellerAnalytics = async (userId) => {
       shop_name:   seller.shop_name,
       avg_rating:  seller.avg_rating,
       is_verified: seller.is_verified,
-      total_sales: seller.total_sales,
+      total_sales: completedSales || 0,
     },
     products: {
       total:  totalProducts  || 0,
@@ -554,6 +591,8 @@ const getSellerAnalytics = async (userId) => {
       total:   totalOrders   || 0,
       pending: pendingOrders || 0,
     },
+    total_revenue: totalRevenue,
+    total_views:   totalViews,
     topProducts: topProducts || [],
   };
 };
