@@ -61,7 +61,7 @@ const sendMessage = async ({ message, conversation_history }) => {
     const client = getClient();
     
     const model = client.getGenerativeModel({
-     model: 'gemini-2.0-flash', // gemini-pro (v1beta) available in all regions including EU
+     model: 'gemini-2.5-flash', // gemini-pro (v1beta) available in all regions including EU
     });
 
     const structuredContents = buildCombinedContents(conversation_history, message);
