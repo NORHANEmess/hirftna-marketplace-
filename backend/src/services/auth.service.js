@@ -45,13 +45,13 @@ const isOtpEnabled = () => {
 
 const smtpTransporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT, 10),
+  port: parseInt(process.env.SMTP_PORT),
   secure: false,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-  family: 4, // forces IPv4 — fixes ENETUNREACH on Render's free tier
+  family: 4,
 });
 
 // crypto.randomInt is cryptographically secure (uses OS CSPRNG), Math.random() is not
