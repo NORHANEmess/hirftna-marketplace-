@@ -47,6 +47,7 @@ const getUsers = async ({ page = 1, limit = 20, role, search, verified } = {}) =
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
+  query = query.neq('role', 'admin');
   if (role) query = query.eq('role', role);
   if (search) query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`);
   if (userIdFilter !== null) query = query.in('id', userIdFilter);
