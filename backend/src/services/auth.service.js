@@ -51,6 +51,7 @@ const smtpTransporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  family: 4, // forces IPv4 — fixes ENETUNREACH on Render's free tier
 });
 
 // crypto.randomInt is cryptographically secure (uses OS CSPRNG), Math.random() is not
