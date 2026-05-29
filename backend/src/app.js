@@ -26,28 +26,25 @@ app.use(helmet());
 // Only your React frontend is allowed
 app.use(cors({
   origin: (origin, callback) => {
-    const allowedOrigins = [process.env.CLIENT_URL];
+    const allowedOrigins = [
+      process.env.CLIENT_URL,
+      'https://hirftna.vercel.app',
+    ].filter(Boolean);
 
-    // Allow localhost only in non-production environments
     if (process.env.NODE_ENV !== 'production') {
-      allowedOrigins.push('http://localhost:5173', 'http://localhost:3000','https://hirftna.vercel.app',);
+      allowedOrigins.push('http://localhost:5173', 'http://localhost:3000');
     }
 
-    // Allow requests with no origin (Postman, mobile apps)
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
-    logger.warn({
-      message: 'CORS blocked request',
-      origin,
-    });
-
+    logger.warn({ message: 'CORS blocked request', origin });
     const corsError = new Error('Not allowed by CORS');
-        corsError.statusCode = 403;
-        callback(corsError);
+    corsError.statusCode = 403;
+    callback(corsError);
   },
   credentials:     true,
   methods:         ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
