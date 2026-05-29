@@ -19,8 +19,6 @@ You must NOT:
 - Discuss topics unrelated to the platform or Algerian handicrafts
 - Make up information about specific products or sellers`;
 
-const FALLBACK_REPLY = "I'm currently unavailable. Please try again later.";
-
 let genAI = null;
 
 function getClient() {
@@ -62,9 +60,8 @@ const sendMessage = async ({ message, conversation_history }) => {
   try {
     const client = getClient();
     
-    // FIXED: Switched to active stable free tier flash model engine
     const model = client.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash', // 1.5-flash is available in all regions including EU
     });
 
     const structuredContents = buildCombinedContents(conversation_history, message);
@@ -85,14 +82,18 @@ const sendMessage = async ({ message, conversation_history }) => {
     return reply;
 
   } catch (err) {
-    console.error('============ [SYSTEM CHATBOT ERROR DETAILS] ============');
-    console.error(err);
-    console.error('========================================================');
-
     if (err instanceof AppError) throw err;
-    
-    logger.error({ message: 'Chatbot operational exception caught.', error: err.message });
-    return FALLBACK_REPLY;
+
+    logger.error({ message: 'Chatbot error', error: err.message });
+
+    if (err.message?.includes('location is not supported')) {
+      throw new AppError(
+        'The AI service is temporarily unavailable in this region. Please try again later.',
+        503
+      );
+    }
+
+    throw new AppError('Could not process your message. Please try again.', 500);
   }
 };
 
