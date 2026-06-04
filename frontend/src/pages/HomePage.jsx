@@ -549,7 +549,7 @@ function HeroRight({ ad }) {
               {seller.city && (
                 <span className="flex items-center gap-1">
                   <MapPin size={11} />
-                  {seller.city}
+                  {t('wilayas.' + (seller.city || '').toLowerCase().trim().replace(/\s+/g, '_'), seller.city)}
                 </span>
               )}
             </div>

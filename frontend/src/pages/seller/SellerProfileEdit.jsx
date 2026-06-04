@@ -420,7 +420,7 @@ export default function SellerProfileEdit() {
                 >
                   <option value="">{t('sellerProducts.form.selectCategory')}</option>
                   {categories.map((category) => (
-                    <option key={category.id} value={category.id}>{category.name}</option>
+                    <option key={category.id} value={category.id}>{t(`categories.${category.name}`, category.name)}</option>
                   ))}
                 </select>
               </Field>
@@ -526,7 +526,7 @@ export default function SellerProfileEdit() {
                 <PasswordInput
                   value={pwForm.new_password}
                   onChange={(e) => setPwField('new_password', e.target.value)}
-                  placeholder="At least 8 characters"
+                  placeholder={t('auth.changePassword.newPasswordHint')}
                   show={pwShow.new}
                   onToggle={() => setPwShow((s) => ({ ...s, new: !s.new }))}
                   error={pwErrors.new_password}
@@ -537,7 +537,7 @@ export default function SellerProfileEdit() {
                 <PasswordInput
                   value={pwForm.confirm_password}
                   onChange={(e) => setPwField('confirm_password', e.target.value)}
-                  placeholder="Repeat new password"
+                  placeholder={t('auth.changePassword.confirmPasswordPlaceholder')}
                   show={pwShow.confirm}
                   onToggle={() => setPwShow((s) => ({ ...s, confirm: !s.confirm }))}
                   error={pwErrors.confirm_password}
