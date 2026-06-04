@@ -734,6 +734,7 @@
     "pendingTitle": "في انتظار موافقة الإدارة",
     "pendingBody": "طلب الترقية قيد المراجعة. سنفعّله في أقرب وقت ممكن.",
     "rejectedTitle": "تم رفض الترقية",
+    "expiredTitle": "انتهت صلاحية الترقية",
     "rejectedReason": "مرفوض: {{reason}}",
     "requestAgain": "طلب مجدداً",
     "boostTitle": "عزّز متجرك",

@@ -736,6 +736,7 @@
     "pendingTitle": "Awaiting Admin Approval",
     "pendingBody": "Your promotion request is being reviewed. We'll activate it as soon as possible.",
     "rejectedTitle": "Promotion Rejected",
+    "expiredTitle": "Promotion Expired",
     "rejectedReason": "Declined: {{reason}}",
     "requestAgain": "Request Again",
     "boostTitle": "Boost Your Shop",

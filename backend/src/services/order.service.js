@@ -335,9 +335,12 @@ const getAllOrders = async (userId, role, query) => {
       .eq('user_id', userId)
       .single();
 
-    if (seller) {
-      dbQuery = dbQuery.eq('seller_id', seller.id);
+    // No seller profile → return empty immediately. Never fall through with no filter.
+    if (!seller) {
+      return { orders: [], pagination: { page: Number(page), limit: Number(limit), total: 0 } };
     }
+
+    dbQuery = dbQuery.eq('seller_id', seller.id);
 
   } else if (role === 'client') {
     dbQuery = dbQuery.eq('client_id', userId);

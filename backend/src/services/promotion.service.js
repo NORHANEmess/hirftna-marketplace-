@@ -6,11 +6,28 @@ const logger            = require('../utils/logger');
 
 const isNotFound = (error) => error?.code === 'PGRST116';
 
+// Mark any active promotions whose ends_at has passed as expired.
+// Called lazily on read so the DB status stays accurate without a cron job.
+const autoExpirePromotions = async () => {
+  const now = new Date().toISOString();
+  const { error } = await supabaseAdmin
+    .from('promotions')
+    .update({ status: 'expired' })
+    .eq('status', 'active')
+    .lt('ends_at', now);
+
+  if (error) {
+    logger.warn({ message: 'Auto-expire promotions failed', error: error.message });
+  }
+};
+
 // ─────────────────────────────────────────────────────────────
 // REQUEST PROMOTION
 // Seller submits a promotion request — only one active/pending at a time
 // ─────────────────────────────────────────────────────────────
 const requestPromotion = async (sellerId, { placement = 'hero', requested_days = 7, product_id = null }) => {
+  await autoExpirePromotions();
+
   // If product_id is provided, verify it exists and belongs to this seller
   if (product_id) {
     const { data: product, error: productError } = await supabaseAdmin
@@ -100,10 +117,13 @@ const requestPromotion = async (sellerId, { placement = 'hero', requested_days =
 // Returns the seller's latest promotion request/status
 // ─────────────────────────────────────────────────────────────
 const getMyPromotion = async (sellerId) => {
+  await autoExpirePromotions();
+
   const { data: promotion, error } = await supabaseAdmin
     .from('promotions')
     .select('id, seller_id, placement, requested_days, status, starts_at, ends_at, rejection_reason, created_at')
     .eq('seller_id', sellerId)
+    .is('product_id', null)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -121,6 +141,7 @@ const getMyPromotion = async (sellerId) => {
 // Returns active promotions in the 'hero' placement visible on the homepage
 // ─────────────────────────────────────────────────────────────
 const getHeroAds = async () => {
+  await autoExpirePromotions();
   const now = new Date().toISOString();
 
   const { data: promotions, error } = await supabaseAdmin
@@ -157,6 +178,7 @@ const getHeroAds = async () => {
 // Returns active promotions in the 'browse' placement for BrowsePage
 // ─────────────────────────────────────────────────────────────
 const getBrowseAds = async () => {
+  await autoExpirePromotions();
   const now = new Date().toISOString();
 
   const { data: promotions, error } = await supabaseAdmin
@@ -194,6 +216,7 @@ const getBrowseAds = async () => {
 // Optionally filtered by category_id
 // ─────────────────────────────────────────────────────────────
 const getFeaturedProducts = async (categoryId = null) => {
+  await autoExpirePromotions();
   const now = new Date().toISOString();
 
   const { data: promotions, error } = await supabaseAdmin
@@ -243,6 +266,8 @@ const getFeaturedProducts = async (categoryId = null) => {
 // Returns all product-level promotions for the authenticated seller
 // ─────────────────────────────────────────────────────────────
 const getMyProductPromotions = async (sellerId) => {
+  await autoExpirePromotions();
+
   const { data, error } = await supabaseAdmin
     .from('promotions')
     .select(`

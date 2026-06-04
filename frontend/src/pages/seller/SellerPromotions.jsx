@@ -250,6 +250,12 @@ export default function SellerPromotions() {
     }
   }
 
+  function handleReRequestProduct(pp) {
+    setSelectedProductId(pp.product?.id ?? '');
+    setSelectedPlacement(pp.placement);
+    setProductError(null);
+  }
+
   const isRejected = promotion?.status === 'rejected';
   const isExpired  = promotion?.status === 'expired';
   const canRequest = promotion === null || isExpired || isRejected;
@@ -297,6 +303,16 @@ export default function SellerPromotions() {
             {promotion.rejection_reason && (
               <p className="text-xs text-warm-600 leading-relaxed">{t('promotions.rejectedReason', { reason: promotion.rejection_reason })}</p>
             )}
+          </div>
+        ) : promotion?.status === 'expired' ? (
+          <div className="bg-cream-200 border border-beige-200 rounded-2xl p-5 space-y-2">
+            <div className="flex items-center gap-2">
+              <XCircle size={16} className="text-warm-400" />
+              <p className="text-sm font-bold text-warm-600">{t('promotions.expiredTitle')}</p>
+            </div>
+            <p className="text-xs text-warm-500">
+              {t('promotions.expiredOn', { date: formatDate(promotion.ends_at, lang) })}
+            </p>
           </div>
         ) : null}
 
@@ -484,7 +500,17 @@ export default function SellerPromotions() {
                       </p>
                     )}
                   </div>
-                  <StatusBadge status={pp.status} />
+                  {(pp.status === 'expired' || pp.status === 'rejected') ? (
+                    <button
+                      type="button"
+                      onClick={() => handleReRequestProduct(pp)}
+                      className="text-xs font-semibold text-sage-600 border border-sage-200 bg-sage-50 hover:bg-sage-100 px-2.5 py-1 rounded-xl transition-colors flex-shrink-0"
+                    >
+                      {t('promotions.requestAgain')}
+                    </button>
+                  ) : (
+                    <StatusBadge status={pp.status} />
+                  )}
                 </div>
               );
             })}
