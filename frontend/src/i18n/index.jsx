@@ -4,11 +4,12 @@ import i18n from 'i18next';
 import { initReactI18next, I18nextProvider, useTranslation as useI18NextTranslation } from 'react-i18next';
 import ar from './locales/ar.json';
 import en from './locales/en.json';
+import fr from './locales/fr.json';
 
 const STORAGE_KEY = 'hirftna_lang';
 const DEFAULT_LANG = 'ar';
 const RTL_LANGS = new Set(['ar']);
-const SUPPORTED_LANGUAGES = ['ar', 'en'];
+const SUPPORTED_LANGUAGES = ['ar', 'en', 'fr'];
 
 function resolveInitialLanguage() {
   const storedLanguage = localStorage.getItem(STORAGE_KEY);
@@ -48,6 +49,7 @@ if (!i18n.isInitialized) {
       resources: {
         ar: { translation: ar },
         en: { translation: en },
+        fr: { translation: fr },
       },
     });
 

@@ -375,7 +375,7 @@ function MobileMenu({ open, onClose, categories, unreadCount }) {
             </button>
           )}
 
-          <LanguageSwitcher variant="full" />
+          <LanguageSwitcher variant="inline" />
         </div>
       </div>
     </>

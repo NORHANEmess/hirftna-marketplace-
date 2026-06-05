@@ -3,7 +3,7 @@ import { ChevronDown, Globe } from 'lucide-react';
 import clsx from 'clsx';
 import { useTranslation } from '../../i18n/index.jsx';
 
-const LANGUAGE_CODES = ['ar', 'en'];
+const LANGUAGE_CODES = ['ar', 'en', 'fr'];
 
 export default function LanguageSwitcher({ variant = 'compact', className = '' }) {
   const { lang, setLang, t } = useTranslation();
@@ -13,6 +13,7 @@ export default function LanguageSwitcher({ variant = 'compact', className = '' }
   const languages = [
     { code: 'en', label: t('language.english'), flag: 'EN', dir: 'ltr' },
     { code: 'ar', label: t('language.arabic'), flag: 'AR', dir: 'rtl' },
+    { code: 'fr', label: t('language.french'), flag: 'FR', dir: 'ltr' },
   ];
 
   const currentLanguage = languages.find((item) => item.code === lang) ?? languages[0];
@@ -38,6 +39,70 @@ export default function LanguageSwitcher({ variant = 'compact', className = '' }
       document.removeEventListener('keydown', handleEscape);
     };
   }, []);
+
+  // Inline variant — for mobile menu; options render in flow, not absolutely positioned
+  if (variant === 'inline') {
+    return (
+      <div ref={containerRef} className={clsx('w-full', className)}>
+        <button
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          aria-expanded={open}
+          aria-haspopup="listbox"
+          aria-label={t('language.switcher')}
+          className="w-full flex items-center justify-between px-4 py-3 text-sm bg-white border border-beige-200 hover:border-sage-300 text-warm-700 rounded-2xl font-medium select-none transition-all duration-200"
+        >
+          <div className="flex items-center gap-3">
+            <Globe size={16} className="text-sage-500" />
+            <div className="text-left">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-warm-400">
+                {t('language.switcher')}
+              </p>
+              <p className="font-semibold">{currentLanguage.label}</p>
+            </div>
+          </div>
+          <ChevronDown
+            size={14}
+            strokeWidth={2.5}
+            className={clsx('transition-transform duration-200', open && 'rotate-180')}
+          />
+        </button>
+
+        {open && (
+          <div className="mt-2 bg-white rounded-2xl border border-beige-200 overflow-hidden">
+            {languages
+              .filter((item) => LANGUAGE_CODES.includes(item.code))
+              .map((item) => {
+                const active = item.code === lang;
+                return (
+                  <button
+                    key={item.code}
+                    type="button"
+                    role="option"
+                    aria-selected={active}
+                    onClick={() => {
+                      setLang(item.code);
+                      setOpen(false);
+                    }}
+                    className={clsx(
+                      'w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors text-left',
+                      active
+                        ? 'bg-sage-50 text-sage-700 font-semibold'
+                        : 'text-warm-700 hover:bg-cream-100 font-medium'
+                    )}
+                    dir={item.dir}
+                  >
+                    <span className="text-xs font-bold w-6 flex-shrink-0">{item.flag}</span>
+                    <span className="flex-1">{item.label}</span>
+                    {active && <span className="w-1.5 h-1.5 bg-sage-500 rounded-full flex-shrink-0" />}
+                  </button>
+                );
+              })}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className={clsx('relative', className)}>
